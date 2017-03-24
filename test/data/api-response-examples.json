@@ -1,0 +1,630 @@
+{
+    "_release": "npm:serve-static:1.7.1",
+    "access_count": 2,
+    "analyses": {
+        "binary_data": {
+            "_release": "npm:serve-static:1.7.1",
+            "details": [
+                {
+                    "output": [
+                        "Unix path: /github.com/expressjs/serve-static/issues\"},\"homepage\":\"https://github.com/expressjs/serve-static\",\"_id\":\"serve-static@1.7.1\",\"_"
+                    ],
+                    "path": "package.json"
+                },
+                {
+                    "output": [
+                        "gzip compressed data, from NTFS filesystem (NT), NULL date (1970-01-01 00:00:00)"
+                    ],
+                    "path": "package.tgz"
+                },
+                {
+                    "output": [
+                        "Copyright string: \"Copyright(c) 2010 Sencha Inc.\"",
+                        "Copyright string: \"Copyright(c) 2011 TJ Holowaychuk\"",
+                        "Copyright string: \"Copyright(c) 2014 Douglas Christopher Wilson\""
+                    ],
+                    "path": "package/index.js"
+                },
+                {
+                    "output": [
+                        "Copyright string: \"Copyright (c) 2010 Sencha Inc.\"",
+                        "Copyright string: \"Copyright (c) 2011 LearnBoost\"",
+                        "Copyright string: \"Copyright (c) 2011 TJ Holowaychuk\"",
+                        "Copyright string: \"Copyright (c) 2014 Douglas Christopher Wilson\"",
+                        "Copyright string: \"copyright notice and this permission notice shall be\""
+                    ],
+                    "path": "package/LICENSE"
+                },
+                {
+                    "output": [
+                        "Unix path: /img.shields.io/npm/v/serve-static.svg?style=flat",
+                        "Unix path: /img.shields.io/travis/expressjs/serve-static.svg?style=flat",
+                        "Unix path: /img.shields.io/coveralls/expressjs/serve-static.svg?style=flat",
+                        "Unix path: /coveralls.io/r/expressjs/serve-static",
+                        "Unix path: /img.shields.io/npm/dm/serve-static.svg?style=flat"
+                    ],
+                    "path": "package/README.md"
+                },
+                {
+                    "output": [],
+                    "path": "package/HISTORY.md"
+                },
+                {
+                    "output": [],
+                    "path": "package/package.json"
+                }
+            ],
+            "schema": {
+                "name": "binary_data",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/binary_data/1-0-0/",
+                "version": "1-0-0"
+            },
+            "status": "success",
+            "summary": []
+        },
+        "blackduck": {
+            "_release": "npm:serve-static:1.7.1",
+            "appliedFilters": [],
+            "items": [
+                {
+                    "_meta": {
+                        "links": [
+                            {
+                                "href": "https://eng-hub.blackducksoftware.com/api/projects/27cf7a35-4834-4bdf-a815-a1ee2f601aec/versions/c3f10eb2-1672-47e3-8f59-613a07df1ab4/components/d277ad73-ebf7-44dc-bf3c-7bcac2d3c35d/versions/3dc33915-66fa-4589-8964-aac54079f322/origins/59e9bd2c-d65f-48ad-85cc-e03502fac9ef/matched-files",
+                                "rel": "matched-files"
+                            }
+                        ]
+                    },
+                    "componentName": "serve-static",
+                    "componentVersion": "https://eng-hub.blackducksoftware.com/api/components/d277ad73-ebf7-44dc-bf3c-7bcac2d3c35d/versions/3dc33915-66fa-4589-8964-aac54079f322",
+                    "componentVersionName": "1.7.1",
+                    "componentVersionOriginId": "serve-static/1.7.1",
+                    "componentVersionOriginName": "npmjs",
+                    "license": {
+                        "licenses": [
+                            {
+                                "codeSharing": "PERMISSIVE",
+                                "license": "https://eng-hub.blackducksoftware.com/api/licenses/ad705c59-6893-4980-bdbf-0837f1823cc4",
+                                "licenses": [],
+                                "name": "MIT License",
+                                "ownership": "OPEN_SOURCE"
+                            }
+                        ],
+                        "type": "DISJUNCTIVE"
+                    },
+                    "vulnerabilityWithRemediation": {
+                        "baseScore": 4.3,
+                        "description": "Open redirect vulnerability in the serve-static plugin before 1.7.2 for Node.js, when mounted at the root, allows remote attackers to redirect users to arbitrary web sites and conduct phishing attacks via a // (slash slash) followed by a domain in the PATH_INFO to the default URI.",
+                        "exploitabilitySubscore": 8.6,
+                        "impactSubscore": 2.9,
+                        "remediationCreatedAt": "2016-08-05T13:42:07.705Z",
+                        "remediationStatus": "NEW",
+                        "remediationUpdatedAt": "2016-08-05T13:42:07.705Z",
+                        "severity": "MEDIUM",
+                        "source": "NVD",
+                        "vulnerabilityName": "CVE-2015-1164",
+                        "vulnerabilityPublishedDate": "2015-01-22T19:08:21.013Z",
+                        "vulnerabilityUpdatedDate": "2015-01-23T21:11:11.353Z"
+                    }
+                }
+            ],
+            "schema": {
+                "name": "blackduck",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/blackduck/1-0-0/",
+                "version": "1-0-0"
+            },
+            "totalCount": 1
+        },
+        "crypto_algorithms": {
+            "_release": "npm:serve-static:1.7.1",
+            "details": [],
+            "schema": {
+                "name": "crypto_algorithms",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/crypto_algorithms/1-0-0/",
+                "version": "1-0-0"
+            },
+            "status": "success",
+            "summary": {
+                "content": [],
+                "filename": []
+            }
+        },
+        "dependency_snapshot": {
+            "_release": "npm:serve-static:1.7.1",
+            "details": {
+                "runtime": [
+                    {
+                        "declaration": "utils-merge 1.0.0",
+                        "ecosystem": "npm",
+                        "name": "utils-merge",
+                        "resolved_at": "2017-01-06T14:30:44.844012",
+                        "version": "1.0.0"
+                    },
+                    {
+                        "declaration": "parseurl ~1.3.0",
+                        "ecosystem": "npm",
+                        "name": "parseurl",
+                        "resolved_at": "2017-01-06T14:30:45.069446",
+                        "version": "1.3.1"
+                    },
+                    {
+                        "declaration": "escape-html 1.0.1",
+                        "ecosystem": "npm",
+                        "name": "escape-html",
+                        "resolved_at": "2017-01-06T14:30:45.287480",
+                        "version": "1.0.1"
+                    },
+                    {
+                        "declaration": "send 0.10.1",
+                        "ecosystem": "npm",
+                        "name": "send",
+                        "resolved_at": "2017-01-06T14:30:45.511223",
+                        "version": "0.10.1"
+                    }
+                ]
+            },
+            "schema": {
+                "name": "dependency_snapshot",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/dependency_snapshot/1-0-0/",
+                "version": "1-0-0"
+            },
+            "status": "success",
+            "summary": {
+                "dependency_counts": {
+                    "runtime": 4
+                },
+                "errors": []
+            }
+        },
+        "digests": {
+            "_release": "npm:serve-static:1.7.1",
+            "details": [
+                {
+                    "md5": "45772746345e3a35abf37b1a3d85da62",
+                    "path": "package.json",
+                    "sha1": "429890061cfa4fb1f5dc5ea9e56dacdc77d0f0e5",
+                    "sha256": "0520024032cd370ba42e246bfc396fff88a7cf33e46ed681ed9c9457f4478cb1",
+                    "ssdeep": "48:YRKaCe4kLTRYUmgP4eqyCF+GrapaHiiH7Ta9qGGDGw:iPLtYUmgP4epQ"
+                },
+                {
+                    "artifact": true,
+                    "md5": "d60c8a030f595020e391928e946e2778",
+                    "path": "package.tgz",
+                    "sha1": "6ea54d5ba7ef563f00e5fad25d0e4f5307e9809b",
+                    "sha256": "b398d75b1595a3f970ee4e59a385e5e969e655d6f4f023afb8e8211f69bed390",
+                    "ssdeep": "96:0r5NDxc3yaa3VGp9qq8whur8VppHcyhG0yG6UazL4o9QeVc/4A780o:0r5ND23yaaFGjqxwhugfpHcUa4AQD/fo"
+                },
+                {
+                    "md5": "7d7f14831f268c7d0de09f9e18aab64a",
+                    "path": "package/index.js",
+                    "sha1": "ccb2a18b6103bff8208bac75e250cb2b2ce7faf2",
+                    "sha256": "ab434de1e4aa7ab6c06c5342ab39433aefd2286757df7f7ba483d1bf147087a1",
+                    "ssdeep": "48:SNflkIBi+lwsZjGkgyg1UO1NHCpH4O9Gzwhzxdo5MaGpdv:UTBi+lwbk7ipNipYO9GJ0dv"
+                },
+                {
+                    "md5": "1d148c632a89e780d1c62889d7b2042a",
+                    "path": "package/LICENSE",
+                    "sha1": "ac98e5a8d139b68e3d26fb7f14ff18dd98578407",
+                    "sha256": "2f17617f32088c90cec0d191e8d3eaa8ebadc445daa33ac26298bb7fd26e49db",
+                    "ssdeep": "24:PsiJH/ZHHuyPP3GtIHw1Gg9MPH+sUW8Ok4odZo3U/qldFD:0iJfxfPvGt7ICMPH+sfINi3OMFD"
+                },
+                {
+                    "md5": "587a081bb5576be3c58acc948659386a",
+                    "path": "package/README.md",
+                    "sha1": "3e52a79b51274622b87b511a0706049186d40d2e",
+                    "sha256": "5ddc3e5ab3baebd6b3075955f45b8f90d099db9cb915c570038c14812301debf",
+                    "ssdeep": "96:FXhLxwnIRX0Fcbf21gd+MHk/ZmVAFPPM61jTI:FHQHFUfcgd+j/O8O"
+                },
+                {
+                    "md5": "e65e515ae2a2dd25bac41d552e120757",
+                    "path": "package/HISTORY.md",
+                    "sha1": "a67b745870a635bd055706f1436214f9954fb175",
+                    "sha256": "84d3aa9629afcf13a73988a51832f3c066215dd92e254abb353342b44deab974",
+                    "ssdeep": "96:4u0/SIdTdDDEdudwR+5t73buE1q8OwzKy4/y/6dGsF/DF:4J7xD2ann7LHqaX40gF"
+                },
+                {
+                    "md5": "a8b00e182898ca392c3bfd34f44424e6",
+                    "path": "package/package.json",
+                    "sha1": "dc4dcefdefca246ab8d9c275738f345a08baeb31",
+                    "sha256": "920636ac6283670405e615611ff38c876d7e5a0c77aefbd19862ab400a648a11",
+                    "ssdeep": "24:KI3rH1ulI6fHQhio/W7P9plZSHbyJHAy8e1vHa:KAxQVfiD+7P3lYc4gPa"
+                }
+            ],
+            "schema": {
+                "name": "digests",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/digests/1-0-0/",
+                "version": "1-0-0"
+            },
+            "status": "success",
+            "summary": []
+        },
+        "github_details": {
+            "_release": "npm:serve-static:1.7.1",
+            "details": {
+                "forks_count": 76,
+                "last_year_commits": {
+                    "sum": 39,
+                    "weekly": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        8,
+                        0,
+                        0,
+                        2,
+                        0,
+                        0,
+                        0,
+                        1,
+                        4,
+                        2,
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        5,
+                        0,
+                        0,
+                        0,
+                        4,
+                        0,
+                        0,
+                        5,
+                        6,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                },
+                "open_issues_count": 1,
+                "stargazers_count": 499,
+                "subscribers_count": 19,
+                "updated_issues": {
+                    "month": {
+                        "closed": 0,
+                        "opened": 0
+                    },
+                    "year": {
+                        "closed": 13,
+                        "opened": 12
+                    }
+                },
+                "updated_pull_requests": {
+                    "month": {
+                        "closed": 0,
+                        "opened": 0
+                    },
+                    "year": {
+                        "closed": 8,
+                        "opened": 8
+                    }
+                }
+            },
+            "schema": {
+                "name": "github_details",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/github_details/1-0-1/",
+                "version": "1-0-1"
+            },
+            "status": "success",
+            "summary": []
+        },
+        "languages": {
+            "_release": "npm:serve-static:1.7.1",
+            "details": [
+                {
+                    "output": null,
+                    "path": "package.tgz",
+                    "type": [
+                        "gzip compressed data, from NTFS filesystem (NT)"
+                    ]
+                },
+                {
+                    "output": {
+                        "language": "JSON",
+                        "lines": 1,
+                        "mime": "application/json",
+                        "sloc": 1,
+                        "type": "Text"
+                    },
+                    "path": "package.json",
+                    "type": [
+                        "ASCII text, with very long lines, with no line terminators"
+                    ]
+                },
+                {
+                    "output": {
+                        "language": "JavaScript",
+                        "lines": 119,
+                        "mime": "application/javascript",
+                        "sloc": 119,
+                        "type": "Text"
+                    },
+                    "path": "package/index.js",
+                    "type": [
+                        "HTML document, ASCII text"
+                    ]
+                },
+                {
+                    "output": {
+                        "language": "JSON",
+                        "lines": 34,
+                        "mime": "application/json",
+                        "sloc": 34,
+                        "type": "Text"
+                    },
+                    "path": "package/package.json",
+                    "type": [
+                        "ASCII text"
+                    ]
+                },
+                {
+                    "output": {
+                        "language": "Text",
+                        "lines": 26,
+                        "mime": "text/plain",
+                        "sloc": 26,
+                        "type": "Text"
+                    },
+                    "path": "package/LICENSE",
+                    "type": [
+                        "ASCII text"
+                    ]
+                },
+                {
+                    "output": {
+                        "language": "Markdown",
+                        "lines": 202,
+                        "mime": "text/plain",
+                        "sloc": 202,
+                        "type": "Text"
+                    },
+                    "path": "package/HISTORY.md",
+                    "type": [
+                        "ASCII text"
+                    ]
+                },
+                {
+                    "output": {
+                        "language": "Markdown",
+                        "lines": 160,
+                        "mime": "text/plain",
+                        "sloc": 160,
+                        "type": "Text"
+                    },
+                    "path": "package/README.md",
+                    "type": [
+                        "ASCII text"
+                    ]
+                }
+            ],
+            "schema": {
+                "name": "languages",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/languages/1-0-0/",
+                "version": "1-0-0"
+            },
+            "status": "success",
+            "summary": []
+        },
+        "metadata": {
+            "_dependency_tree_lock": null,
+            "_tests_implemented": true,
+            "_release": "npm:serve-static:1.7.1",
+            "author": "Douglas Christopher Wilson <doug@somethingdoug.com>",
+            "bug_reporting": "https://github.com/expressjs/serve-static/issues",
+            "code_repository": {
+                "type": "git",
+                "url": "https://github.com/expressjs/serve-static"
+            },
+            "declared_license": "MIT",
+            "dependencies": [
+                "parseurl ~1.3.0",
+                "escape-html 1.0.1",
+                "send 0.10.1",
+                "utils-merge 1.0.0"
+            ],
+            "description": "Serve static files",
+            "devel_dependencies": [
+                "mocha ~2.0.0",
+                "supertest ~0.14.0",
+                "istanbul 0.3.2",
+                "should ~4.1.0"
+            ],
+            "engines": {
+                "node": ">= 0.8.0"
+            },
+            "files": [
+                "LICENSE",
+                "HISTORY.md",
+                "index.js"
+            ],
+            "git_head": "61f59894e6a3d41532383ca440a395772bcdc8ed",
+            "homepage": "https://github.com/expressjs/serve-static",
+            "keywords": null,
+            "maintainers": [
+                "dougwilson <doug@somethingdoug.com>",
+                "jongleberry <jonathanrichardong@gmail.com>",
+                "shtylman <shtylman@gmail.com>",
+                "tjholowaychuk <tj@vision-media.ca>",
+                "mscdex <mscdex@mscdex.net>",
+                "fishrock123 <fishrock123@rocketmail.com>"
+            ],
+            "name": "serve-static",
+            "readme": null,
+            "schema": {
+                "name": "metadata",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/metadata/3-0-1/",
+                "version": "3-0-1"
+            },
+            "scripts": {
+                "test": "mocha --reporter spec --bail --check-leaks --require should test/",
+                "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --reporter dot --check-leaks --require should test/",
+                "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec --check-leaks --require should test/"
+            },
+            "version": "1.7.1"
+        },
+        "redhat_downstream": {
+            "_release": "npm:serve-static:1.7.1",
+            "details": {
+                "brew": [ ],
+                "pulp_cdn": [ ],
+                "redhat_anitya": {
+                    "backend": "npmjs",
+                    "created_on": 1473672333.0,
+                    "homepage": "https://github.com/expressjs/serve-static",
+                    "id": 1,
+                    "name": "serve-static",
+                    "packages": [],
+                    "regex": null,
+                    "updated_on": 1473672333.0,
+                    "version": "1.11.1",
+                    "version_url": null,
+                    "versions": [
+                        "1.11.1"
+                    ]
+                }
+            },
+            "schema": {
+                "name": "redhat_downstream",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/redhat_downstream/2-2-0/",
+                "version": "2-2-0"
+            },
+            "status": "success",
+            "summary": {
+                "all_rhn_channels": [ ],
+                "all_rhsm_content_sets": [ ],
+                "all_rhsm_product_names": [ ],
+                "package_names": [
+                    "nodejs-serve-static"
+                ],
+                "registered_srpms": [ ]
+            }
+        },
+        "security_issues": {
+            "_release": "npm:serve-static:1.7.1",
+            "details": [
+                {
+                    "access": {
+                        "authentication": "NONE",
+                        "complexity": "MEDIUM",
+                        "vector": "NETWORK"
+                    },
+                    "cvss": 4.3,
+                    "id": "CVE-2015-1164",
+                    "impact": {
+                        "availability": "NONE",
+                        "confidentiality": "NONE",
+                        "integrity": "PARTIAL"
+                    },
+                    "references": [
+                        "https://github.com/expressjs/serve-static/issues/26",
+                        "https://bugzilla.redhat.com/show_bug.cgi?id=1181917",
+                        "http://xforce.iss.net/xforce/xfdb/99936",
+                        "http://www.securityfocus.com/bid/72064",
+                        "http://nodesecurity.io/advisories/serve-static-open-redirect"
+                    ],
+                    "summary": "Open redirect vulnerability in the serve-static plugin before 1.7.2 for Node.js, when mounted at the root, allows remote attackers to redirect users to arbitrary web sites and conduct phishing attacks via a // (slash slash) followed by a domain in the PATH_INFO to the default URI."
+                }
+            ],
+            "schema": {
+                "name": "security_issues",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/security_issues/1-0-0/",
+                "version": "1-0-0"
+            },
+            "status": "success",
+            "summary": [
+                "CVE-2015-1164"
+            ]
+        },
+        "source_licenses": {
+            "_release": "npm:serve-static:1.7.1",
+            "details": {
+                "files": [
+                    {
+                        "path": "package/LICENSE",
+                        "result": [
+                            {
+                                "license_name": "MITNFA",
+                                "match": 35,
+                                "variant_id": "mitnfa"
+                            }
+                        ]
+                    }
+                ],
+                "license_stats": [
+                    {
+                        "count": "1",
+                        "license_name": "MITNFA",
+                        "variant_id": "mitnfa"
+                    }
+                ],
+                "oslc_stats": {
+                    "All files": 35,
+                    "Conflicts (global)": 0,
+                    "Conflicts (ref)": 0,
+                    "Distinct licenses": 1,
+                    "License files": 1,
+                    "Source files": 1
+                }
+            },
+            "schema": {
+                "name": "source_licenses",
+                "url": "http://localhost:32000/api/v1/schemas/component_analyses/source_licenses/1-0-0/",
+                "version": "1-0-0"
+            },
+            "status": "success",
+            "summary": {
+                "all_files": 35,
+                "distinct_licenses": [
+                    {
+                        "count": 1,
+                        "license_name": "MITNFA"
+                    }
+                ],
+                "license_files": 1,
+                "licensed_files": 1,
+                "source_files": 1,
+                "sure_licenses": [
+                    "MITNFA"
+                ]
+            }
+        }
+    },
+    "ecosystem": "npm",
+    "finished_at": "2016-09-12T11:32:52.084696",
+    "latest_version": "1.11.1",
+    "package": "serve-static",
+    "package_info": {
+        "dependents_count": -1
+    },
+    "schema": {
+        "name": "component_analyses",
+        "url": "http://localhost:32000/api/v1/schemas/api/component_analyses/1-0-1/",
+        "version": "1-0-1"
+    },
+    "started_at": "2016-09-12T11:32:04.416906",
+    "version": "1.7.1"
+}
+

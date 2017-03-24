@@ -1,0 +1,33 @@
+version: "2"
+services:
+  gremlin-http:
+#    build:
+#      context: build/gremlin/
+#      dockerfile: Dockerfile
+    image: registry.centos.org/datamodel/gremlin:concaf
+    environment:
+      - REST=1
+      - DYNAMODB_PREFIX=${DYNAMODB_PREFIX}
+      - DYNAMODB_CLIENT_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com
+      - DYNAMODB_CLIENT_CREDENTIALS_CLASS_NAME=com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    ports:
+      - "8181:8182"
+    labels:
+      kompose.service.expose: "gremlin-data-model.che.ci.centos.org"
+  gremlin-websocket:
+#    build:
+#      context: build/gremlin/
+#      dockerfile: Dockerfile
+    image: registry.centos.org/datamodel/gremlin:concaf
+    environment:
+      - DYNAMODB_PREFIX=${DYNAMODB_PREFIX}
+      - DYNAMODB_CLIENT_ENDPOINT=https://dynamodb.us-east-1.amazonaws.com
+      - DYNAMODB_CLIENT_CREDENTIALS_CLASS_NAME=com.amazonaws.auth.DefaultAWSCredentialsProviderChain
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    ports:
+      - "8182:8182"
+    labels:
+      kompose.service.expose: "gremlin-websocket-data-model.che.ci.centos.org"

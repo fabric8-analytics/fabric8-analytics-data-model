@@ -1,0 +1,462 @@
+{
+    "started_at": "2016-11-29T08:41:35.303074",
+    "analyses": {
+        "languages": {
+            "details": [
+                {
+                    "type": [
+                        "gzip compressed data, from Unix"
+                    ],
+                    "path": "package.tgz",
+                    "output": null
+                },
+                {
+                    "type": [
+                        "ASCII text, with very long lines, with no line terminators"
+                    ],
+                    "path": "package.json",
+                    "output": {
+                        "sloc": 1,
+                        "mime": "application/json",
+                        "type": "Text",
+                        "language": "JSON",
+                        "lines": 1
+                    }
+                },
+                {
+                    "type": [
+                        "ASCII text"
+                    ],
+                    "path": "package/LICENSE",
+                    "output": {
+                        "sloc": 24,
+                        "mime": "text/plain",
+                        "type": "Text",
+                        "language": "Text",
+                        "lines": 24
+                    }
+                },
+                {
+                    "type": [
+                        "ASCII text"
+                    ],
+                    "path": "package/README.md",
+                    "output": {
+                        "sloc": 24,
+                        "mime": "text/plain",
+                        "type": "Text",
+                        "language": "Markdown",
+                        "lines": 24
+                    }
+                },
+                {
+                    "type": [
+                        "ASCII text"
+                    ],
+                    "path": "package/package.json",
+                    "output": {
+                        "sloc": 16,
+                        "mime": "application/json",
+                        "type": "Text",
+                        "language": "JSON",
+                        "lines": 16
+                    }
+                },
+                {
+                    "type": [
+                        "ASCII text"
+                    ],
+                    "path": "package/lib/abbrev.js",
+                    "output": {
+                        "sloc": 112,
+                        "mime": "application/javascript",
+                        "type": "Text",
+                        "language": "JavaScript",
+                        "lines": 112
+                    }
+                }
+            ],
+            "schema": {
+                "version": "1-0-0",
+                "name": "languages",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/languages/1-0-0/"
+            },
+            "status": "success",
+            "summary": [],
+            "_release": "npm:abbrev:1.0.4"
+        },
+        "redhat_downstream": {
+            "details": {
+                "redhat_anitya": {
+                    "packages": [
+                        {
+                            "distro": "rh-dist-git",
+                            "package_name": "nodejs-abbrev"
+                        },
+                        {
+                            "distro": "rh-dist-git",
+                            "package_name": "rh-nodejs4-nodejs-abbrev"
+                        },
+                        {
+                            "distro": "rh-dist-git",
+                            "package_name": "nodejs010-nodejs-abbrev"
+                        }
+                    ],
+                    "updated_on": 1479816609.0,
+                    "version_url": null,
+                    "regex": null,
+                    "name": "abbrev",
+                    "created_on": 1479816609.0,
+                    "id": 447560,
+                    "homepage": "https://github.com/isaacs/abbrev-js#readme",
+                    "version": "1.0.9",
+                    "versions": [
+                        "1.0.9"
+                    ],
+                    "backend": "npmjs"
+                },
+                "brew": []
+            },
+            "schema": {
+                "version": "2-0-0",
+                "name": "redhat_downstream",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/redhat_downstream/2-0-0/"
+            },
+            "status": "success",
+            "summary": {
+                "package_names": [
+                    "rh-nodejs4-nodejs-abbrev",
+                    "nodejs010-nodejs-abbrev",
+                    "nodejs-abbrev"
+                ],
+                "registered_srpms": [
+                    {
+                        "modified_file_count": -1,
+                        "published_in": [
+                            "rhel-x86_64-server-6-rhscl-1",
+                            "rhel-x86_64-server-6.3.z-rhscl-1",
+                            "rhel-x86_64-server-6.4.z-rhscl-1",
+                            "rhel-x86_64-server-6.5.z-rhscl-1",
+                            "rhel-x86_64-server-6.6.z-rhscl-1",
+                            "rhel-x86_64-server-6.7.z-rhscl-1",
+                            "rhel-x86_64-workstation-6-rhscl-1"
+                        ],
+                        "release": "7.el6",
+                        "version": "1.0.4",
+                        "patch_count": -1,
+                        "epoch": 0,
+                        "modified_line_count": -1,
+                        "package_name": "nodejs010-nodejs-abbrev"
+                    },
+                    {
+                        "modified_file_count": -1,
+                        "published_in": [
+                            "rhel-x86_64-server-7-rhscl-1",
+                            "rhel-x86_64-server-7.1.eus-rhscl-1",
+                            "rhel-x86_64-server-7.2.eus-rhscl-1",
+                            "rhel-x86_64-workstation-7-rhscl-1"
+                        ],
+                        "release": "7.el7",
+                        "version": "1.0.4",
+                        "patch_count": -1,
+                        "epoch": 0,
+                        "modified_line_count": -1,
+                        "package_name": "nodejs010-nodejs-abbrev"
+                    },
+                    {
+                        "modified_file_count": -1,
+                        "published_in": [
+                            "rhel-x86_64-server-6-rhscl-1",
+                            "rhel-x86_64-server-6.2.z-rhscl-1",
+                            "rhel-x86_64-server-6.3.z-rhscl-1",
+                            "rhel-x86_64-server-6.4.z-rhscl-1",
+                            "rhel-x86_64-server-6.5.z-rhscl-1",
+                            "rhel-x86_64-server-6.6.z-rhscl-1",
+                            "rhel-x86_64-server-6.7.z-rhscl-1",
+                            "rhel-x86_64-workstation-6-rhscl-1"
+                        ],
+                        "release": "4.1.el6",
+                        "version": "1.0.4",
+                        "patch_count": -1,
+                        "epoch": 0,
+                        "modified_line_count": -1,
+                        "package_name": "nodejs010-nodejs-abbrev"
+                    },
+                    {
+                        "modified_file_count": -1,
+                        "published_in": [],
+                        "release": "4.el6_4",
+                        "version": "1.0.4",
+                        "patch_count": -1,
+                        "epoch": 0,
+                        "modified_line_count": -1,
+                        "package_name": "nodejs010-nodejs-abbrev"
+                    }
+                ]
+            },
+            "_release": "npm:abbrev:1.0.4"
+        },
+        "security_issues": {
+            "details": [],
+            "schema": {
+                "version": "2-0-0",
+                "name": "security_issues",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/security_issues/2-0-0/"
+            },
+            "status": "success",
+            "summary": [],
+            "_release": "npm:abbrev:1.0.4"
+        },
+        "binary_data": {
+            "details": [
+                {
+                    "path": "package.tgz",
+                    "output": [
+                        "gzip compressed data, from Unix, NULL date (1970-01-01 00:00:00)"
+                    ]
+                },
+                {
+                    "path": "package.json",
+                    "output": [
+                        "Unix path: /github.com/isaacs/abbrev-js/raw/master/LICENSE\"},\"_id\":\"abbrev@1.0.4\",\"dist\":{\"shasum\":\"bd55ae5e413ba1722ee4caba1f6ea10414a59ec"
+                    ]
+                },
+                {
+                    "path": "package/package.json",
+                    "output": [
+                        "Unix path: /github.com/isaacs/abbrev-js/raw/master/LICENSE\""
+                    ]
+                },
+                {
+                    "path": "package/README.md",
+                    "output": []
+                },
+                {
+                    "path": "package/LICENSE",
+                    "output": [
+                        "Copyright string: \"Copyright 2009, 2010, 2011 Isaac Z. Schlueter.\"",
+                        "Copyright string: \"copyright notice and this permission notice shall be\""
+                    ]
+                },
+                {
+                    "path": "package/lib/abbrev.js",
+                    "output": []
+                }
+            ],
+            "schema": {
+                "version": "1-0-0",
+                "name": "binary_data",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/binary_data/1-0-0/"
+            },
+            "status": "success",
+            "summary": [],
+            "_release": "npm:abbrev:1.0.4"
+        },
+        "crypto_algorithms": {
+            "details": [],
+            "schema": {
+                "version": "1-0-0",
+                "name": "crypto_algorithms",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/crypto_algorithms/1-0-0/"
+            },
+            "status": "success",
+            "summary": {
+                "content": [],
+                "filename": []
+            },
+            "_release": "npm:abbrev:1.0.4"
+        },
+        "digests": {
+            "details": [
+                {
+                    "sha256": "8dc0f480571a4a19e74f1abd4f31f6a70f94953d1ccafa16ed1a544a19a6f3a8",
+                    "md5": "85aa5087294a43d964af949deb0fca86",
+                    "ssdeep": "48:XPAUzrusqSqHvUPcocxdBXep8q9pk0BvJ1WyqxUqorHbmukY:oiunSCUzcxHOpZpk0BxAwyY",
+                    "artifact": true,
+                    "path": "package.tgz",
+                    "sha1": "bd55ae5e413ba1722ee4caba1f6ea10414a59ecd"
+                },
+                {
+                    "path": "package.json",
+                    "sha256": "b8eaeeb4bc5a49557addbb3d5c2d614f4eec330c19c7933693e8f0d129d71596",
+                    "md5": "0bc3d9243368a12dbf183432b26f68a3",
+                    "ssdeep": "12:YO7HNuqmMussP6E++T7e2QNEw4nbkvQiTwAs/Shn9I/KSNusa6usfen9sedKJa:YOLkMxsCEze2QAnYvP3WNxxx2Tl",
+                    "sha1": "da30d9d49803a68d8208c2c47d5ab4a1a85de232"
+                },
+                {
+                    "path": "package/package.json",
+                    "sha256": "e46d8ebcf41a23aa903a2562ae072e4dee4371924d8df21a9fa0ebff318f2b7d",
+                    "md5": "91fb59a2c07fe8957b2ff90ccdf763dc",
+                    "ssdeep": "6:vw3MqS18hf/QaCNPWPBlksuyHuWV+3fHiO/mwyEqL5yiGzzqLocR:Z18pQHNuPo2V+3aOOXEwKPwnR",
+                    "sha1": "2832a2ddeaff7e4e7960926364afd12af09b24ba"
+                },
+                {
+                    "path": "package/README.md",
+                    "sha256": "2581765d44e15c58a2b88ad7bc9cc5c9ee029b4b5013c06dc45d9e94e8cb2ba4",
+                    "md5": "96b93093abdfdfef1ef8a3e2d5ca7f71",
+                    "ssdeep": "12:AhvNbUQjAXr/R/fN/vY/7tm/7t/zP4Mxa8RAmtdOl:4NQ+mh9A7tW71r9Ol",
+                    "sha1": "c520bc857ec612ed88e13d794c47882d5aed3286"
+                },
+                {
+                    "path": "package/LICENSE",
+                    "sha256": "ab95d69fc43021e0451b5021ff09fbc89ee6f9199354397f18fe7ce3f4b50554",
+                    "md5": "b3245a33f2d41818f14c489bd33bc4a8",
+                    "ssdeep": "24:h+L+ZlnB4J5X30yP1gtOHw1Gg9QH+sUu8Ok4F+dxoBoqMSPz:wKliJ5HlP1E9ICQH+szIt6BoE7",
+                    "sha1": "4a1927e74796f06ac7e7a687ca6b44d39c65d8f4"
+                },
+                {
+                    "path": "package/lib/abbrev.js",
+                    "sha256": "6dbd26a673dd839cd7e0dc0d9d28dd6a80373ca7d114400d47ca7aa68bb703bb",
+                    "md5": "603580683bf579f239e07d213da29a0b",
+                    "ssdeep": "48:7KWJQfusN0sNno7nykRPTeIu9Q/YqdxZri3Ly6VHVQKV82qIqi+2/vX7EAY:7WNpNo7n1RLeIMQ/YqribJ2Kq2qu+2/k",
+                    "sha1": "3bbe6fc1ec9637b4b479944a2c07e56e5af781d4"
+                }
+            ],
+            "schema": {
+                "version": "1-0-0",
+                "name": "digests",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/digests/1-0-0/"
+            },
+            "status": "success",
+            "summary": [],
+            "_release": "npm:abbrev:1.0.4"
+        },
+        "source_licenses": {
+            "details": {
+                "files": [
+                    {
+                        "path": "package/LICENSE",
+                        "result": [
+                            {
+                                "match": 35,
+                                "license_name": "MITNFA",
+                                "variant_id": "mitnfa"
+                            }
+                        ]
+                    }
+                ],
+                "license_stats": [
+                    {
+                        "license_name": "MITNFA",
+                        "variant_id": "mitnfa",
+                        "count": 1
+                    }
+                ],
+                "oslc_stats": {
+                    "All files": 34,
+                    "Source files": 1,
+                    "Distinct licenses": 1,
+                    "Conflicts (global)": 0,
+                    "Conflicts (ref)": 0,
+                    "License files": 1
+                }
+            },
+            "schema": {
+                "version": "2-0-0",
+                "name": "source_licenses",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/source_licenses/2-0-0/"
+            },
+            "status": "success",
+            "summary": {
+                "sure_licenses": [
+                    "MITNFA"
+                ],
+                "all_files": 34,
+                "license_files": 1,
+                "licensed_files": 1,
+                "distinct_licenses": [
+                    {
+                        "license_name": "MITNFA",
+                        "count": 1
+                    }
+                ],
+                "source_files": 1
+            },
+            "_release": "npm:abbrev:1.0.4"
+        },
+        "metadata": {
+            "details": [
+                {
+                    "contributors": null,
+                    "git_head": null,
+                    "_tests_implemented": true,
+                    "declared_license": "MIT",
+                    "keywords": null,
+                    "readme": null,
+                    "code_repository": {
+                        "type": "git",
+                        "url": "http://github.com/isaacs/abbrev-js"
+                    },
+                    "version": "1.0.4",
+                    "files": null,
+                    "devel_dependencies": null,
+                    "engines": null,
+                    "author": "Isaac Z. Schlueter <i@izs.me>",
+                    "name": "abbrev",
+                    "scripts": {
+                        "test": "node lib/abbrev.js"
+                    },
+                    "homepage": null,
+                    "description": "Like ruby's abbrev module, but in js",
+                    "maintainers": [
+                        "isaacs <i@izs.me>"
+                    ],
+                    "dependencies": null,
+                    "bug_reporting": null
+                }
+            ],
+            "schema": {
+                "version": "2-1-1",
+                "name": "metadata",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/metadata/2-1-1/"
+            },
+            "_release": "npm:abbrev:1.0.4"
+        },
+        "dependency_snapshot": {
+            "details": {
+                "runtime": []
+            },
+            "schema": {
+                "version": "1-0-0",
+                "name": "dependency_snapshot",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/dependency_snapshot/1-0-0/"
+            },
+            "status": "success",
+            "summary": {
+                "errors": [],
+                "dependency_counts": {
+                    "runtime": 0
+                }
+            },
+            "_release": "npm:abbrev:1.0.4"
+        },
+        "github_details": {
+            "details": {},
+            "schema": {
+                "version": "1-0-1",
+                "name": "github_details",
+                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/github_details/1-0-1/"
+            },
+            "status": "unknown",
+            "summary": [],
+            "_release": "npm:abbrev:1.0.4"
+        }
+    },
+    "schema": {
+        "version": "1-1-2",
+        "name": "component_analyses",
+        "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/api/component_analyses/1-1-2/"
+    },
+    "package_info": {
+        "dependents_count": 204,
+        "relative_usage": "not used"
+    },
+    "finished_at": "2016-11-29T17:02:25.076793",
+    "_release": "npm:abbrev:1.0.4",
+    "latest_version": "1.0.9",
+    "ecosystem": "npm",
+    "package": "abbrev",
+    "access_count": 5,
+    "version": "1.0.4",
+    "dependents_count": -1
+}

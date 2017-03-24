@@ -1,0 +1,21 @@
+version: "2"
+services:
+  client-console:
+#    build:
+#      context: build/gremlin-client/
+#      dockerfile: Dockerfile
+    image: registry.centos.org/datamodel/gremlin-client:concaf
+    stdin_open: true
+    tty: true
+    environment:
+      - GREMLIN_HOST=${GREMLIN_HOST}
+      - GREMLIN_PORT=${GREMLIN_PORT}
+  client-ipython:
+#    build:
+#      context: build/gremlin-client/
+#      dockerfile: Dockerfile
+    image: registry.centos.org/datamodel/gremlin-client:concaf
+    stdin_open: true
+    tty: true
+    environment:
+      - REST=1

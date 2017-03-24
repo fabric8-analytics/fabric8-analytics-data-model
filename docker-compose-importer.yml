@@ -1,0 +1,20 @@
+version: "2"
+services:
+  data-model:
+    build:
+      context: .
+      dockerfile: Dockerfile.data-model
+    image: atomic-registry.usersys.redhat.com:5000/data-model-importer/data-model-importer:master
+    network_mode: bridge
+    entrypoint:
+      - /bin/entrypoint.sh
+    environment:
+      # controls whether to use http/ws or https/wss
+      GREMLIN_USE_SECURE_CONNECTION: "false"
+      BAYESIAN_GREMLIN_HTTP_SERVICE_HOST: "localhost"
+      BAYESIAN_GREMLIN_HTTP_SERVICE_PORT: "8181"
+      BAYESIAN_GREMLIN_WS_SERVICE_HOST: "localhost"
+      BAYESIAN_GREMLIN_WS_SERVICE_PORT: "8182"
+      AWS_S3_ACCESS_KEY_ID: ""
+      AWS_S3_SECRET_ACCESS_KEY: ""
+      AWS_BUCKET: ""
