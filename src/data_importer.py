@@ -13,12 +13,30 @@ logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def group_keys(all_keys, split_count):
+def group_keys_s3(all_keys):
     grouped_keys = {}
     counter = 0
     for key in all_keys:
-        if len(key.split("/")) == split_count:
+        if len(key.split("/")) == 3:
             counter += 1
+            grouped_keys[counter] = []
+            grouped_keys[counter].append(key)
+        else:
+            grouped_keys[counter].append(key)
+    return grouped_keys
+
+
+def group_keys_directory(all_keys, packages_path):
+    grouped_keys = {}
+    counter = 0
+    grouped_keys[counter] = []
+    version_json = json.load(open(os.path.join(packages_path, all_keys[0])))
+    version = version_json["version"]
+    for key in all_keys:
+        if version not in key:
+            counter += 1
+            version_json = json.load(open(os.path.join(packages_path, key)))
+            version = version_json["version"]
             grouped_keys[counter] = []
             grouped_keys[counter].append(key)
         else:
@@ -70,7 +88,7 @@ def import_from_s3():
     all_keys = [x.key for x in objects]
 
     print ("Group by EPV...")
-    grouped_keys = group_keys(all_keys, 3)
+    grouped_keys = group_keys_s3(all_keys)
 
     print ("Begin import...")
     for counter, file_list in grouped_keys.items():
@@ -117,7 +135,7 @@ def import_from_folder(packages_path):
             all_keys.append(file_name)
 
     print ("Group by EPV...")
-    grouped_keys = group_keys(all_keys, 1)
+    grouped_keys = group_keys_directory(all_keys, packages_path)
 
     print ("Begin import...")
 
