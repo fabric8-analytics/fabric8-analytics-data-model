@@ -19,6 +19,20 @@ AWS_SECRET_ACCESS_KEY=<dynamodb-secret-access-key>
 
 ## HowTOs
 
+## How to run run REST API:
+
+This REST API serves as a language-independent interface to data-model functionality such as importing the given list
+of EPVs. It enables the consumers like UI-component to easily invoke data-model APIs.
+
+```
+virtualenv --python /usr/bin/python2.7 env
+source env/bin/activate
+pip install -r requirements.txt
+cp src/config.py.template src/config.py
+#make necessary changes in config.py
+gunicorn --pythonpath src/ -b 0.0.0.0:5001 rest_api:app
+```
+
 ### How to run the tests?
 
 ```
@@ -84,7 +98,7 @@ oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamod
   * HTTP endpoint
 
 ```
-oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=1 -v CHHANELIZER=http | oc create -f -
+oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=1 -v CHANNELIZER=http | oc create -f -
 ```
 
 ### Building container images
@@ -140,7 +154,7 @@ Now, to deploy on:
 
           - HTTP channelizer:
 
-            `oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=1 -v CHHANELIZER=http | oc create -f -`
+            `oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=1 -v CHANNELIZER=http | oc create -f -`
 
     Get the endpoint from `oc get services` or `oc get routes` if you have a router configured.
 
@@ -253,3 +267,5 @@ oc process -f data-model-importer-openshift-template.yaml -v AWS_BUCKET=<value> 
 - For any queries related to building of container images on registry.centos.org, or if some modifications are required in the Dockerfiles, then the CentOS Container Pipeline team can be contacted on the `container-build` channel under CentOS on Mattermost.
 
 - For any queries regarding deployment of the application on OpenShift, contact the Deploy team at devtools-deploy@redhat.com or at `devtools-deploy` channel under RH-DevTools on Mattermost.
+
+- User a Linter and follow PEP8 coding standard. 

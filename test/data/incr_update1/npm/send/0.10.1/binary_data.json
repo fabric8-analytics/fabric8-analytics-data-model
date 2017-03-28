@@ -1,0 +1,15 @@
+{
+  "_audit": {
+    "ended_at": "2017-02-22T15:33:42.568032",
+    "started_at": "2017-02-22T15:33:41.984295",
+    "version": "v1"
+  },
+  "_release": "npm:send:0.10.1",
+  "details": [],
+  "schema": {
+    "name": "binary_data",
+    "version": "1-0-0"
+  },
+  "status": "success",
+  "summary": []
+}

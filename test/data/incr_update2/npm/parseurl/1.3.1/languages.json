@@ -1,0 +1,81 @@
+{
+  "_audit": {
+    "ended_at": "2017-02-22T15:34:50.054051",
+    "started_at": "2017-02-22T15:34:44.721809",
+    "version": "v1"
+  },
+  "_release": "npm:parseurl:1.3.1",
+  "details": [
+    {
+      "output": {
+        "language": "JSON",
+        "lines": 34,
+        "mime": "application/json",
+        "sloc": 34,
+        "type": "Text"
+      },
+      "path": "package/package.json",
+      "type": [
+        "ASCII text"
+      ]
+    },
+    {
+      "output": {
+        "language": "Markdown",
+        "lines": 48,
+        "mime": "text/plain",
+        "sloc": 48,
+        "type": "Text"
+      },
+      "path": "package/HISTORY.md",
+      "type": [
+        "ASCII text"
+      ]
+    },
+    {
+      "output": {
+        "language": "JavaScript",
+        "lines": 139,
+        "mime": "text/javascript",
+        "sloc": 139,
+        "type": "Text"
+      },
+      "path": "package/index.js",
+      "type": [
+        "ASCII text"
+      ]
+    },
+    {
+      "output": {
+        "language": "Text",
+        "lines": 25,
+        "mime": "text/plain",
+        "sloc": 25,
+        "type": "Text"
+      },
+      "path": "package/LICENSE",
+      "type": [
+        "Emacs v18 byte-compiled Lisp data"
+      ]
+    },
+    {
+      "output": {
+        "language": "Markdown",
+        "lines": 121,
+        "mime": "text/plain",
+        "sloc": 121,
+        "type": "Text"
+      },
+      "path": "package/README.md",
+      "type": [
+        "UTF-8 Unicode text"
+      ]
+    }
+  ],
+  "schema": {
+    "name": "languages",
+    "version": "1-0-0"
+  },
+  "status": "success",
+  "summary": []
+}
