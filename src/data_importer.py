@@ -1,6 +1,4 @@
-import glob
 from graph_populator import GraphPopulator
-from entities.utils import get_values as gv
 import sys
 import config
 import logging
@@ -36,12 +34,14 @@ def retrieve_blob_json(s3, bucket_name, object_key):
     utf_data = retrieve_blob(s3, bucket_name, object_key).decode("utf-8")
     return json.loads(utf_data)
 
+
 def find_files(directory, pattern):
     for root, dirs, files in os.walk(directory):
         for basename in files:
             if fnmatch.fnmatch(basename, pattern):
                 filename = os.path.join(root, basename)
                 yield filename
+
 
 def import_from_s3():
 
@@ -108,7 +108,12 @@ def import_from_folder(packages_path):
     packages_path = packages_path if packages_path.endswith("/") else packages_path + "/"
 
     aks = sorted([x for x in find_files(packages_path, "*.json")])
-    all_keys = [x.lstrip(packages_path) for x in aks]
+    all_keys = []
+
+    for x in aks:
+        if x.startswith(packages_path):
+            x = x.replace(packages_path, '')
+            all_keys.append(x)
 
     print ("Group by EPV...")
     dict_vals = grouped_keys(all_keys, 1)
