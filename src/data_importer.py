@@ -13,17 +13,17 @@ logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def grouped_keys(all_keys, split_count):
-    d = {}
-    c = 0
-    for b in all_keys:
-        if len(b.split("/")) == split_count:
-            c += 1
-            d[c] = []
-            d[c].append(b)
+def group_keys(all_keys, split_count):
+    grouped_keys = {}
+    counter = 0
+    for key in all_keys:
+        if len(key.split("/")) == split_count:
+            counter += 1
+            grouped_keys[counter] = []
+            grouped_keys[counter].append(key)
         else:
-            d[c].append(b)
-    return d
+            grouped_keys[counter].append(key)
+    return grouped_keys
 
 
 def retrieve_blob(s3, bucket_name, object_key):
@@ -70,24 +70,25 @@ def import_from_s3():
     all_keys = [x.key for x in objects]
 
     print ("Group by EPV...")
-    dict_vals = grouped_keys(all_keys, 3)
+    grouped_keys = group_keys(all_keys, 3)
 
     print ("Begin import...")
-    for counter, v in dict_vals.items():
+    for counter, file_list in grouped_keys.items():
         obj = {}
         obj["analyses"] = {}
-        first_key = v[0]
+        first_key = file_list[0]
         print(first_key)
         logger.info("File---- %s  numbered---- %d  added:" % (first_key, counter))
 
-        t = retrieve_blob_json(s3, config.AWS_BUCKET, first_key)
-        obj["dependents_count"] = t.get("dependents_count", '')
-        obj["package_info"] = t.get("package_info", {})
-        obj["version"] = t.get("version", '')
-        obj["latest_version"] = t.get("latest_version", '')
-        obj["ecosystem"] = t.get("ecosystem", '')
-        obj["package"] = t.get("package", '')
-        for this_key in v[1:]:
+        version_json = retrieve_blob_json(s3, config.AWS_BUCKET, first_key)
+        # combined json for a package
+        obj["dependents_count"] = version_json.get("dependents_count", '')
+        obj["package_info"] = version_json.get("package_info", {})
+        obj["version"] = version_json.get("version", '')
+        obj["latest_version"] = version_json.get("latest_version", '')
+        obj["ecosystem"] = version_json.get("ecosystem", '')
+        obj["package"] = version_json.get("package", '')
+        for this_key in file_list[1:]:
             value = retrieve_blob_json(s3, config.AWS_BUCKET, this_key)
             if this_key.endswith("source_licenses.json"):
                 obj["analyses"]["source_licenses"] = value
@@ -107,34 +108,34 @@ def import_from_folder(packages_path):
     # ensure path ends with forward slash
     packages_path = packages_path if packages_path.endswith("/") else packages_path + "/"
 
-    aks = sorted([x for x in find_files(packages_path, "*.json")])
+    all_files_sorted = sorted([x for x in find_files(packages_path, "*.json")])
     all_keys = []
 
-    for x in aks:
-        if x.startswith(packages_path):
-            x = x.replace(packages_path, '')
-            all_keys.append(x)
+    for file_name in all_files_sorted:
+        if file_name.startswith(packages_path):
+            file_name = file_name.replace(packages_path, '')
+            all_keys.append(file_name)
 
     print ("Group by EPV...")
-    dict_vals = grouped_keys(all_keys, 1)
+    grouped_keys = group_keys(all_keys, 1)
 
     print ("Begin import...")
 
-    for counter, v in dict_vals.items():
+    for counter, file_list in grouped_keys.items():
         obj = {}
         obj["analyses"] = {}
-        first_key = v[0]
+        first_key = file_list[0]
         print(first_key)
         logger.info("File---- %s  numbered---- %d  added:" % (first_key, counter))
 
-        t = json.load(open(os.path.join(packages_path, first_key)))
-        obj["dependents_count"] = t.get("dependents_count", '')
-        obj["package_info"] = t.get("package_info", {})
-        obj["version"] = t.get("version", '')
-        obj["latest_version"] = t.get("latest_version", '')
-        obj["ecosystem"] = t.get("ecosystem", '')
-        obj["package"] = t.get("package", '')
-        for this_key in v[1:]:
+        version_json = json.load(open(os.path.join(packages_path, first_key)))
+        obj["dependents_count"] = version_json.get("dependents_count", '')
+        obj["package_info"] = version_json.get("package_info", {})
+        obj["version"] = version_json.get("version", '')
+        obj["latest_version"] = version_json.get("latest_version", '')
+        obj["ecosystem"] = version_json.get("ecosystem", '')
+        obj["package"] = version_json.get("package", '')
+        for this_key in file_list[1:]:
             value = json.load(open(os.path.join(packages_path, this_key)))
             if this_key.endswith("source_licenses.json"):
                 obj["analyses"]["source_licenses"] = value
