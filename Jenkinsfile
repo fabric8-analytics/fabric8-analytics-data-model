@@ -50,11 +50,11 @@ if (env.BRANCH_NAME == 'master') {
 		//	}
         //}
 
-        //stage('Deploy - dsaas') {
-        //    rerunOpenShiftJob {
-        //        jobName = 'bayesian-data-model-importer'
-        //        cluster = 'dsaas'
-		//	}
-        //}
+        stage('Deploy - dsaas') {
+            rerunOpenShiftJob {
+                jobName = 'bayesian-data-model-importer'
+                cluster = 'dsaas'
+            }
+        }
     }
 }
