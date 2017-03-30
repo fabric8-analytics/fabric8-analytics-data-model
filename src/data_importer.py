@@ -68,7 +68,6 @@ def import_from_s3():
     print ("Fetch all objects from bucket: %s" % config.AWS_BUCKET)
     objects = bucket.objects.all()
     all_keys = [x.key for x in objects]
-
     print ("Group by EPV...")
     dict_vals = grouped_keys(all_keys, 3)
 
@@ -99,6 +98,8 @@ def import_from_s3():
                 obj["analyses"]["github_details"] = value
             elif this_key.endswith("blackduck.json"):
                 obj["analyses"]["blackduck"] = value
+            elif this_key.endswith("security_issues.json"):
+                obj["analyses"]["security_issues"] = value
 
         GraphPopulator.populate_from_json(obj)
 
@@ -141,6 +142,8 @@ def import_from_folder(packages_path):
                 obj["analyses"]["github_details"] = value
             elif this_key.endswith("blackduck.json"):
                 obj["analyses"]["blackduck"] = value
+            elif this_key.endswith("security_issues.json"):
+                obj["analyses"]["security_issues"] = value
 
         GraphPopulator.populate_from_json(obj)
 

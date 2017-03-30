@@ -198,25 +198,36 @@ class SecurityDetails(EntityBase):
     def load_from_json(cls, security_data):
         security_obj_list = []
         cvss_list = []
+        cve_id_list = []
         if (security_data is not None and
                 'summary' in security_data and
                 len(security_data["summary"]) != 0):
             security_list = []
             for security_value in security_data["details"]:
-                security_list.append((security_value.get('id'), security_value.get('cvss'), security_value.get('summary'), security_value.get('references'),
+                cvss = 0
+                if security_value.get("cvss") is not None:
+                    temp_cvss = security_value.get("cvss")
+                    if temp_cvss.get("score") is not None:
+                        cvss = temp_cvss.get("score")
+
+                security_list.append((security_value.get('id'), cvss, security_value.get('summary'), security_value.get('references'),
                                       security_value.get('access'), security_value.get('impact')))
             for s in security_list:
                 objsecurity = SecurityDetails(s[0], s[1], s[2])
-                for link in s[3]:
-                    objsecurity.issue_has_references(link)
-                for t, v in s[4].items():
-                    objsecurity.issue_has_access(t, v)
-                for t, v in s[5].items():
-                    objsecurity.issue_has_impact(t, v)
+                if s[3] is not None:
+                    for link in s[3]:
+                        objsecurity.issue_has_references(link)
+                if s[4] is not None:
+                    for t, v in s[4].items():
+                        objsecurity.issue_has_access(t, v)
+                if s[5] is not None:
+                    for t, v in s[5].items():
+                        objsecurity.issue_has_impact(t, v)
                 security_obj_list.append(objsecurity)
                 cvss_list.append(objsecurity.cvss)
+                cve_id_list.append(objsecurity.cve_id)
 
-        return security_obj_list, cvss_list
+        return security_obj_list, cvss_list, cve_id_list
 
     @classmethod
     def find_all(cls):

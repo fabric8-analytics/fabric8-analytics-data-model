@@ -33,22 +33,18 @@ def test_additional_data_as_attr():
         npm_crumb_data["analyses"]["code_metrics"])
 
     security_data = serve_static_json["analyses"]["security_issues"]
-    security_list, cvss_score = SD.load_from_json(security_data)
+    security_list, cvss_score, cve_ids = SD.load_from_json(security_data)
 
-    if len(security_data.get("details", {})) > 0:
-        obj = security_data.get("details")[0]
-        cve_id = obj.get("id", "")
-        cvss = obj.get("cvss", "")
-        temp_set = set()
-        temp_set.add(str(cve_id) + ":" + str(cvss))
-        add_details["cve_ids"] = temp_set
+    if len(cvss_score) > 0 and len(cve_ids) >0:
+        cve_ids = cve_ids
+        cvss = cvss_score
+        
+        add_details["cve_ids"] = cve_ids[0]
+        add_details["cvss"] = cvss[0]
 
-    add_details["cm_loc"] = code_metrics.details.languages[0].code_lines
-    add_details["cm_num_files"] = code_metrics.details.languages[0].files_count
-    add_details["cm_avg_cyclomatic_complexity"] = code_metrics.details.\
-        languages[0].average_cyclomatic_complexity
-
-    ver_obj.add_additional_data_as_attr(add_details)
+    ver_obj.add_additional_data_as_attr(code_metrics)
+    
+    ver_obj.add_cve_ids(add_details["cvss"], add_details["cve_ids"])
     assert ver_obj.last_updated >= v_ts1
 
     version_criteria = {'pecosystem': pck_obj.ecosystem,
@@ -57,10 +53,10 @@ def test_additional_data_as_attr():
     present_version = Version.find_by_criteria(
         ver_obj.label, pck_obj, version_criteria)
     logger.info(present_version.__dict__)
-    assert present_version.cm_loc == 3
-    assert present_version.cm_num_files == 1
-    assert present_version.cm_avg_cyclomatic_complexity == -1
-    assert present_version.cve_ids == set()
+    assert present_version.cm_loc == 1351
+    assert present_version.cm_num_files == 16
+    assert present_version.cm_avg_cyclomatic_complexity == 0.0
+    assert present_version.cve_ids ==  ['CVE-2015-1164:7.5']
     assert present_version.last_updated == ver_obj.last_updated
 
     Version.delete_by_id(ver_obj.id)

@@ -19,7 +19,7 @@ class CodeMetricsLanguage(EntityBase):
     def __init__(self,
                  package_version=None,
                  blank_lines=None, code_lines=None, comment_lines=None,
-                 files_count=None, language=None, average_cyclomatic_complexity=None,
+                 files_count=None, language=None, average_cyclomatic_complexity=0.0,
                  average_function_lines_of_code=None, average_function_parameters_count=None,
                  average_halstead_effort=None, cost_change=None, first_order_density=None):
         super(CodeMetricsLanguage, self).__init__()
@@ -36,7 +36,7 @@ class CodeMetricsLanguage(EntityBase):
         # Might be language-specific once we add support for new languages, leave it generic for now
         # self.metrics = metrics  # jsl.DictField(required=False, additional_properties=True)
 
-        self.average_cyclomatic_complexity = average_cyclomatic_complexity or -1
+        self.average_cyclomatic_complexity = average_cyclomatic_complexity or 0.0
         self.average_function_lines_of_code = average_function_lines_of_code or -1
         self.average_function_parameters_count = average_function_parameters_count or -1
         self.average_halstead_effort = average_halstead_effort or -1
@@ -186,13 +186,16 @@ class CodeMetricsResult(EntityBase):
                 files_count = language_data.get("files_count")
                 language = language_data.get("language")
                 metrics = language_data.get("metrics", {})
+                average_cyclomatic_complexity = 0.0
+                func = metrics.get("functions", {})
+                if len(func) > 0:
+                    average_cyclomatic_complexity = func.get("average_cyclomatic_complexity", 0.0)
 
-                average_cyclomatic_complexity = metrics.get("average_cyclomatic_complexity")
-                average_function_lines_of_code = metrics.get("average_function_lines_of_code")
-                average_function_parameters_count = metrics.get("average_function_parameters_count")
-                average_halstead_effort = metrics.get("average_halstead_effort")
-                cost_change = metrics.get("cost_change")
-                first_order_density = metrics.get("first_order_density")
+                average_function_lines_of_code = metrics.get("average_function_lines_of_code", -1)
+                average_function_parameters_count = metrics.get("average_function_parameters_count", -1)
+                average_halstead_effort = metrics.get("average_halstead_effort", -1)
+                cost_change = metrics.get("cost_change", -1)
+                first_order_density = metrics.get("first_order_density", -1)
 
                 l = CodeMetricsLanguage(blank_lines=blank_lines,
                                         code_lines=code_lines,

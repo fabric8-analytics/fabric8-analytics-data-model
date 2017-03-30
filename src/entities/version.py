@@ -173,10 +173,13 @@ class Version(EntityBase):
                 return None
             else:
                 values = cls.g().V(check_ver[0].id).valueMap().toList()[0]
-                add_data_list = ["cm_loc","cm_num_files","cm_avg_cyclomatic_complexity","relative_used"]
+                add_data_list = ["cm_loc","cm_num_files","cm_avg_cyclomatic_complexity","relative_used", "cve_ids"]
                 for each in add_data_list:
                     if each in values.keys():
-                        add_data_dict[each]=values.get(each)[0]
+                        if each is "cve_ids":
+                            add_data_dict[each]=values.get(each)
+                        else:
+                            add_data_dict[each]=values.get(each)[0]
 
                 return cls.return_entity_obj(pck_obj, values.get('version')[0],
                                              values.get('description')[0],
@@ -473,13 +476,23 @@ class Version(EntityBase):
             raise RuntimeError(msg)
 
 
-    def add_additional_data_as_attr(self, add_details):
+    def add_additional_data_as_attr(self, code_metrics):
 
         logger.debug("reached add_details_as_attributes")
-        self.add_details = add_details
+        cm_details = {}
+        cm_details["cm_loc"] = code_metrics.summary.total_lines
+        cm_details["cm_num_files"] = code_metrics.summary.total_files
+
+        code_complexity = 0.0
+        for each in code_metrics.details.languages:
+            code_complexity += each.average_cyclomatic_complexity
+        cm_details["cm_avg_cyclomatic_complexity"] = code_complexity/len(code_metrics.details.languages)
+        #cm_details["relative_used"] = code_metrics.relative_used # what should go here
+
+        self.add_details = cm_details
 
         # self.licences = self.add_details.get("licences", [])
-        self.cve_ids = self.add_details.get("cve_ids", [])
+        #self.cve_ids = self.add_details.get("cve_ids", [])
         self.cm_loc = self.add_details.get("cm_loc", 0)
         self.cm_num_files = self.add_details.get("cm_num_files", 0)
         self.cm_avg_cyclomatic_complexity = self.add_details.\
@@ -493,9 +506,6 @@ class Version(EntityBase):
                 property('cm_avg_cyclomatic_complexity', self.cm_avg_cyclomatic_complexity). \
                 property('relative_used', self.relative_used). \
                 property('last_updated', ts)
-                
-            for c in self.cve_ids:
-                query.property('cve_ids', c)
 
             results = query.toList()        
 
@@ -531,6 +541,25 @@ class Version(EntityBase):
         except Exception as e:
             logger.error("add_license_attributes() failed: %s" % e)
             return None
+
+
+    def add_cve_ids(self, cvss, cve_id):
+        cve_to_add = []
+        cve = ""
+        try:
+            if cvss and cve_id is not None:
+                cve = str(cve_id) + ":" + str(cvss)
+                self.g().V(self.id). \
+                property('cve_ids', cve). \
+                toList()
+                self.cve_ids.add(cve)
+            logger.debug("add_cve_ids() %s" % (self.label))
+            logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+        except Exception as e:
+            logger.error("add_additional_details_as_attr() failed: %s" % e)
+
+
+        return cve
 
 
     def add_blackduck_cve_edge(self, security_detail):
