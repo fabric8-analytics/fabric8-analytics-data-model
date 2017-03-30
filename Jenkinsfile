@@ -21,7 +21,7 @@ node('gremlin') {
 
     if (env.BRANCH_NAME == 'master') {
         stage('Push Images') {
-            def commitId = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+            def commitId = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
             docker.withRegistry('https://docker-registry.usersys.redhat.com/') {
                 image.push('latest')
                 image.push(commitId)
