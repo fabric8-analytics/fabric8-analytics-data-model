@@ -9,13 +9,13 @@ node('gremlin') {
     }
 
     stage('Tests') {
+        dockerCleanup()
         timeout(30) {
             sh './runtests.sh'
         }
     }
 
     stage('Build') {
-        dockerCleanup()
         docker.build(image.id, '-f Dockerfile.data-model --pull --no-cache .')
     }
 
