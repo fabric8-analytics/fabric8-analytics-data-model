@@ -51,7 +51,7 @@ def test_create_package_entity():
 
 def test_version_entity():
     p = Package.load_from_json(serve_static_json)
-    p.save()
+    assert p.save() is not None
 
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
@@ -96,7 +96,8 @@ def test_version_entity():
 
 def test_support_vector_license():
     p = Package.load_from_json(serve_static_json)
-    p.save()
+    assert p.save() is not None
+
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
     p.create_version_edge(v)
@@ -133,7 +134,8 @@ def test_support_vector_license():
 
 def test_support_vector_security():
     p = Package.load_from_json(serve_static_json)
-    p.save()
+    assert p.save() is not None
+    
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
     p.create_version_edge(v)
@@ -187,7 +189,8 @@ def test_support_vector_security():
 
 def test_support_vector_github_detail():
     p = Package.load_from_json(serve_static_json)
-    p.save()
+    assert p.save()is not None
+
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
     p.create_version_edge(v)
@@ -221,7 +224,8 @@ def test_support_vector_github_detail():
 
 def test_person_author():
     p = Package.load_from_json(serve_static_json)
-    p.save()
+    assert p.save() is not None
+
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
     p.create_version_edge(v)
@@ -257,7 +261,8 @@ def test_person_author():
 
 def test_person_contributor():
     p = Package.load_from_json(serve_static_json)
-    p.save()
+    assert p.save() is not None
+
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
     p.create_version_edge(v)
@@ -283,7 +288,8 @@ def test_person_contributor():
 
 def test_version_dependencies():
     p = Package.load_from_json(serve_static_json)
-    p.save()
+    assert p.save() is not None
+
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
     p.create_version_edge(v)
@@ -291,7 +297,7 @@ def test_version_dependencies():
     dependency_pck_list, dependency_ver_list, dependency_type = \
         vdv.load_dependencies(v.ecosystem_package.ecosystem, dependency_data)
     for d_pck, d_ver, d_type in zip(dependency_pck_list, dependency_ver_list, dependency_type):
-        d_pck.save()
+        assert d_pck.save() is not None
         d_ver.save()
         d_pck.create_version_edge(d_ver)
         v.add_edge_dependency(d_ver, d_type)

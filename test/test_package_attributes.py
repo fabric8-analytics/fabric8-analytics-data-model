@@ -15,7 +15,7 @@ def test_github_attr():
     pck_obj = Package.load_from_json(serve_static_json)
     assert pck_obj.last_updated is None
 
-    pck_obj.save()
+    assert pck_obj.save() is not None
     p_ts1 = pck_obj.last_updated
     assert p_ts1 is not None
     assert Package.count() == 1

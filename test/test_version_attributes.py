@@ -20,7 +20,8 @@ def test_additional_data_as_attr():
     add_details = {}
     pck_obj = Package.load_from_json(serve_static_json)
     assert pck_obj.last_updated is None
-    pck_obj.save()
+    assert pck_obj.save() is not None
+    
     ver_obj = Version.load_from_json(serve_static_json, package=pck_obj)
     assert ver_obj.last_updated is None
     ver_obj.save()

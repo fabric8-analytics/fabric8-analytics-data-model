@@ -39,7 +39,8 @@ def test_code_metrics_non_empty():
 
 def test_add_code_metrics_non_empty():
     p = Package.load_from_json(npm_crumb_data)
-    p.save()
+    assert p.save() is not None
+    
     v = Version.load_from_json(npm_crumb_data, package=p)
     v.save()
     p.create_version_edge(v)
