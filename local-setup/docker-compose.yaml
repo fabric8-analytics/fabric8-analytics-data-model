@@ -8,7 +8,8 @@ services:
       ports:
         - "8000:8000"
         - "4567:4567"
-      mem_limit: 2G
+      mem_limit: 4G
+      restart: always
 
     gremlin-http:
       image: registry.centos.org/datamodel/gremlin:concaf

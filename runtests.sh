@@ -1,13 +1,21 @@
 #!/usr/bin/bash -ex
+
+gc() {
+  retval=$?
+  sudo docker-compose -f local-setup/docker-compose.yaml down || :
+  exit $retval
+}
+trap gc EXIT SIGINT
+
 # Enter local-setup/ directory
 # Run local instances for: dynamodb, gremlin-websocket, gremlin-http
-
 function start_gremlin_http_websocket {
     pushd local-setup/
     echo "Invoke Docker Compose Start Gremlin HTTP and WebSocket services"
-    sudo docker-compose -f docker-compose.yaml up -d gremlin-websocket gremlin-http
+    sudo docker-compose -f docker-compose.yaml up --force-recreate -d gremlin-websocket gremlin-http
     popd
 }
+
 
 echo JAVA_OPTIONS value: $JAVA_OPTIONS
 
@@ -45,10 +53,6 @@ py.test -s test/
 # Print all the logs for inspection
 
 cat $LOGFILE_PATH
-
-pushd local-setup/
-sudo docker-compose -f docker-compose.yaml down
-popd
 
 rm -rf env-test/
 
