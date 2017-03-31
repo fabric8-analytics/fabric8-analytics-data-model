@@ -29,7 +29,7 @@ def test_create_package_entity():
     criteria_dict = {'ecosystem': 'maven', 'name': 'junit:junit'}
     p2 = Package.find_by_criteria('Package', criteria_dict)
 
-    # assert p2.latest_version == ''
+    assert p2.latest_version == ''
 
     list_epv_2 = [{'ecosystem': 'maven', 'name': 'junit:junit', 'version': '4.8.2'}]
     import_epv_from_folder('test/data/S3-data', list_epv=list_epv_2)
@@ -39,7 +39,7 @@ def test_create_package_entity():
     assert p3.latest_version == '4.12'
 
     p.save()  # must be an update
-    # assert (Package.count() == 2)
+    assert (Package.count() == 2)
 
     Package.delete_all()
     assert (Package.count() == 0)
