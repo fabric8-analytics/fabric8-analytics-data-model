@@ -4,7 +4,7 @@ from entities.utils import get_values as gv
 import sys
 import config
 import traceback
-import logging
+import set_logging as log
 import json
 from optparse import OptionParser
 from datetime import datetime
@@ -13,9 +13,6 @@ from sqlalchemy import create_engine
 from data_source.local_filesystem_data_source import LocalFileSystem
 from data_source.s3_data_source import S3DataSource
 from data_source.rds_book_keeper import RDSBookKeeper
-
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 
 def _group_keys_by_epv(all_keys):
@@ -32,7 +29,7 @@ def _group_keys_by_epv(all_keys):
 
 
 def _import_grouped_keys(data_source, dict_grouped_keys):
-    logger.debug("Begin import...")
+    log.logger.debug("Begin import...")
     date_time_format = "%Y-%m-%dT%H:%M:%S.%f"
 
     report = {'status': 'Success', 'message': 'The import finished successfully!'}
@@ -46,8 +43,8 @@ def _import_grouped_keys(data_source, dict_grouped_keys):
         for counter, v in dict_grouped_keys.items():
             obj = {"analyses": {}}
             first_key = v[0]
-            logger.debug("Importing " + first_key)
-            logger.info("File---- %s  numbered---- %d  added:" % (first_key, counter))
+            log.logger.debug("Importing " + first_key)
+            log.logger.debug("File---- %s  numbered---- %d  added:" % (first_key, counter))
 
             t = data_source.read_json_file(first_key)
             cur_finished_at = t.get("finished_at")
@@ -84,9 +81,9 @@ def _import_grouped_keys(data_source, dict_grouped_keys):
 
     except Exception as e:
         msg = "The import failed with error '%s'." % e
-        logger.error(msg)
+        log.logger.error(msg)
         tb = traceback.format_exc()
-        logger.error("Traceback for latest failure in import: %s" % tb)
+        log.logger.error("Traceback for latest failure in import: %s" % tb)
         report['status'] = 'Failure'
         report['message'] = msg
 
@@ -113,7 +110,7 @@ def import_bulk(data_source, book_keeper):
         list_keys = []
         if graph_meta is None:
             # Collect all the files from data-source and group them by package-version.
-            logger.debug("Performing full import. Fetching all objects from : " + data_source.get_source_name())
+            log.logger.debug("Performing full import. Fetching all objects from : " + data_source.get_source_name())
             list_keys = data_source.list_files()
 
         # else if the timestamp is available then we need to perform incremental update.
@@ -127,7 +124,7 @@ def import_bulk(data_source, book_keeper):
             list_epv = book_keeper.get_recent_epv(min_finished_at)
 
             # Collect relevant files from data-source and group them by package-version.
-            logger.debug("Performing incremental update. Fetching some objects from : " + data_source.get_source_name())
+            log.logger.debug("Performing incremental update. Fetching some objects from : " + data_source.get_source_name())
             for epv in list_epv:
                 key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/" + epv.get('version')
                 list_keys.extend(data_source.list_files(prefix=key_prefix))
@@ -159,16 +156,16 @@ def import_bulk(data_source, book_keeper):
                          report.get('max_finished_at'))
 
         if report.get('status') is 'Success':
-            logger.info(msg)
+            log.logger.debug(msg)
         else:
             # TODO: retry ??
-            logger.error(msg)
+            log.logger.error(msg)
 
     except Exception as e:
         msg = "import_bulk() failed with error: %s" % e
-        logger.error(msg)
+        log.logger.error(msg)
         tb = traceback.format_exc()
-        logger.error("Traceback for latest failure in import_bulk(): %s" % tb)
+        log.logger.error("Traceback for latest failure in import_bulk(): %s" % tb)
         raise RuntimeError(msg)
 
     return report
@@ -202,16 +199,16 @@ def import_epv(data_source, list_epv):
                          report.get('max_finished_at'))
 
         if report.get('status') is 'Success':
-            logger.info(msg)
+            log.logger.debug(msg)
         else:
             # TODO: retry ??
-            logger.error(msg)
+            log.logger.error(msg)
 
     except Exception as e:
         msg = "import_epv() failed with error: %s" % e
-        logger.error(msg)
+        log.logger.error(msg)
         tb = traceback.format_exc()
-        logger.error("Traceback for the latest failure in import_epv(): %s" % tb)
+        log.logger.error("Traceback for the latest failure in import_epv(): %s" % tb)
         raise RuntimeError(msg)
 
     return report
@@ -260,12 +257,12 @@ if __name__ == '__main__':
 
     source = "S3"
     if options.source is None:
-        print ("No source provided")
+        log.logger.info ("No source provided")
     else:
         if options.source.upper() == "DIR":
             source = "DIR"
             if options.directory is None:
-                print ("Directory path not provided")
+                log.logger.info ("Directory path not provided")
                 sys.exit(-1)
 
     if source == "S3":
@@ -273,6 +270,6 @@ if __name__ == '__main__':
     elif source == "DIR":
         import_from_folder(options.directory)
     else:
-        print ("Invalid CLI arguments")
+        log.logger.info ("Invalid CLI arguments")
         sys.exit(-1)
 

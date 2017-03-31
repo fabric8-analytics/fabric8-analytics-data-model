@@ -3,10 +3,7 @@ from entities.utils import get_values as gv
 import config
 import traceback
 import time
-import logging
-
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+import set_logging as log
 
 
 class Package(EntityBase):
@@ -52,7 +49,7 @@ class Package(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            logger.error("find_all() failed: %s" % e)
+            log.logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -61,7 +58,7 @@ class Package(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            logger.error("count() failed: %s" % e)
+            log.logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -71,7 +68,7 @@ class Package(EntityBase):
                 outE().count().toList()[0]
 
         except Exception as e:
-            logger.error("edge_count() failed: %s" % e)
+            log.logger.error("edge_count() failed: %s" % e)
 
     @classmethod
     def delete_all(cls):
@@ -79,7 +76,7 @@ class Package(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            logger.error("delete all() failed: %s" % e)
+            log.logger.error("delete all() failed: %s" % e)
             return None
 
     @classmethod
@@ -108,8 +105,8 @@ class Package(EntityBase):
             for k, v in criteria_dict.items():
                 query = query.has(k, v)
             check_pck = query.toList()
-            logger.debug("query sent:------ %s" % query)
-            logger.debug("query_result:----- %s" % check_pck)
+            log.logger.debug("query sent:------ %s" % query)
+            log.logger.debug("query_result:----- %s" % check_pck)
 
             if len(check_pck) == 0:
                 return None
@@ -126,7 +123,7 @@ class Package(EntityBase):
                                              values.get('latest_version')[0], check_pck[0].id, values.get('last_updated')[0], **github_dict)
 
         except Exception as e:
-            logger.error("find_by_criteria() failed: %s" % e)
+            log.logger.error("find_by_criteria() failed: %s" % e)
             return None
 
     #TODO: refactor redundant functions of create, update, count etc
@@ -135,7 +132,7 @@ class Package(EntityBase):
             package_criteria = {'ecosystem': self.ecosystem, 'name': self.name}
             present_package = Package.find_by_criteria(
                 self.label, package_criteria)
-            logger.debug("Package contents: %s" % self.to_json())
+            log.logger.debug("Package contents: %s" % self.to_json())
             if present_package is None:
                 ts = time.time()
                 results = self.g().addV(self.label). \
@@ -148,30 +145,30 @@ class Package(EntityBase):
                     property('last_updated', ts). \
                     toList()
 
-                logger.debug("create() %s - results: %s" %
+                log.logger.debug("create() %s - results: %s" %
                              (self.label, results))
 
                 self.last_updated = ts
                 self.id = results[0].id
-                logger.info("Vertex ID : %s, %s: %s" %
+                log.logger.debug("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
                 
-                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+                log.logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
 
                 return self.id
 
             else:
-                logger.debug("Package exists: %s " %
+                log.logger.debug("Package exists: %s " %
                              present_package.id)
                 self.last_updated = present_package.last_updated
                 self.id = present_package.id
                   
-                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                log.logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
 
                 return self.id
 
         except Exception as e:
-            logger.error("create() failed: %s" % traceback.print_exc())
+            log.logger.error("create() failed: %s" % traceback.print_exc())
             return None
 
     def update(self):
@@ -188,15 +185,15 @@ class Package(EntityBase):
                 toList()
 
             self.last_updated = ts
-            logger.debug("update() %s - results: %s" % (self.label, results))
-            logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            log.logger.debug("update() %s - results: %s" % (self.label, results))
+            log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
   
-            print("---Update--- %s = %d"%(self.label, self.id))
+            log.logger.info("---Update--- %s = %d"%(self.label, self.id))
 
             return self.id
 
         except Exception as e:
-            logger.error("update() failed: %s" % e)
+            log.logger.error("update() failed: %s" % e)
             return None
 
     def create_version_edge(self, v):
@@ -204,7 +201,7 @@ class Package(EntityBase):
             result = Package.edge_exists(self.id, v.id, 'has_version')
 
             if result == True:
-                logger.info("Package-version edge present, nothing to do")
+                log.logger.debug("Package-version edge present, nothing to do")
                 return
 
             elif result == False:
@@ -212,18 +209,18 @@ class Package(EntityBase):
                 return g.V(self.id).addE("has_version").property('last_updated',time.time()).to(g.V(v.id)).toList()
 
         except Exception as e:
-            logger.error("package_version_edge() failed: %s" % e)
+            log.logger.error("package_version_edge() failed: %s" % e)
             return None
 
     def get_versions(self):
         try:
             g = self.g()
             results = g.V(self.id).out("has_version").toList()
-            logger.debug("results: %s" % results)
+            log.logger.debug("results: %s" % results)
             return results
 
         except Exception as e:
-            logger.error("get_versions_of_package() failed: %s" % e)
+            log.logger.error("get_versions_of_package() failed: %s" % e)
             return None
 
     @classmethod
@@ -238,14 +235,14 @@ class Package(EntityBase):
 
         except Exception as e:
             msg = "edge_exists() failed: %s" % e
-            logger.error(msg)
+            log.logger.error(msg)
             tb = traceback.format_exc()
-            logger.error("EDGE_EXISTS failure  %s" % tb)
+            log.logger.error("EDGE_EXISTS failure  %s" % tb)
             raise RuntimeError(msg)
 
     def add_github_details_as_attr(self, github_result):
 
-        logger.debug("reached add_github_details_as_attributes")
+        log.logger.debug("reached add_github_details_as_attributes")
         self.github_details = github_result
         if github_result.details is not None:
             ts = time.time()
@@ -275,13 +272,13 @@ class Package(EntityBase):
                     property('last_updated', ts).\
                     toList()
                 self.last_updated = ts
-                logger.debug("add_github_details_as_attr() %s - results: %s" % (self.label, results))
-                logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+                log.logger.debug("add_github_details_as_attr() %s - results: %s" % (self.label, results))
+                log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
-                print("---Add_GITHUB_DETAILS---To %s  = %d"%(self.label, self.id))
+                log.logger.info("---Add_GITHUB_DETAILS---To %s  = %d"%(self.label, self.id))
 
             except Exception as e:
-                logger.error("add_github_details_as_attr() failed: %s" % e)
+                log.logger.error("add_github_details_as_attr() failed: %s" % e)
 
         return self.github_details
 

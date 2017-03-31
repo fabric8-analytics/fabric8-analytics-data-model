@@ -3,14 +3,9 @@ from entities.version import Version
 from entities.github_details import GithubResult
 from entities.utils import get_values as gv
 
-import config
-import logging
-
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
 
 npm_sequence_3 = gv.read_from_file('test/data/npm-sequence-3.0.0.json')
+
 
 def test_empty_github_results():
     p = Package.load_from_json(npm_sequence_3)

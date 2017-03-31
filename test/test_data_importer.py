@@ -1,5 +1,3 @@
-import config
-import logging
 import os
 from data_importer import import_bulk
 from data_source.local_filesystem_data_source import LocalFileSystem
@@ -13,9 +11,6 @@ from entities.people import Author, Contributor
 from entities.support_vectors import LicenseDetails
 from entities.version import Version
 from graph_populator import GraphPopulator
-
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 
 # TODO: check various vertices/edges/properties inside graph after import is successful

@@ -1,4 +1,4 @@
-import logging
+import set_logging as log
 import config
 import json
 import requests
@@ -11,10 +11,6 @@ import os
 import sys
 
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-
 # singleton object which will have reference to Graph object
 class BayesianGraph(object):
     _instances = {'graph': None}
@@ -22,19 +18,19 @@ class BayesianGraph(object):
     @classmethod
     def instance(cls):
         if cls._instances['graph'] is None:
-            logger.info("BayesianGraph instance creating...")
+            log.logger.info("BayesianGraph instance creating...")
             graph = Graph()
             g = graph.traversal().withRemote(DriverRemoteConnection(config.GREMLIN_SERVER_URL_WEBSOCKET, 'g'))
 
             # populate schema if not already done
             if not cls.is_index_created():
-                print ("Index is not created as yet, checking schema creation")
+                log.logger.info ("Index is not created as yet, checking schema creation")
                 if not cls.is_schema_defined():
-                    print("Schema is not yet created, creating now...")
+                    log.logger.info("Schema is not yet created, creating now...")
                     cls.populate_schema()
                     ## double check
                     schema_definition_success = cls.is_schema_defined()
-                    print("Double check: schema_definition_success %s" % schema_definition_success)
+                    log.logger.info("Double check: schema_definition_success %s" % schema_definition_success)
                     if not schema_definition_success:
                         raise RuntimeError("Failed to setup graph schema")
 
@@ -44,15 +40,15 @@ class BayesianGraph(object):
 
     @classmethod
     def execute(cls, str_gremlin_dsl):
-        logger.info("BayesianGraph::execute() Gremlin DSL:  %s", str_gremlin_dsl)
+        log.logger.debug("BayesianGraph::execute() Gremlin DSL:  %s", str_gremlin_dsl)
         payload = {'gremlin': str_gremlin_dsl}
         response = requests.post(config.GREMLIN_SERVER_URL_REST,
                                  data=json.dumps(payload))
         json_response = response.json()
 
-        logger.info("BayesianGraph::execute(): %s", response)
+        log.logger.debug("BayesianGraph::execute(): %s", response)
         if response.status_code != 200:
-            logger.info("ERROR %d(%s): %s" % (response.status_code, response.reason, json_response.get("message")))
+            log.logger.debug("ERROR %d(%s): %s" % (response.status_code, response.reason, json_response.get("message")))
             return False, json_response
         else:
             return True, json_response

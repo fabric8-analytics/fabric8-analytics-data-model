@@ -1,18 +1,12 @@
 from entities.entity_base import EntityBase
-import logging
-import config
+import set_logging as log
 import time
-
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 
 # TODO: Handle 1-language-multipe-modules
 # class CRModules:
 #     pass
 #     def __init__(self):
-
-
 class CodeMetricsLanguage(EntityBase):
     label = "LanguageCodeMetrics"
 
@@ -63,16 +57,16 @@ class CodeMetricsLanguage(EntityBase):
                 property('last_updated', ts).\
                 toList()
 
-            logger.debug("create() CodeMetricsLanguage - results: %s" % results)
+            log.logger.debug("create() CodeMetricsLanguage - results: %s" % results)
 
             self.last_updated = ts
             self.id = results[0].id
-            logger.info("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
+            log.logger.debug("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
 
             return self.id
 
         except Exception as e:
-            logger.error("update() failed: %s" % e)
+            log.logger.error("update() failed: %s" % e)
             return None
 
     def update(self):
@@ -95,12 +89,12 @@ class CodeMetricsLanguage(EntityBase):
                 toList()
 
             self.last_updated = ts
-            logger.debug("update() CodeMetricsLanguage - results: %s" % results)
-            logger.info("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
+            log.logger.debug("update() CodeMetricsLanguage - results: %s" % results)
+            log.logger.debug("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
             return self.id
 
         except Exception as e:
-            logger.error("update() failed: %s" % e)
+            log.logger.error("update() failed: %s" % e)
             return None
 
     @classmethod
@@ -109,7 +103,7 @@ class CodeMetricsLanguage(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            logger.error("find_all() failed: %s" % e)
+            log.logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -118,7 +112,7 @@ class CodeMetricsLanguage(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            logger.error("count() failed: %s" % e)
+            log.logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -127,7 +121,7 @@ class CodeMetricsLanguage(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            logger.error("delete all() failed: %s" % e)
+            log.logger.error("delete all() failed: %s" % e)
             return None
 
 
@@ -222,7 +216,7 @@ class CodeMetricsResult(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            logger.error("find_all() failed: %s" % e)
+            log.logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -231,7 +225,7 @@ class CodeMetricsResult(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            logger.error("count() failed: %s" % e)
+            log.logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -240,7 +234,7 @@ class CodeMetricsResult(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            logger.error("delete all() failed: %s" % e)
+            log.logger.error("delete all() failed: %s" % e)
             return None
 
     def create(self):
@@ -253,11 +247,11 @@ class CodeMetricsResult(EntityBase):
                 property('last_updated', ts).\
                 toList()
 
-            logger.debug("create() CodeMetricsResult - results: %s" % results)
+            log.logger.debug("create() CodeMetricsResult - results: %s" % results)
 
             self.last_updated = ts
             self.id = results[0].id
-            logger.info("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
+            log.logger.debug("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
 
             for lang in self.details.languages:
                 lang.save()
@@ -266,7 +260,7 @@ class CodeMetricsResult(EntityBase):
             return self.id
 
         except Exception as e:
-            logger.error("update() failed: %s" % e)
+            log.logger.error("update() failed: %s" % e)
             return None
 
     def create_language_metrics_edge(self, v):
@@ -275,7 +269,7 @@ class CodeMetricsResult(EntityBase):
             return g.V(self.id).addE("has_language_metrics").property('last_updated', time.time()).to(g.V(v.id)).toList()
 
         except Exception as e:
-            logger.error("create_language_metrics_edge() failed: %s" % e)
+            log.logger.error("create_language_metrics_edge() failed: %s" % e)
             return None
 
     def update(self):
@@ -300,15 +294,15 @@ class CodeMetricsResult(EntityBase):
 
                 for lang in self.details.languages:
                     lang.save()
-                    logger.debug("update() CodeMetricsLanguage - results: %s" % lang.to_json())
+                    log.logger.debug("update() CodeMetricsLanguage - results: %s" % lang.to_json())
                     self.create_language_metrics_edge(lang)
 
-                logger.debug("update() CodeMetricsResult - results: %s" % results)
-                logger.info("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
+                log.logger.debug("update() CodeMetricsResult - results: %s" % results)
+                log.logger.debug("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
                 return self.id
             except Exception as e:
                 raise Exception('Failed to delete and update the language code metric')
                 
         except Exception as e:
-            logger.error("update() failed: %s" % e)
+            log.logger.error("update() failed: %s" % e)
             return None

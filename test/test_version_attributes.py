@@ -1,14 +1,10 @@
-import config
-import logging
 from entities.package import Package
 from entities.utils import get_values as gv
 from entities.version import Version
 from entities.github_details import load_github_result_from_json
 from entities.code_metrics import CodeMetricsResult as CMR
 from entities.support_vectors import SecurityDetails as SD
-
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+import set_logging as log
 
 npm_crumb_data = gv.read_from_file('test/data/npm-crumb-4.0.0.json')
 serve_static_json = gv.read_from_file('test/data/npm--serve-static-1.7.1.json')
@@ -56,7 +52,7 @@ def test_additional_data_as_attr():
 
     present_version = Version.find_by_criteria(
         ver_obj.label, pck_obj, version_criteria)
-    logger.info(present_version.__dict__)
+    log.logger.debug(present_version.__dict__)
     assert present_version.cm_loc == 3
     assert present_version.cm_num_files == 1
     assert present_version.cm_avg_cyclomatic_complexity == -1
