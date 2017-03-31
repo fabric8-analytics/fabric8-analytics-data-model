@@ -98,8 +98,7 @@ def test_full_import_and_incr_update():
 
 
 def test_package_import_from_folder():
-    bucket_dir = 'test/data/S3-maven'
-    package_dir = 'test/data/S3-maven/maven/junit:junit'
+    package_dir = 'test/data/S3-data/maven/junit:junit'
 
     packages = Package.find_all()
     assert (len(packages) == 0)
@@ -153,7 +152,7 @@ def test_package_import_from_folder():
 
 
 def test_ecosystem_import_from_folder():
-    ecosystem_dir = 'test/data/S3-maven/maven'
+    ecosystem_dir = 'test/data/S3-data/maven'
 
     packages = Package.find_all()
     assert (len(packages) == 0)
@@ -185,6 +184,57 @@ def test_ecosystem_import_from_folder():
 
     versions = Version.find_all()
     assert (len(versions) == 3)
+
+    Package.delete_all()
+    assert (Package.count() == 0)
+
+    Version.delete_all()
+    assert (Version.count() == 0)
+
+    GraphMetaData.delete_all()
+    assert (GraphMetaData.count() == 0)
+
+
+def test_bucket_import_from_folder():
+    bucket_dir = 'test/data/S3-data'
+
+    packages = Package.find_all()
+    assert (len(packages) == 0)
+
+    p = Package()
+    assert (p.id is None)
+    assert (p.label == "Package")
+    assert p.last_updated is None
+
+    report = import_from_folder(bucket_dir)
+
+    assert (report.get('status') == 'Success')
+    assert (report.get('count_imported_EPVs') == 3)
+    assert (report.get('last_imported_EPV') == 'npm/sequence/3.0.0.json')
+    assert (report.get('max_finished_at') == '2017-02-24T13:43:11.872916')
+
+    criteria_dict = {'ecosystem': 'npm', 'name': 'sequence'}
+    p1 = Package.find_by_criteria('Package', criteria_dict)
+
+    assert p1 is not None
+    assert p1.id is not None
+    assert (p1.ecosystem == 'npm')
+    assert (p1.latest_version == '3.0.0')
+    assert (p1.package_dependents_count == 22)
+    assert (p1.name == 'sequence')
+
+    criteria_dict = {'pecosystem': 'npm', 'pname': 'sequence', 'version': '3.0.0'}
+    v1 = Version.find_by_criteria('Version', p1, criteria_dict)
+
+    assert v1 is not None
+    assert v1.ecosystem_package is not None
+    assert (v1.ecosystem_package.ecosystem == 'npm')
+
+    packages = Package.find_all()
+    assert (len(packages) == 3)
+
+    versions = Version.find_all()
+    assert (len(versions) == 4)
 
     Package.delete_all()
     assert (Package.count() == 0)

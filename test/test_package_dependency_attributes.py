@@ -14,7 +14,7 @@ def test_create_package_entity():
     assert (len(packages) == 0)
 
     list_epv_1 = [{'ecosystem': 'maven', 'name': 'org.slf4j:slf4j-api', 'version': '1.5.6'}]
-    import_epv_from_folder('test/data/S3-maven', list_epv=list_epv_1)
+    import_epv_from_folder('test/data/S3-data', list_epv=list_epv_1)
 
     criteria_dict = {'ecosystem': 'maven', 'name': 'org.slf4j:slf4j-api'}
     p = Package.find_by_criteria('Package', criteria_dict)
@@ -32,7 +32,7 @@ def test_create_package_entity():
     # assert p2.latest_version == ''
 
     list_epv_2 = [{'ecosystem': 'maven', 'name': 'junit:junit', 'version': '4.8.2'}]
-    import_epv_from_folder('test/data/S3-maven', list_epv=list_epv_2)
+    import_epv_from_folder('test/data/S3-data', list_epv=list_epv_2)
 
     criteria_dict = {'ecosystem': 'maven', 'name': 'junit:junit'}
     p3 = Package.find_by_criteria('Package', criteria_dict)
