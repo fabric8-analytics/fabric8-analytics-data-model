@@ -1,0 +1,31 @@
+{
+  "_audit": {
+    "ended_at": "2017-02-24T13:44:28.942018",
+    "started_at": "2017-02-24T13:44:28.597057",
+    "version": "v1"
+  },
+  "_release": "maven:junit:junit:4.8.2",
+  "analyses": [
+    "digests",
+    "source_licenses",
+    "languages",
+    "crypto_algorithms",
+    "binary_data",
+    "code_metrics"
+  ],
+  "audit": null,
+  "dependents_count": -1,
+  "ecosystem": "maven",
+  "finished_at": "2017-02-24T13:42:29.665786",
+  "id": 8459,
+  "latest_version": "4.12",
+  "package": "junit:junit",
+  "package_info": {
+    "dependents_count": -1,
+    "relative_usage": "not used"
+  },
+  "release": "maven:junit:junit:4.8.2",
+  "started_at": "2017-02-24T13:34:42.735788",
+  "subtasks": null,
+  "version": "4.8.2"
+}

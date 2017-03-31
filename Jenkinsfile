@@ -9,13 +9,13 @@ node('gremlin') {
     }
 
     stage('Tests') {
+        dockerCleanup()
         timeout(30) {
             sh './runtests.sh'
         }
     }
 
     stage('Build') {
-        dockerCleanup()
         docker.build(image.id, '-f Dockerfile.data-model --pull --no-cache .')
     }
 
@@ -43,17 +43,10 @@ if (env.BRANCH_NAME == 'master') {
 			}
         }
 
-        //stage('Deploy - rh-idev') {
-        //    rerunOpenShiftJob {
-        //        jobName = 'bayesian-data-model-importer'
-        //        cluster = 'rh-idev'
-		//	}
-        //}
-
-        stage('Deploy - dsaas') {
+        stage('Deploy - rh-idev') {
             rerunOpenShiftJob {
                 jobName = 'bayesian-data-model-importer'
-                cluster = 'dsaas'
+                cluster = 'rh-idev'
             }
         }
     }
