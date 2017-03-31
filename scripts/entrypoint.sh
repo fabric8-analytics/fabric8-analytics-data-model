@@ -8,8 +8,11 @@
 
 # Start cron daemon
 # crond
+
+# Note: removing rest API support for now
+# Start data model service with time out of 15 min !
+# gunicorn --pythonpath /src/ -b 0.0.0.0:5001 -t 900 rest_api:app
 # --------------------------------------------------------------------------------------------------------------
 
-# Start data model service with time out of 15 min !
-gunicorn --pythonpath /src/ -b 0.0.0.0:5001 -t 900 rest_api:app
-
+export PYTHONPATH=/src
+python /src/data_importer.py -s S3
