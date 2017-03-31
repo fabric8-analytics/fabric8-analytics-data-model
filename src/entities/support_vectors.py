@@ -1,6 +1,5 @@
 from entities.entity_base import EntityBase
 import logging
-import json
 import config
 import time
 
@@ -119,12 +118,18 @@ class LicenseDetails(EntityBase):
                 self.id = results[0].id
                 logger.info("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
+                
+                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+
                 return self.id
             else:
                 logger.debug("License exists: %s " %
                              present_license.id)
                 self.last_updated = present_license.last_updated
                 self.id = present_license.id
+                
+                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+
                 return self.id
 
         except Exception as e:
@@ -143,6 +148,9 @@ class LicenseDetails(EntityBase):
             self.last_updated = ts
             logger.debug("update() %s - results: %s" % (self.label, results))
             logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            
+            print("---Update %s = %d"%(self.label, self.id))
+
             return self.id
 
         except Exception as e:
@@ -150,18 +158,10 @@ class LicenseDetails(EntityBase):
             return None
 
 
-class TechnicalDebt(EntityBase):
-    pass
-
-
-class UsageDetails(EntityBase):
-    pass
-
-
 class SecurityDetails(EntityBase):
     label = 'CVE'
 
-    def __init__(self, cve_id='', cvss='0', summary='', **issue):
+    def __init__(self, cve_id='', cvss='-1', summary='', **issue):
         super(SecurityDetails, self).__init__()
         self.cve_id = cve_id
         self.cvss = float(cvss)
@@ -173,8 +173,8 @@ class SecurityDetails(EntityBase):
         if len(issue) is not 0:
             self.bl_base_score = issue.get('baseScore', '')
             self.bl_description = issue.get('description', '')
-            self.bl_exploitability_subscore = issue.get('exploitabilitySubscore', 0)
-            self.bl_impact_subscore = issue.get('impactSubscore', 0)
+            self.bl_exploitability_subscore = issue.get('exploitabilitySubscore', -1)
+            self.bl_impact_subscore = issue.get('impactSubscore', -1)
             self.bl_remediation_status = issue.get('remediationStatus', '')
             self.bl_remediation_updated_at = issue.get('remediationUpdatedAt', '')
             self.bl_remediation_created_at = issue.get('remediationCreatedAt', '')
@@ -328,12 +328,18 @@ class SecurityDetails(EntityBase):
                 self.id = results[0].id
                 logger.info("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
+                
+                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+
                 return self.id
             else:
                 logger.debug("CVE exists: %s " %
                              present_security.id)
                 self.last_updated = present_security.last_updated
                 self.id = present_security.id
+                
+                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+
                 return self.id
 
         except Exception as e:
@@ -363,6 +369,9 @@ class SecurityDetails(EntityBase):
             self.last_updated = ts
             logger.debug("update() %s - results: %s" % (self.label, results))
             logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            
+            print("---Update %s = %d"%(self.label, self.id))
+
             return self.id
 
         except Exception as e:
@@ -373,8 +382,8 @@ class SecurityDetails(EntityBase):
         if len(issue) is not 0:
             self.bl_base_score = issue.get('baseScore', '')
             self.bl_description = issue.get('description', '')
-            self.bl_exploitability_subscore = issue.get('exploitabilitySubscore', 0)
-            self.bl_impact_subscore = issue.get('impactSubscore', 0)
+            self.bl_exploitability_subscore = issue.get('exploitabilitySubscore', -1)
+            self.bl_impact_subscore = issue.get('impactSubscore', -1)
             self.bl_remediation_status = issue.get('remediationStatus', '')
             self.bl_remediation_updated_at = issue.get('remediationCreatedAt', '')
             self.bl_remediation_created_at = issue.get('remediationUpdatedAt', '')
