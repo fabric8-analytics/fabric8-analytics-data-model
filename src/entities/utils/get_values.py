@@ -44,15 +44,23 @@ def get_latest_version(input_json):
 
 
 def get_version_dependents_count(input_json):
-    return input_json.get('dependents_count') or 0
+    return input_json.get('dependents_count') or -1
+
+
+def get_last_incr_update_ts(input_json):
+    return input_json.get('last_incremental_update_timestamp')
+
+
+def get_last_imported_epv(input_json):
+    return input_json.get('last_imported_epv')
 
 
 def get_package_info(input_json):
     result = ''
-    result2 = 0
+    result2 = -1
     if 'package_info' in input_json:
         result = input_json['package_info'].get('relative_usage') or ''
-        result2 = input_json['package_info'].get('dependents_count') or 0
+        result2 = input_json['package_info'].get('dependents_count') or -1
     return result, result2
 
 

@@ -120,12 +120,18 @@ class Person(EntityBase):
                 self.id = results[0].id
                 logger.info("Vertex ID : %s, Person-->%s: %s" %
                             (self.id, self.label, self))
+                  
+                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+
                 return self.id
             else:
                 logger.debug("Person exists: %s " %
                              present_person.id)
                 self.last_updated = present_person.last_updated
                 self.id = present_person.id
+
+                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                
                 return self.id
 
         except Exception as e:
@@ -147,6 +153,9 @@ class Person(EntityBase):
                          (self.label, results))
             logger.info("Vertex ID : %s, Person-->%s: %s" %
                         (self.id, self.label, self))
+
+            print("---Update--- %s = %d"%(self.label, self.id))
+            
             return self.id
 
         except Exception as e:

@@ -22,6 +22,7 @@ class BayesianGraph(object):
     @classmethod
     def instance(cls):
         if cls._instances['graph'] is None:
+            logger.info("BayesianGraph instance creating...")
             graph = Graph()
             g = graph.traversal().withRemote(DriverRemoteConnection(config.GREMLIN_SERVER_URL_WEBSOCKET, 'g'))
 

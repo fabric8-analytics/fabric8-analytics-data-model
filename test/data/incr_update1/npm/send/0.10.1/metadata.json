@@ -1,0 +1,74 @@
+{
+  "_audit": {
+    "ended_at": "2017-02-22T15:33:43.857283",
+    "started_at": "2017-02-22T15:33:43.546813",
+    "version": "v1"
+  },
+  "_release": "npm:send:0.10.1",
+  "details": [
+    {
+      "_dependency_tree_lock": null,
+      "_tests_implemented": true,
+      "author": "TJ Holowaychuk <tj@vision-media.ca>",
+      "bug_reporting": null,
+      "code_repository": {
+        "type": "git",
+        "url": "https://github.com/tj/send.git"
+      },
+      "contributors": [
+        "Douglas Christopher Wilson <doug@somethingdoug.com>"
+      ],
+      "declared_license": "MIT",
+      "dependencies": [
+        "destroy 1.0.3",
+        "debug ~2.1.0",
+        "range-parser ~1.0.2",
+        "depd ~1.0.0",
+        "etag ~1.5.0",
+        "mime 1.2.11",
+        "fresh 0.2.4",
+        "on-finished ~2.1.1",
+        "ms 0.6.2",
+        "escape-html 1.0.1"
+      ],
+      "description": "Better streaming static file server with Range and conditional-GET support",
+      "devel_dependencies": [
+        "should ~4.1.0",
+        "mocha ~2.0.0",
+        "supertest ~0.14.0",
+        "istanbul 0.3.2"
+      ],
+      "ecosystem": "npm",
+      "engines": {
+        "node": ">=0.8.0"
+      },
+      "files": [
+        "History.md",
+        "LICENSE",
+        "index.js"
+      ],
+      "git_head": null,
+      "homepage": null,
+      "keywords": [
+        "static",
+        "file",
+        "server"
+      ],
+      "maintainers": null,
+      "name": "send",
+      "readme": null,
+      "scripts": {
+        "test": "mocha --check-leaks --reporter spec --bail",
+        "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --check-leaks --reporter dot",
+        "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --check-leaks --reporter spec"
+      },
+      "version": "0.10.1"
+    }
+  ],
+  "schema": {
+    "name": "metadata",
+    "version": "3-1-0"
+  },
+  "status": "success",
+  "summary": []
+}

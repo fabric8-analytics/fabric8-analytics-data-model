@@ -1,0 +1,98 @@
+{
+  "_audit": {
+    "ended_at": "2017-02-22T15:34:12.151791",
+    "started_at": "2017-02-22T15:34:04.654050",
+    "version": "v1"
+  },
+  "_release": "npm:send:0.10.1",
+  "details": {
+    "contributors_count": 16,
+    "forks_count": 101,
+    "last_year_commits": {
+      "sum": 65,
+      "weekly": [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        13,
+        13,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        5,
+        0,
+        0,
+        2,
+        0,
+        0,
+        1,
+        0,
+        0,
+        2,
+        14
+      ]
+    },
+    "open_issues_count": 14,
+    "stargazers_count": 405,
+    "subscribers_count": 16,
+    "updated_issues": {
+      "month": {
+        "closed": 4,
+        "opened": 4
+      },
+      "year": {
+        "closed": 13,
+        "opened": 16
+      }
+    },
+    "updated_pull_requests": {
+      "month": {
+        "closed": 4,
+        "opened": 1
+      },
+      "year": {
+        "closed": 12,
+        "opened": 14
+      }
+    }
+  },
+  "schema": {
+    "name": "github_details",
+    "version": "1-0-2"
+  },
+  "status": "success",
+  "summary": []
+}

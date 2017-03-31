@@ -35,9 +35,14 @@ def load_dependencies(ecosystem, dependency_data):
             if len(splits) >= 2:
                 v = splits[1]
 
-            pck_dep = Package(ecosystem, n)
-            ver_dep = Version(pck_dep, v)
+            pck_criteria_dict = {'ecosystem': ecosystem, 'name': n}
+            pck_dep = Package.find_by_criteria('Package', pck_criteria_dict) or Package(ecosystem, n)
+
+            ver_criteria_dict = {'pecosystem': ecosystem, 'pname': n, 'version': v}
+            ver_dep = Version.find_by_criteria('Version', pck_dep, ver_criteria_dict) or Version(pck_dep, v)
+
             dependency_pck_list.append(pck_dep)
             dependency_ver_list.append(ver_dep)
             dependency_type.append(dep_type)
+
     return dependency_pck_list, dependency_ver_list, dependency_type

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Package(EntityBase):
 
-    def __init__(self, ecosystem='', name='', package_relative_used='', package_dependents_count=0, latest_version='', **github_dict):
+    def __init__(self, ecosystem='', name='', package_relative_used='', package_dependents_count=-1, latest_version='', **github_dict):
         super(Package, self).__init__()
         self.ecosystem = ecosystem
         self.name = name
@@ -19,16 +19,16 @@ class Package(EntityBase):
         self.package_dependents_count = package_dependents_count
         self.latest_version = latest_version
         if len(github_dict) is not 0:
-            self.gh_stargazers = github_dict.get("gh_stargazers",0)
-            self.gh_forks = github_dict.get("gh_forks",0)
-            self.gh_issues_last_year_opened = github_dict.get("gh_issues_last_year_opened",0)
-            self.gh_issues_last_year_closed = github_dict.get("gh_issues_last_year_closed",0)
-            self.gh_issues_last_month_opened = github_dict.get("gh_issues_last_month_opened",0)
-            self.gh_issues_last_month_closed = github_dict.get("gh_issues_last_month_closed",0)
-            self.gh_prs_last_year_opened = github_dict.get("gh_prs_last_year_opened",0)
-            self.gh_prs_last_year_closed = github_dict.get("gh_prs_last_year_closed",0)
-            self.gh_prs_last_month_opened = github_dict.get("gh_prs_last_month_opened",0)
-            self.gh_prs_last_month_closed = github_dict.get("gh_prs_last_month_closed",0)
+            self.gh_stargazers = github_dict.get("gh_stargazers",-1)
+            self.gh_forks = github_dict.get("gh_forks",-1)
+            self.gh_issues_last_year_opened = github_dict.get("gh_issues_last_year_opened",-1)
+            self.gh_issues_last_year_closed = github_dict.get("gh_issues_last_year_closed",-1)
+            self.gh_issues_last_month_opened = github_dict.get("gh_issues_last_month_opened",-1)
+            self.gh_issues_last_month_closed = github_dict.get("gh_issues_last_month_closed",-1)
+            self.gh_prs_last_year_opened = github_dict.get("gh_prs_last_year_opened",-1)
+            self.gh_prs_last_year_closed = github_dict.get("gh_prs_last_year_closed",-1)
+            self.gh_prs_last_month_opened = github_dict.get("gh_prs_last_month_opened",-1)
+            self.gh_prs_last_month_closed = github_dict.get("gh_prs_last_month_closed",-1)
         self.last_updated = None
 
     @classmethod
@@ -129,6 +129,7 @@ class Package(EntityBase):
             logger.error("find_by_criteria() failed: %s" % e)
             return None
 
+    #TODO: refactor redundant functions of create, update, count etc
     def create(self):
         try:
             package_criteria = {'ecosystem': self.ecosystem, 'name': self.name}
@@ -154,6 +155,9 @@ class Package(EntityBase):
                 self.id = results[0].id
                 logger.info("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
+                
+                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+
                 return self.id
 
             else:
@@ -161,6 +165,9 @@ class Package(EntityBase):
                              present_package.id)
                 self.last_updated = present_package.last_updated
                 self.id = present_package.id
+                  
+                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+
                 return self.id
 
         except Exception as e:
@@ -183,6 +190,8 @@ class Package(EntityBase):
             self.last_updated = ts
             logger.debug("update() %s - results: %s" % (self.label, results))
             logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+  
+            print("---Update--- %s = %d"%(self.label, self.id))
 
             return self.id
 
@@ -268,6 +277,8 @@ class Package(EntityBase):
                 self.last_updated = ts
                 logger.debug("add_github_details_as_attr() %s - results: %s" % (self.label, results))
                 logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+
+                print("---Add_GITHUB_DETAILS---To %s  = %d"%(self.label, self.id))
 
             except Exception as e:
                 logger.error("add_github_details_as_attr() failed: %s" % e)

@@ -1,28 +1,54 @@
 # from graph_manager import BayesianGraph
 from entities.package import Package
 from entities.version import Version
+from entities.graph_metadata import GraphMetaData
 from entities.people import Author, Contributor
 from entities.github_details import GithubResult
 from entities.code_metrics import CodeMetricsResult
 from entities.support_vectors import LicenseDetails, SecurityDetails
 from entities.utils import version_dependencies as vdv
 from entities.utils import blackduck_cve as bl
+import logging
+import config
+
+logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class GraphPopulator(object):
+
+    @classmethod
+    def update_metadata(cls, input_json):
+        logger.info("Instantiating graph metadata ...")
+
+        # Note: we look for meta-data vertex with only one criteria about label
+        # There is no additional criteria on properties because we want to maintain only one such vertex.
+        graph_meta = GraphMetaData.find_by_criteria(GraphMetaData.__name__, {})
+        if graph_meta is None:
+            graph_meta = GraphMetaData.load_from_json(input_json)
+        else:
+            graph_meta.update_from_json(input_json)
+        meta_id = graph_meta.save()
+        logger.info("Graph MetaData node ID: %s" % meta_id)
+
+    @classmethod
+    def get_metadata(cls):
+        return GraphMetaData.find_by_criteria(GraphMetaData.__name__, {})
 
     @classmethod
     def populate_from_json(cls, input_json):
 
         # NPM packages with dependencies, versions i.e. Package version
         # insertion
+        logger.info("Instantiating package ...")
         package = Package.load_from_json(input_json)
+        logger.info("Saving package ...")
         pkg_id = package.save()
-        print(" Package node ID: %s" % pkg_id)
+        logger.info(" Package node ID: %s" % pkg_id)
 
         version = Version.load_from_json(input_json, package=package)
         ver_id = version.save()
-        print(" Version node ID: %s" % ver_id)
+        logger.info(" Version node ID: %s" % ver_id)
         package.create_version_edge(version)
 
         analyses = input_json["analyses"]
