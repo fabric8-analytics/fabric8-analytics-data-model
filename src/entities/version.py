@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 
 class Version(EntityBase):
 
-    def __init__(self, package,version='', hash_values='', description='', dependents_count=0,
+    def __init__(self, package,version='', hash_values='', description='', dependents_count=-1,
                  shipped_as_downstream=False,
-                 github_details=0, **add_data):
+                 github_details=-1, **add_data):
         super(Version, self).__init__()
         self.ecosystem_package = package
         self.version = version
@@ -36,9 +36,9 @@ class Version(EntityBase):
         if len(add_data)>0:
             self.cve_ids = add_data.get("cve_ids", set())
             self.cvss_scores = add_data.get("cvss_scores",set())
-            self.cm_loc = add_data.get("cm_loc", 0)
-            self.cm_num_files = add_data.get("cm_num_files", 0)
-            self.cm_avg_cyclomatic_complexity = add_data.get("cm_avg_cyclomatic_complexity", 0.0)
+            self.cm_loc = add_data.get("cm_loc", -1)
+            self.cm_num_files = add_data.get("cm_num_files", -1)
+            self.cm_avg_cyclomatic_complexity = add_data.get("cm_avg_cyclomatic_complexity", -1)
             self.relative_used = add_data.get("relative_used", "")
         self.last_updated = None
 
@@ -239,6 +239,9 @@ class Version(EntityBase):
                 logger.debug("results: %s" % (results))
                 logger.info("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
+                
+                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+
                 return self.id
 
             else:
@@ -246,6 +249,9 @@ class Version(EntityBase):
                              present_version.id)
                 self.last_updated = present_version.last_updated
                 self.id = present_version.id
+                
+                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+
                 return self.id
 
         except Exception as e:
@@ -275,6 +281,9 @@ class Version(EntityBase):
             self.last_updated = ts
             logger.debug("update() %s - results: %s" % (self.label, results))
             logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            
+            print("---Update %s = %d"%(self.label, self.id))
+
             return self.id
 
         except Exception as e:
@@ -472,7 +481,6 @@ class Version(EntityBase):
             logger.error(msg)
             raise RuntimeError(msg)
 
-
     def add_additional_data_as_attr(self, add_details):
 
         logger.debug("reached add_details_as_attributes")
@@ -480,10 +488,10 @@ class Version(EntityBase):
 
         # self.licences = self.add_details.get("licences", [])
         self.cve_ids = self.add_details.get("cve_ids", [])
-        self.cm_loc = self.add_details.get("cm_loc", 0)
-        self.cm_num_files = self.add_details.get("cm_num_files", 0)
+        self.cm_loc = self.add_details.get("cm_loc", -1)
+        self.cm_num_files = self.add_details.get("cm_num_files", -1)
         self.cm_avg_cyclomatic_complexity = self.add_details.\
-            get("cm_avg_cyclomatic_complexity", 0.0)
+            get("cm_avg_cyclomatic_complexity", -1)
         self.relative_used = self.add_details.get("relative_used", "")
         try:
             ts = time.time()
@@ -503,12 +511,12 @@ class Version(EntityBase):
             logger.debug("add_additional_details_as_attr() %s - results: %s" % (self.label, results))
             logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
+            print("---Add_CODE_METRIC_DETAILS---To %s  = %d"%(self.label, self.id))
+
         except Exception as e:
             logger.error("add_additional_details_as_attr() failed: %s" % e)
 
         return self.add_details
-
-
 
     def add_license_attribute(self, licenses):
         try:
@@ -527,11 +535,13 @@ class Version(EntityBase):
             logger.debug("add_license_as_attr() %s - results: %s" %
                          (self.label, results))
             logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+
+            print("---Add_LICENSE_DETAILS---To %s  = %d"%(self.label, self.id))
+            
             return self.licenses
         except Exception as e:
             logger.error("add_license_attributes() failed: %s" % e)
             return None
-
 
     def add_blackduck_cve_edge(self, security_detail):
         try:
@@ -544,6 +554,9 @@ class Version(EntityBase):
 
             logger.debug("add_blackduck_cve_edge(): %s - results: %s" %
                          (self.label, results))
+            
+            print("---Add_BLACKDUCK_DETAILS---To %s  = %d"%(self.label, self.id))
+
             return results
 
         except Exception as e:

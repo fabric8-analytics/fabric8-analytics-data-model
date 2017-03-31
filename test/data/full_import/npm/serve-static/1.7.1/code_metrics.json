@@ -1,0 +1,339 @@
+{
+  "_audit": {
+    "ended_at": "2017-02-08T12:26:21.284059",
+    "started_at": "2017-02-08T12:26:20.649427",
+    "version": "v1"
+  },
+  "_release": "npm:serve-static:1.7.1",
+  "details": {
+    "languages": [
+      {
+        "blank_lines": 105,
+        "code_lines": 255,
+        "comment_lines": 0,
+        "files_count": 2,
+        "language": "Markdown"
+      },
+      {
+        "blank_lines": 24,
+        "code_lines": 60,
+        "comment_lines": 34,
+        "files_count": 1,
+        "language": "JavaScript",
+        "metrics": {
+          "average_cyclomatic_complexity": 3.75,
+          "average_function_lines_of_code": 10,
+          "average_function_parameters_count": 1.5,
+          "average_halstead_effort": 4416.746033526401,
+          "cost_change": 100,
+          "first_order_density": 0,
+          "modules": [
+            {
+              "average_function_lines_of_code": 10,
+              "average_function_parameters_count": 1.5,
+              "dependencies": [
+                {
+                  "line": 13,
+                  "path": "escape-html",
+                  "type": "CommonJS"
+                },
+                {
+                  "line": 14,
+                  "path": "utils-merge",
+                  "type": "CommonJS"
+                },
+                {
+                  "line": 15,
+                  "path": "parseurl",
+                  "type": "CommonJS"
+                },
+                {
+                  "line": 16,
+                  "path": "path",
+                  "type": "CommonJS"
+                },
+                {
+                  "line": 17,
+                  "path": "send",
+                  "type": "CommonJS"
+                },
+                {
+                  "line": 18,
+                  "path": "url",
+                  "type": "CommonJS"
+                }
+              ],
+              "functions": [
+                {
+                  "cyclomatic": 6,
+                  "cyclomatic_density": 42.857142857142854,
+                  "halstead": {
+                    "bugs": 0.13566567576667574,
+                    "difficulty": 18.22222222222222,
+                    "effort": 7416.390275244939,
+                    "length": 80,
+                    "operands": {
+                      "distinct": 18,
+                      "identifiers": [
+                        "root",
+                        "options",
+                        "\"root path required\"",
+                        "TypeError",
+                        "\"string\"",
+                        "\"root path must be a string\"",
+                        "<anonymous>",
+                        "merge",
+                        "resolve",
+                        "redirect",
+                        false,
+                        "setHeaders",
+                        "\"function\"",
+                        "\"option setHeaders must be function\"",
+                        "maxage",
+                        "maxAge",
+                        0,
+                        "serveStatic"
+                      ],
+                      "total": 41
+                    },
+                    "operators": {
+                      "distinct": 16,
+                      "identifiers": [
+                        "if",
+                        "! (prefix)",
+                        "throw",
+                        "new",
+                        "!==",
+                        "typeof (prefix)",
+                        "=",
+                        "()",
+                        "{}",
+                        "var",
+                        ".",
+                        "delete (prefix)",
+                        "&&",
+                        "||",
+                        "return",
+                        "function"
+                      ],
+                      "total": 39
+                    },
+                    "time": 412.02168195805217,
+                    "vocabulary": 34,
+                    "volume": 406.9970273000272
+                  },
+                  "line": 27,
+                  "name": "serveStatic",
+                  "params": 2,
+                  "sloc": {
+                    "logical": 14,
+                    "physical": 83
+                  }
+                },
+                {
+                  "cyclomatic": 5,
+                  "cyclomatic_density": 29.411764705882355,
+                  "halstead": {
+                    "bugs": 0.20381878042912577,
+                    "difficulty": 14.233333333333333,
+                    "effort": 8703.06192432367,
+                    "length": 112,
+                    "operands": {
+                      "distinct": 30,
+                      "identifiers": [
+                        "req",
+                        "res",
+                        "next",
+                        "method",
+                        "\"GET\"",
+                        "\"HEAD\"",
+                        "opts",
+                        "<anonymous>",
+                        "options",
+                        "merge",
+                        "originalUrl",
+                        "parseurl",
+                        "original",
+                        "path",
+                        "pathname",
+                        "hasTrailingSlash",
+                        "length",
+                        1,
+                        "\"/\"",
+                        "\"\"",
+                        "stream",
+                        "send",
+                        "redirect",
+                        "\"directory\"",
+                        "on",
+                        "setHeaders",
+                        "\"headers\"",
+                        "\"error\"",
+                        "error",
+                        "pipe"
+                      ],
+                      "total": 61
+                    },
+                    "operators": {
+                      "distinct": 14,
+                      "identifiers": [
+                        "if",
+                        "&&",
+                        "!==",
+                        ".",
+                        "return",
+                        "()",
+                        "var",
+                        "=",
+                        "{}",
+                        "===",
+                        "-",
+                        "! (prefix)",
+                        "else",
+                        "function"
+                      ],
+                      "total": 51
+                    },
+                    "time": 483.50344024020393,
+                    "vocabulary": 44,
+                    "volume": 611.4563412873773
+                  },
+                  "line": 57,
+                  "name": "serveStatic",
+                  "params": 3,
+                  "sloc": {
+                    "logical": 17,
+                    "physical": 52
+                  }
+                },
+                {
+                  "cyclomatic": 2,
+                  "cyclomatic_density": 25,
+                  "halstead": {
+                    "bugs": 0.08332748531566514,
+                    "difficulty": 5.8,
+                    "effort": 1449.8982444925732,
+                    "length": 52,
+                    "operands": {
+                      "distinct": 20,
+                      "identifiers": [
+                        "hasTrailingSlash",
+                        "next",
+                        "originalUrl",
+                        "pathname",
+                        "\"/\"",
+                        "target",
+                        "url",
+                        "format",
+                        "res",
+                        "statusCode",
+                        303,
+                        "\"Content-Type\"",
+                        "\"text/html; charset=utf-8\"",
+                        "setHeader",
+                        "\"Location\"",
+                        "\"Redirecting to <a href=\"\"",
+                        "escapeHtml",
+                        "\"\">\"",
+                        "\"</a>\n\"",
+                        "end"
+                      ],
+                      "total": 29
+                    },
+                    "operators": {
+                      "distinct": 8,
+                      "identifiers": [
+                        "if",
+                        "return",
+                        "()",
+                        "+=",
+                        ".",
+                        "var",
+                        "=",
+                        "+"
+                      ],
+                      "total": 23
+                    },
+                    "time": 80.54990247180962,
+                    "vocabulary": 28,
+                    "volume": 249.9824559469954
+                  },
+                  "line": 77,
+                  "name": "redirect",
+                  "params": 0,
+                  "sloc": {
+                    "logical": 8,
+                    "physical": 14
+                  }
+                },
+                {
+                  "cyclomatic": 2,
+                  "cyclomatic_density": 200,
+                  "halstead": {
+                    "bugs": 0.011623058338621813,
+                    "difficulty": 2.8,
+                    "effort": 97.63369004442322,
+                    "length": 11,
+                    "operands": {
+                      "distinct": 5,
+                      "identifiers": [
+                        "err",
+                        "status",
+                        404,
+                        null,
+                        "next"
+                      ],
+                      "total": 7
+                    },
+                    "operators": {
+                      "distinct": 4,
+                      "identifiers": [
+                        "()",
+                        ":?",
+                        "===",
+                        "."
+                      ],
+                      "total": 4
+                    },
+                    "time": 5.424093891356845,
+                    "vocabulary": 9,
+                    "volume": 34.86917501586544
+                  },
+                  "line": 102,
+                  "name": "error",
+                  "params": 1,
+                  "sloc": {
+                    "logical": 1,
+                    "physical": 3
+                  }
+                }
+              ],
+              "module_maintainability": 104.68951553775626,
+              "path": "package/index.js"
+            }
+          ],
+          "project_maintainability": 104.68951553775626
+        }
+      },
+      {
+        "blank_lines": 0,
+        "code_lines": 34,
+        "comment_lines": 0,
+        "files_count": 2,
+        "language": "JSON"
+      }
+    ]
+  },
+  "schema": {
+    "name": "code_metrics",
+    "version": "1-0-0"
+  },
+  "status": "success",
+  "summary": {
+    "blank_lines": 129,
+    "code_lines": 349,
+    "comment_lines": 34,
+    "total_files": 5,
+    "total_lines": 512
+  }
+}

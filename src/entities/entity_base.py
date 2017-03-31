@@ -12,7 +12,7 @@ def default_json_decoder(self):
         return list(self)
     return self.__dict__
 
-
+#TODO: Code refactor to PEP8
 class EntityBase(object):
     label = None
 

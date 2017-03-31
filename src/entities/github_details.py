@@ -9,14 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 class GithubLastYearCommits():
-    def __init__(self, sum=0, weekly=[]):
+    def __init__(self, sum=-1, weekly=[]):
         self.sum = sum  # jsl.IntField(required=True)
         self.weekly = weekly  # jsl.ArrayField(jsl.IntField(), required=True)
         self.last_updated = None
 
 
 class GithubItemsByTime():
-    def __init__(self, opened=0, closed=0):
+    def __init__(self, opened=-1, closed=-1):
         self.opened = opened  # jsl.IntField(required=True)
         self.closed = closed  # jsl.IntField(required=True)
         self.last_updated = None
@@ -41,10 +41,10 @@ class GithubUpdatedPullRequests(GithubUpdatedIssues):
 
 class GithubDetail:
     def __init__(self,
-                 forks_count=0,
+                 forks_count=-1,
                  last_year_commits=GithubLastYearCommits(),
-                 open_issues_count=0,
-                 stargazers_count=0, subscribers_count=0,
+                 open_issues_count=-1,
+                 stargazers_count=-1, subscribers_count=-1,
                  updated_issues=GithubUpdatedIssues(),
                  updated_pull_requests=GithubUpdatedPullRequests()):
         self.forks_count = forks_count  # jsl.IntField()
