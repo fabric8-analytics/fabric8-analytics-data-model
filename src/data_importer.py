@@ -2,6 +2,7 @@ import glob
 from graph_populator import GraphPopulator
 from entities.utils import get_values as gv
 import logging
+import set_logging
 import sys
 import config
 import traceback
