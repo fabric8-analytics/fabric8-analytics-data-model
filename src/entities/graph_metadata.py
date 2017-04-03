@@ -4,7 +4,6 @@ import config
 import traceback
 import logging
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -112,7 +111,7 @@ class GraphMetaData(EntityBase):
                 logger.debug("create() %s - results: %s" % (self.label, results))
 
                 self.id = results[0].id
-                logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+                logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
                 return self.id
 
             else:
@@ -132,7 +131,7 @@ class GraphMetaData(EntityBase):
                 toList()
 
             logger.debug("update() %s - results: %s" % (self.label, results))
-            logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
             return self.id
 

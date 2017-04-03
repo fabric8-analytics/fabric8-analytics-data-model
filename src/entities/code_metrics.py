@@ -1,18 +1,13 @@
 from entities.entity_base import EntityBase
-import logging
-import config
 import time
+import logging
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
 
 # TODO: Handle 1-language-multipe-modules
 # class CRModules:
 #     pass
 #     def __init__(self):
-
-
 class CodeMetricsLanguage(EntityBase):
     label = "LanguageCodeMetrics"
 
@@ -67,7 +62,7 @@ class CodeMetricsLanguage(EntityBase):
 
             self.last_updated = ts
             self.id = results[0].id
-            logger.info("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
+            logger.debug("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
 
             return self.id
 
@@ -96,7 +91,7 @@ class CodeMetricsLanguage(EntityBase):
 
             self.last_updated = ts
             logger.debug("update() CodeMetricsLanguage - results: %s" % results)
-            logger.info("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
+            logger.debug("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
             return self.id
 
         except Exception as e:
@@ -257,7 +252,7 @@ class CodeMetricsResult(EntityBase):
 
             self.last_updated = ts
             self.id = results[0].id
-            logger.info("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
+            logger.debug("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
 
             for lang in self.details.languages:
                 lang.save()
@@ -304,7 +299,7 @@ class CodeMetricsResult(EntityBase):
                     self.create_language_metrics_edge(lang)
 
                 logger.debug("update() CodeMetricsResult - results: %s" % results)
-                logger.info("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
+                logger.debug("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
                 return self.id
             except Exception as e:
                 raise Exception('Failed to delete and update the language code metric')

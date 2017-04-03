@@ -1,11 +1,9 @@
 from entities.entity_base import EntityBase
 import re
-import logging
 from email.utils import parseaddr
-import config
 import time
+import logging
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -118,10 +116,10 @@ class Person(EntityBase):
 
                 self.last_updated = ts
                 self.id = results[0].id
-                logger.info("Vertex ID : %s, Person-->%s: %s" %
+                logger.debug("Vertex ID : %s, Person-->%s: %s" %
                             (self.id, self.label, self))
                   
-                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
 
                 return self.id
             else:
@@ -130,7 +128,7 @@ class Person(EntityBase):
                 self.last_updated = present_person.last_updated
                 self.id = present_person.id
 
-                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
                 
                 return self.id
 
@@ -151,10 +149,10 @@ class Person(EntityBase):
             self.last_updated = ts
             logger.debug("update() Person-->%s - results: %s" %
                          (self.label, results))
-            logger.info("Vertex ID : %s, Person-->%s: %s" %
+            logger.debug("Vertex ID : %s, Person-->%s: %s" %
                         (self.id, self.label, self))
 
-            print("---Update--- %s = %d"%(self.label, self.id))
+            logger.info("---Update--- %s = %d"%(self.label, self.id))
             
             return self.id
 
