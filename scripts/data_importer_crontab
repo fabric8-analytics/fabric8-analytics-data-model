@@ -1,2 +1,2 @@
-0 */6 * * * root . /root/project_env.sh; export PYTHONPATH=/src; python /src/data_importer.py -s S3
+# 0 */6 * * * root . /root/project_env.sh; export PYTHONPATH=/src; python /src/data_importer.py -s S3
 # An empty line is required at the end of this file for a valid cron file.
