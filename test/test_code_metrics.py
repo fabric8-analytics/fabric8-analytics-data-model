@@ -1,14 +1,8 @@
 from entities.package import Package
 from entities.version import Version
-
-import logging
-import config
-
 from entities.utils import get_values as gv
 from entities.code_metrics import CodeMetricsResult, CodeMetricsLanguage
-
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+import set_logging as log
 
 npm_crumb_data = gv.read_from_file('test/data/npm-crumb-4.0.0.json')
 
@@ -33,7 +27,7 @@ def test_code_metrics_non_empty():
     assert(js_metrics.language == "JavaScript")
     assert(js_metrics.average_cyclomatic_complexity == 0.0)
 
-    logger.debug("js_lang_metrics: %s" %
+    log.logger.debug("js_lang_metrics: %s" %
                  js_metrics.average_cyclomatic_complexity)
 
 

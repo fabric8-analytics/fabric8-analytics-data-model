@@ -22,11 +22,11 @@ class RDSBookKeeper(BookKeeper):
         """Get all the EPVs that were ingested after the given timestamp"""
         list_epv = []
         try:
-            postgres_host = self.POSTGRESQL_HOST
-            postgres_port = self.POSTGRESQL_PORT
-            postgres_user = self.POSTGRESQL_USER
-            postgres_pass = self.POSTGRESQL_PASSWORD
-            postgres_db = self.POSTGRESQL_DATABASE
+            postgres_host = self.postgres_host
+            postgres_port = self.postgres_port
+            postgres_user = self.postgres_user
+            postgres_pass = self.postgres_pass
+            postgres_db = self.postgres_db
 
             postgres_conn_str = 'postgres://{user}:{passwd}@{host}:{port}/{db}'
             postgres_conn_str = postgres_conn_str.format(user=postgres_user, passwd=postgres_pass,

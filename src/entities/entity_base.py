@@ -1,9 +1,7 @@
 import json
 from graph_manager import BayesianGraph
-import config
 import logging
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 

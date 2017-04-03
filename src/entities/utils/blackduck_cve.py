@@ -1,8 +1,6 @@
 from entities.entity_base import EntityBase
 from entities.support_vectors import SecurityDetails
 from entities.utils import get_values as gv
-import logging
-import config
 
 
 def load_from_json(input_json):

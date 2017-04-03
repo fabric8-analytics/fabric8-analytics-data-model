@@ -1,9 +1,7 @@
 from entities.entity_base import EntityBase
-import logging
-import config
 import time
+import logging
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -116,10 +114,10 @@ class LicenseDetails(EntityBase):
 
                 self.last_updated = ts
                 self.id = results[0].id
-                logger.info("Vertex ID : %s, %s: %s" %
+                logger.debug("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
                 
-                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
 
                 return self.id
             else:
@@ -128,7 +126,7 @@ class LicenseDetails(EntityBase):
                 self.last_updated = present_license.last_updated
                 self.id = present_license.id
                 
-                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
 
                 return self.id
 
@@ -147,9 +145,9 @@ class LicenseDetails(EntityBase):
 
             self.last_updated = ts
             logger.debug("update() %s - results: %s" % (self.label, results))
-            logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
             
-            print("---Update %s = %d"%(self.label, self.id))
+            logger.info("---Update--- %s = %d"%(self.label, self.id))
 
             return self.id
 
@@ -326,10 +324,10 @@ class SecurityDetails(EntityBase):
 
                 self.last_updated = ts
                 self.id = results[0].id
-                logger.info("Vertex ID : %s, %s: %s" %
+                logger.debug("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
                 
-                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
 
                 return self.id
             else:
@@ -338,7 +336,7 @@ class SecurityDetails(EntityBase):
                 self.last_updated = present_security.last_updated
                 self.id = present_security.id
                 
-                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
 
                 return self.id
 
@@ -368,9 +366,9 @@ class SecurityDetails(EntityBase):
 
             self.last_updated = ts
             logger.debug("update() %s - results: %s" % (self.label, results))
-            logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
             
-            print("---Update %s = %d"%(self.label, self.id))
+            logger.info("---Update--- %s = %d"%(self.label, self.id))
 
             return self.id
 
@@ -414,7 +412,7 @@ class SecurityDetails(EntityBase):
                 self.last_updated = ts
 
                 logger.debug("add_blackduck_cve() %s - results: %s" % (self.label, results))
-                logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+                logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
             except Exception as e:
                 logger.error("add_blackduck_cve() failed: %s" % e)

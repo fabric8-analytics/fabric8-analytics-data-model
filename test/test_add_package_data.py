@@ -5,13 +5,8 @@ from entities.github_details import GithubResult
 from entities.people import Person, Author, Contributor
 from entities.utils import get_values as gv
 from entities.utils import version_dependencies as vdv
-
-import logging
-import config
 from graph_manager import BayesianGraph
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 serve_static_json = gv.read_from_file('test/data/npm--serve-static-1.7.1.json')
 

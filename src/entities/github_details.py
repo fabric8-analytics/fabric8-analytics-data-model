@@ -1,10 +1,8 @@
 from entities.entity_base import EntityBase
 from entities.utils import get_values as gv
-import logging
-import config
 import time
+import logging
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -180,7 +178,7 @@ class GithubResult(EntityBase):
 
             self.last_updated = ts
             self.id = results[0].id
-            logger.info("Vertex ID : %s, GithubResult: %s" % (self.id, self))
+            logger.debug("Vertex ID : %s, GithubResult: %s" % (self.id, self))
             return self.id
 
         except Exception as e:
@@ -201,7 +199,7 @@ class GithubResult(EntityBase):
 
             self.last_updated = ts
             logger.debug("update() GithubResult - results: %s" % results)
-            logger.info("Vertex ID : %s, GithubResult: %s" % (self.id, self))
+            logger.debug("Vertex ID : %s, GithubResult: %s" % (self.id, self))
             return self.id
 
         except Exception as e:

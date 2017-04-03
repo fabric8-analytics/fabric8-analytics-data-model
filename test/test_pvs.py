@@ -1,9 +1,7 @@
 from entities.utils import test_utils
 from entities.version import Version
 import logging
-import config
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 

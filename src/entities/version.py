@@ -2,12 +2,10 @@ from entities.entity_base import EntityBase
 from entities.package import Package
 from entities.code_metrics import CodeMetricsResult, CodeMetricsLanguage
 from entities.utils import get_values as gv
-import config
 import re
-import logging
 import time
+import logging
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -240,10 +238,10 @@ class Version(EntityBase):
                 self.last_updated = ts
                 self.id = results[0].id
                 logger.debug("results: %s" % (results))
-                logger.info("Vertex ID : %s, %s: %s" %
+                logger.debug("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
                 
-                print("---Create--- %s ---NEW = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
 
                 return self.id
 
@@ -253,7 +251,7 @@ class Version(EntityBase):
                 self.last_updated = present_version.last_updated
                 self.id = present_version.id
                 
-                print("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
 
                 return self.id
 
@@ -283,9 +281,9 @@ class Version(EntityBase):
             results = query.toList()    
             self.last_updated = ts
             logger.debug("update() %s - results: %s" % (self.label, results))
-            logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
             
-            print("---Update %s = %d"%(self.label, self.id))
+            logger.info("---Update--- %s = %d"%(self.label, self.id))
 
             return self.id
 
@@ -298,7 +296,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, license_detail.id, 'licensed_under')
             if result == True:
-                logger.info("version-license edge present, nothing to do")
+                logger.debug("version-license edge present, nothing to do")
                 return
             elif result == False:
                 g = self.g()
@@ -322,7 +320,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, security_detail.id, 'contains_cve')
             if result == True:
-                logger.info("version-security edge present, nothing to do")
+                logger.debug("version-security edge present, nothing to do")
                 return
             elif result == False:
                 g = self.g()
@@ -372,7 +370,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, author.id, 'authored_by')
             if result == True:
-                logger.info("version-author edge present, nothing to do")
+                logger.debug("version-author edge present, nothing to do")
                 return
             elif result == False:
                 g = self.g()
@@ -395,7 +393,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, contributor.id, 'contributed_by')
             if result == True:
-                logger.info("version-contributor edge present, nothing to do")
+                logger.debug("version-contributor edge present, nothing to do")
                 return
             elif result == False:
                 g = self.g()
@@ -418,7 +416,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, dependency.id, 'depends_on', {'dependency_type': dependency_type})
             if result == True:
-                logger.info(
+                logger.debug(
                     "version-version-dependency-dependency_type edge present, nothing to do")
                 return
             elif result == False:
@@ -521,9 +519,9 @@ class Version(EntityBase):
 
             self.last_updated = ts
             logger.debug("add_additional_details_as_attr() %s - results: %s" % (self.label, results))
-            logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
-            print("---Add_CODE_METRIC_DETAILS---To %s  = %d"%(self.label, self.id))
+            logger.info("---Add_CODE_METRIC_DETAILS---To %s  = %d"%(self.label, self.id))
 
         except Exception as e:
             logger.error("add_additional_details_as_attr() failed: %s" % e)
@@ -546,9 +544,9 @@ class Version(EntityBase):
             self.last_updated = ts
             logger.debug("add_license_as_attr() %s - results: %s" %
                          (self.label, results))
-            logger.info("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
-            print("---Add_LICENSE_DETAILS---To %s  = %d"%(self.label, self.id))
+            logger.info("---Add_LICENSE_DETAILS---To %s  = %d"%(self.label, self.id))
             
             return self.licenses
         except Exception as e:
@@ -586,7 +584,7 @@ class Version(EntityBase):
             logger.debug("add_blackduck_cve_edge(): %s - results: %s" %
                          (self.label, results))
             
-            print("---Add_BLACKDUCK_DETAILS---To %s  = %d"%(self.label, self.id))
+            logger.info("---Add_BLACKDUCK_DETAILS---To %s  = %d"%(self.label, self.id))
 
             return results
 
