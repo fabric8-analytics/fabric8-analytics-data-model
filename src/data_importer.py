@@ -1,7 +1,7 @@
 import glob
 from graph_populator import GraphPopulator
 from entities.utils import get_values as gv
-import set_logging
+import logging
 import sys
 import config
 import traceback
@@ -14,7 +14,7 @@ from data_source.local_filesystem_data_source import LocalFileSystem
 from data_source.s3_data_source import S3DataSource
 from data_source.rds_book_keeper import RDSBookKeeper
 
-logger = set_logging.logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _group_keys_by_epv(all_keys):
