@@ -1,7 +1,9 @@
 from entities.entity_base import EntityBase
 from entities.utils import get_values as gv
-import set_logging as log
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class GithubLastYearCommits():
@@ -136,7 +138,7 @@ class GithubResult(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            log.logger.error("find_all() failed: %s" % e)
+            logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -145,7 +147,7 @@ class GithubResult(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            log.logger.error("count() failed: %s" % e)
+            logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -157,7 +159,7 @@ class GithubResult(EntityBase):
                 return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete all() failed: %s" % e)
+            logger.error("delete all() failed: %s" % e)
             return None
 
     def create(self):
@@ -172,15 +174,15 @@ class GithubResult(EntityBase):
                 property('last_updated', ts).\
                 toList()
 
-            log.logger.debug("create() GithubResult - results: %s" % results)
+            logger.debug("create() GithubResult - results: %s" % results)
 
             self.last_updated = ts
             self.id = results[0].id
-            log.logger.debug("Vertex ID : %s, GithubResult: %s" % (self.id, self))
+            logger.debug("Vertex ID : %s, GithubResult: %s" % (self.id, self))
             return self.id
 
         except Exception as e:
-            log.logger.error("create() failed: %s" % e)
+            logger.error("create() failed: %s" % e)
             return None
 
     def update(self):
@@ -196,12 +198,12 @@ class GithubResult(EntityBase):
                 toList()
 
             self.last_updated = ts
-            log.logger.debug("update() GithubResult - results: %s" % results)
-            log.logger.debug("Vertex ID : %s, GithubResult: %s" % (self.id, self))
+            logger.debug("update() GithubResult - results: %s" % results)
+            logger.debug("Vertex ID : %s, GithubResult: %s" % (self.id, self))
             return self.id
 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None
 
 

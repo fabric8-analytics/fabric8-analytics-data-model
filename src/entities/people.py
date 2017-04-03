@@ -2,7 +2,9 @@ from entities.entity_base import EntityBase
 import re
 from email.utils import parseaddr
 import time
-import set_logging as log
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Person(EntityBase):
@@ -24,7 +26,7 @@ class Person(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            log.logger.error("find_all() failed: %s" % e)
+            logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -33,7 +35,7 @@ class Person(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            log.logger.error("count() failed: %s" % e)
+            logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -42,7 +44,7 @@ class Person(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete all() failed: %s" % e)
+            logger.error("delete all() failed: %s" % e)
             return None
 
 # TODO: remove redundancy in return_entity_obj
@@ -78,8 +80,8 @@ class Person(EntityBase):
             for k, v in criteria_dict.items():
                 query = query.has(k, v)
             check_person = query.toList()
-            log.logger.debug("query sent:------ %s" % query)
-            log.logger.debug("query_result:----- %s" % check_person)
+            logger.debug("query sent:------ %s" % query)
+            logger.debug("query_result:----- %s" % check_person)
             if len(check_person) == 0:
                 return None
             else:
@@ -92,7 +94,7 @@ class Person(EntityBase):
                                                          values.get('email')[0], check_person[0].id, values.get('last_updated')[0])
 
         except Exception as e:
-            log.logger.error("find_by_criteria() failed: %s" % e)
+            logger.error("find_by_criteria() failed: %s" % e)
             return None
 
     def create(self):
@@ -109,29 +111,29 @@ class Person(EntityBase):
                     property('last_updated', ts).\
                     toList()
 
-                log.logger.debug("create() Person-->%s - results: %s" %
+                logger.debug("create() Person-->%s - results: %s" %
                              (self.label, results))
 
                 self.last_updated = ts
                 self.id = results[0].id
-                log.logger.debug("Vertex ID : %s, Person-->%s: %s" %
+                logger.debug("Vertex ID : %s, Person-->%s: %s" %
                             (self.id, self.label, self))
                   
-                log.logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
 
                 return self.id
             else:
-                log.logger.debug("Person exists: %s " %
+                logger.debug("Person exists: %s " %
                              present_person.id)
                 self.last_updated = present_person.last_updated
                 self.id = present_person.id
 
-                log.logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
                 
                 return self.id
 
         except Exception as e:
-            log.logger.error("create() failed: %s" % e)
+            logger.error("create() failed: %s" % e)
             return None
 
     def update(self):
@@ -145,17 +147,17 @@ class Person(EntityBase):
                 toList()
 
             self.last_updated = ts
-            log.logger.debug("update() Person-->%s - results: %s" %
+            logger.debug("update() Person-->%s - results: %s" %
                          (self.label, results))
-            log.logger.debug("Vertex ID : %s, Person-->%s: %s" %
+            logger.debug("Vertex ID : %s, Person-->%s: %s" %
                         (self.id, self.label, self))
 
-            log.logger.info("---Update--- %s = %d"%(self.label, self.id))
+            logger.info("---Update--- %s = %d"%(self.label, self.id))
             
             return self.id
 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None
 
 

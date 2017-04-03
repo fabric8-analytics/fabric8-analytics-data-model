@@ -1,6 +1,9 @@
 import json
 from graph_manager import BayesianGraph
-import set_logging as log
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def default_json_decoder(self):
     if isinstance(self, set):
@@ -82,5 +85,5 @@ class EntityBase(object):
                 return  self.g().V(obj_id).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete() failed: %s" % e)
+            logger.error("delete() failed: %s" % e)
             return None

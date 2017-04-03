@@ -1,6 +1,8 @@
 from entities.entity_base import EntityBase
-import set_logging as log
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class LicenseDetails(EntityBase):
@@ -38,7 +40,7 @@ class LicenseDetails(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            log.logger.error("find_all() failed: %s" % e)
+            logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -47,7 +49,7 @@ class LicenseDetails(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            log.logger.error("count() failed: %s" % e)
+            logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -56,7 +58,7 @@ class LicenseDetails(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete all() failed: %s" % e)
+            logger.error("delete all() failed: %s" % e)
             return None
 
     def save(self):
@@ -83,8 +85,8 @@ class LicenseDetails(EntityBase):
             for k, v in criteria_dict.items():
                 query = query.has(k, v)
             check_license = query.toList()
-            log.logger.debug("query sent:------ %s" % query)
-            log.logger.debug("query_result:----- %s" % check_license)
+            logger.debug("query sent:------ %s" % query)
+            logger.debug("query_result:----- %s" % check_license)
             if len(check_license) == 0:
                 return None
             else:
@@ -92,7 +94,7 @@ class LicenseDetails(EntityBase):
                 return cls.return_entity_obj(values.get('lname')[0], check_license[0].id, values.get('last_updated')[0])
 
         except Exception as e:
-            log.logger.error("find_by_criteria() failed: %s" % e)
+            logger.error("find_by_criteria() failed: %s" % e)
             return None
 
     def create(self):
@@ -107,29 +109,29 @@ class LicenseDetails(EntityBase):
                     property('lname', self.name).\
                     property('last_updated', ts).\
                     toList()
-                log.logger.debug("create() %s - results: %s" %
+                logger.debug("create() %s - results: %s" %
                              (self.label, results))
 
                 self.last_updated = ts
                 self.id = results[0].id
-                log.logger.debug("Vertex ID : %s, %s: %s" %
+                logger.debug("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
                 
-                log.logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
 
                 return self.id
             else:
-                log.logger.debug("License exists: %s " %
+                logger.debug("License exists: %s " %
                              present_license.id)
                 self.last_updated = present_license.last_updated
                 self.id = present_license.id
                 
-                log.logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
 
                 return self.id
 
         except Exception as e:
-            log.logger.error("create() failed: %s" % e)
+            logger.error("create() failed: %s" % e)
             return None
 
     def update(self):
@@ -142,15 +144,15 @@ class LicenseDetails(EntityBase):
                 toList()
 
             self.last_updated = ts
-            log.logger.debug("update() %s - results: %s" % (self.label, results))
-            log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("update() %s - results: %s" % (self.label, results))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
             
-            log.logger.info("---Update--- %s = %d"%(self.label, self.id))
+            logger.info("---Update--- %s = %d"%(self.label, self.id))
 
             return self.id
 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None
 
 
@@ -220,7 +222,7 @@ class SecurityDetails(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            log.logger.error("find_all() failed: %s" % e)
+            logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -229,7 +231,7 @@ class SecurityDetails(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            log.logger.error("count() failed: %s" % e)
+            logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -238,7 +240,7 @@ class SecurityDetails(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete all() failed: %s" % e)
+            logger.error("delete all() failed: %s" % e)
             return None
 
     def save(self):
@@ -266,8 +268,8 @@ class SecurityDetails(EntityBase):
             for k, v in criteria_dict.items():
                 query = query.has(k, v)
             check_security = query.toList()
-            log.logger.debug("query sent:------ %s" % query)
-            log.logger.debug("query_result:----- %s" % check_security)
+            logger.debug("query sent:------ %s" % query)
+            logger.debug("query_result:----- %s" % check_security)
             if len(check_security) == 0:
                 return None
             else:
@@ -278,7 +280,7 @@ class SecurityDetails(EntityBase):
                                             check_security[0].id, values.get('last_updated')[0])
 
         except Exception as e:
-            log.logger.error("find_by_criteria() failed: %s" % e)
+            logger.error("find_by_criteria() failed: %s" % e)
             return None
 
     def create(self):
@@ -306,29 +308,29 @@ class SecurityDetails(EntityBase):
                 
                 results = query.toList()    
 
-                log.logger.debug("create() %s - results: %s" %
+                logger.debug("create() %s - results: %s" %
                              (self.label, results))
 
                 self.last_updated = ts
                 self.id = results[0].id
-                log.logger.debug("Vertex ID : %s, %s: %s" %
+                logger.debug("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
                 
-                log.logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
 
                 return self.id
             else:
-                log.logger.debug("CVE exists: %s " %
+                logger.debug("CVE exists: %s " %
                              present_security.id)
                 self.last_updated = present_security.last_updated
                 self.id = present_security.id
                 
-                log.logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
 
                 return self.id
 
         except Exception as e:
-            log.logger.error("create() failed: %s" % e)
+            logger.error("create() failed: %s" % e)
             return None
 
     def update(self):
@@ -352,15 +354,15 @@ class SecurityDetails(EntityBase):
             results = query.toList()    
 
             self.last_updated = ts
-            log.logger.debug("update() %s - results: %s" % (self.label, results))
-            log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("update() %s - results: %s" % (self.label, results))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
             
-            log.logger.info("---Update--- %s = %d"%(self.label, self.id))
+            logger.info("---Update--- %s = %d"%(self.label, self.id))
 
             return self.id
 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None
 
     def add_blackduck_data(self, issue):
@@ -398,9 +400,9 @@ class SecurityDetails(EntityBase):
 
                 self.last_updated = ts
 
-                log.logger.debug("add_blackduck_cve() %s - results: %s" % (self.label, results))
-                log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+                logger.debug("add_blackduck_cve() %s - results: %s" % (self.label, results))
+                logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
             except Exception as e:
-                log.logger.error("add_blackduck_cve() failed: %s" % e)
+                logger.error("add_blackduck_cve() failed: %s" % e)
 

@@ -3,8 +3,10 @@ from entities.package import Package
 from entities.code_metrics import CodeMetricsResult, CodeMetricsLanguage
 from entities.utils import get_values as gv
 import re
-import set_logging as log
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Version(EntityBase):
@@ -70,7 +72,7 @@ class Version(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            log.logger.error("find_all() failed: %s" % e)
+            logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -79,7 +81,7 @@ class Version(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            log.logger.error("count() failed: %s" % e)
+            logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -88,7 +90,7 @@ class Version(EntityBase):
             return cls.g().V(version_id).outE().hasLabel("depends_on").count().toList()[0]
 
         except Exception as e:
-            log.logger.error("count_dependency() for version failed: %s" % e)
+            logger.error("count_dependency() for version failed: %s" % e)
             return None
 
     @classmethod
@@ -114,7 +116,7 @@ class Version(EntityBase):
                 return self.g().V(self.id).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete() failed: %s" % e)
+            logger.error("delete() failed: %s" % e)
             return None
 
     @classmethod
@@ -123,7 +125,7 @@ class Version(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete all() failed: %s" % e)
+            logger.error("delete all() failed: %s" % e)
             return None
 
     def save(self):
@@ -131,7 +133,7 @@ class Version(EntityBase):
             'ecosystem': self.ecosystem_package.ecosystem, 'name': self.ecosystem_package.name}
         pck_obj = Package.find_by_criteria('Package', package_criteria)
         if pck_obj is None:
-            log.logger.error(
+            logger.error(
                 "create() failed because package node does not exists")
             return None
         version_criteria = {'pecosystem': self.ecosystem_package.ecosystem,
@@ -163,8 +165,8 @@ class Version(EntityBase):
             for k, v in criteria_dict.items():
                 query = query.has(k, v)
             check_ver = query.toList()
-            log.logger.debug("query sent:------ %s" % query)
-            log.logger.debug("query_result:----- %s" % check_ver)
+            logger.debug("query sent:------ %s" % query)
+            logger.debug("query_result:----- %s" % check_ver)
             if len(check_ver) == 0:
                 return None
             else:
@@ -184,21 +186,21 @@ class Version(EntityBase):
                                              check_ver[0].id,  values.get('last_updated')[0], **add_data_dict)
 
         except Exception as e:
-            log.logger.error("find_by_criteria() failed: %s" % e)
+            logger.error("find_by_criteria() failed: %s" % e)
             return None
 
     def create(self):
-        log.logger.debug("create() %s - data:\n%s\n" %
+        logger.debug("create() %s - data:\n%s\n" %
                      (self.label, self.to_json()))
 
         if self.ecosystem_package is None:
-            log.logger.error("create() failed because ecosystem_package is None")
+            logger.error("create() failed because ecosystem_package is None")
             return None
         package_criteria = {
             'ecosystem': self.ecosystem_package.ecosystem, 'name': self.ecosystem_package.name}
         pck_obj = Package.find_by_criteria('Package', package_criteria)
         if pck_obj is None:
-            log.logger.error(
+            logger.error(
                 "create() failed because package node does not exists")
             return None
 
@@ -227,31 +229,31 @@ class Version(EntityBase):
 
                 results = query.toList()
 
-                log.logger.debug("create() %s - results: %s" %
+                logger.debug("create() %s - results: %s" %
                              (self.label, results))
 
                 self.last_updated = ts
                 self.id = results[0].id
-                log.logger.debug("results: %s" % (results))
-                log.logger.debug("Vertex ID : %s, %s: %s" %
+                logger.debug("results: %s" % (results))
+                logger.debug("Vertex ID : %s, %s: %s" %
                             (self.id, self.label, self))
                 
-                log.logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---NEW = %d"%(self.label, self.id))
 
                 return self.id
 
             else:
-                log.logger.debug("Version exists: %s " %
+                logger.debug("Version exists: %s " %
                              present_version.id)
                 self.last_updated = present_version.last_updated
                 self.id = present_version.id
                 
-                log.logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
+                logger.info("---Create--- %s ---EXISTS = %d"%(self.label, self.id))
 
                 return self.id
 
         except Exception as e:
-            log.logger.error("create() failed: %s" % e)
+            logger.error("create() failed: %s" % e)
             return None
 
     def update(self):
@@ -275,15 +277,15 @@ class Version(EntityBase):
 
             results = query.toList()    
             self.last_updated = ts
-            log.logger.debug("update() %s - results: %s" % (self.label, results))
-            log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("update() %s - results: %s" % (self.label, results))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
             
-            log.logger.info("---Update--- %s = %d"%(self.label, self.id))
+            logger.info("---Update--- %s = %d"%(self.label, self.id))
 
             return self.id
 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None
 
     def add_license_edge(self, license_detail, license_count):
@@ -291,7 +293,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, license_detail.id, 'licensed_under')
             if result == True:
-                log.logger.debug("version-license edge present, nothing to do")
+                logger.debug("version-license edge present, nothing to do")
                 return
             elif result == False:
                 g = self.g()
@@ -302,12 +304,12 @@ class Version(EntityBase):
                     to(g.V(license_detail.id)).\
                     toList()
 
-                log.logger.debug("add_license_edge(): %s - results: %s" %
+                logger.debug("add_license_edge(): %s - results: %s" %
                              (self.label, results))
                 return results
 
         except Exception as e:
-            log.logger.error("add_edge_version_license_data failed: %s" % e)
+            logger.error("add_edge_version_license_data failed: %s" % e)
             return None
 
     def add_security_edge(self, security_detail, cvss):
@@ -315,7 +317,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, security_detail.id, 'contains_cve')
             if result == True:
-                log.logger.debug("version-security edge present, nothing to do")
+                logger.debug("version-security edge present, nothing to do")
                 return
             elif result == False:
                 g = self.g()
@@ -326,12 +328,12 @@ class Version(EntityBase):
                     to(g.V(security_detail.id)).\
                     toList()
 
-                log.logger.debug("add_security_edge(): %s - results: %s" %
+                logger.debug("add_security_edge(): %s - results: %s" %
                              (self.label, results))
                 return results
 
         except Exception as e:
-            log.logger.error("add_edge_version_security_data failed: %s" % e)
+            logger.error("add_edge_version_security_data failed: %s" % e)
             return None
 
     def add_edge_github_details(self, github_result):
@@ -347,7 +349,7 @@ class Version(EntityBase):
                     to(g.V(github_result.id)). \
                     toList()
 
-                log.logger.debug("add_edge_github_details(): %s - results: %s" %
+                logger.debug("add_edge_github_details(): %s - results: %s" %
                              (self.label, results))
                 return github_result
             else:
@@ -356,7 +358,7 @@ class Version(EntityBase):
                 return github_result
 
         except Exception as e:
-            log.logger.error("add_edge_version_github_details failed: %s" % e)
+            logger.error("add_edge_version_github_details failed: %s" % e)
             return None
 
 
@@ -365,7 +367,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, author.id, 'authored_by')
             if result == True:
-                log.logger.debug("version-author edge present, nothing to do")
+                logger.debug("version-author edge present, nothing to do")
                 return
             elif result == False:
                 g = self.g()
@@ -375,12 +377,12 @@ class Version(EntityBase):
                     to(g.V(author.id)). \
                     toList()
 
-                log.logger.debug("add_edge_author(): %s - results: %s" %
+                logger.debug("add_edge_author(): %s - results: %s" %
                              (self.label, results))
                 return results
 
         except Exception as e:
-            log.logger.error("add_edge_version_authored_by  failed: %s" % e)
+            logger.error("add_edge_version_authored_by  failed: %s" % e)
             return None
 
     def add_edge_contributor(self, contributor):
@@ -388,7 +390,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, contributor.id, 'contributed_by')
             if result == True:
-                log.logger.debug("version-contributor edge present, nothing to do")
+                logger.debug("version-contributor edge present, nothing to do")
                 return
             elif result == False:
                 g = self.g()
@@ -398,12 +400,12 @@ class Version(EntityBase):
                     to(g.V(contributor.id)). \
                     toList()
 
-                log.logger.debug("add_edge_contributor(): %s - results: %s" %
+                logger.debug("add_edge_contributor(): %s - results: %s" %
                              (self.label, results))
                 return results
 
         except Exception as e:
-            log.logger.error("add_edge_version_contributed_by failed: %s" % e)
+            logger.error("add_edge_version_contributed_by failed: %s" % e)
             return None
 
     def add_edge_dependency(self, dependency, dependency_type):
@@ -411,7 +413,7 @@ class Version(EntityBase):
             result = Version.edge_exists(
                 self.id, dependency.id, 'depends_on', {'dependency_type': dependency_type})
             if result == True:
-                log.logger.debug(
+                logger.debug(
                     "version-version-dependency-dependency_type edge present, nothing to do")
                 return
             elif result == False:
@@ -423,12 +425,12 @@ class Version(EntityBase):
                     to(g.V(dependency.id)).\
                     toList()
 
-                log.logger.debug("d_dependency_edge(): %s - results: %s" %
+                logger.debug("d_dependency_edge(): %s - results: %s" %
                              (self.label, results))
                 return results
 
         except Exception as e:
-            log.logger.error(
+            logger.error(
                 "add_edge_version_depends_on_version all failed: %s" % e)
             return None
 
@@ -445,7 +447,7 @@ class Version(EntityBase):
                     to(g.V(code_metrics.id)).\
                     toList()
 
-                log.logger.debug("add_code_metrics_edge(): %s - results: %s" %
+                logger.debug("add_code_metrics_edge(): %s - results: %s" %
                              (self.label, results))
                 return code_metrics
             else:
@@ -454,7 +456,7 @@ class Version(EntityBase):
                     return code_metrics
 
         except Exception as e:
-            log.logger.error("add_code_metrics_edge() failed: %s" % e)
+            logger.error("add_code_metrics_edge() failed: %s" % e)
             return None
 
     @classmethod
@@ -474,12 +476,12 @@ class Version(EntityBase):
 
         except Exception as e:
             msg = "edge_exists() failed: %s" % e
-            log.logger.error(msg)
+            logger.error(msg)
             raise RuntimeError(msg)
 
     def add_additional_data_as_attr(self, add_details):
 
-        log.logger.debug("reached add_details_as_attributes")
+        logger.debug("reached add_details_as_attributes")
         self.add_details = add_details
 
         # self.licences = self.add_details.get("licences", [])
@@ -504,20 +506,20 @@ class Version(EntityBase):
             results = query.toList()        
 
             self.last_updated = ts
-            log.logger.debug("add_additional_details_as_attr() %s - results: %s" % (self.label, results))
-            log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("add_additional_details_as_attr() %s - results: %s" % (self.label, results))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
-            log.logger.info("---Add_CODE_METRIC_DETAILS---To %s  = %d"%(self.label, self.id))
+            logger.info("---Add_CODE_METRIC_DETAILS---To %s  = %d"%(self.label, self.id))
 
         except Exception as e:
-            log.logger.error("add_additional_details_as_attr() failed: %s" % e)
+            logger.error("add_additional_details_as_attr() failed: %s" % e)
 
         return self.add_details
 
     def add_license_attribute(self, licenses):
         try:
             self.licenses = licenses
-            log.logger.debug("Saving license under version")
+            logger.debug("Saving license under version")
             ts = time.time()
             query = self.g().V(self.id).\
                             property('last_updated', ts)
@@ -528,15 +530,15 @@ class Version(EntityBase):
             results = query.toList()                    
             
             self.last_updated = ts
-            log.logger.debug("add_license_as_attr() %s - results: %s" %
+            logger.debug("add_license_as_attr() %s - results: %s" %
                          (self.label, results))
-            log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
-            log.logger.info("---Add_LICENSE_DETAILS---To %s  = %d"%(self.label, self.id))
+            logger.info("---Add_LICENSE_DETAILS---To %s  = %d"%(self.label, self.id))
             
             return self.licenses
         except Exception as e:
-            log.logger.error("add_license_attributes() failed: %s" % e)
+            logger.error("add_license_attributes() failed: %s" % e)
             return None
 
     def add_blackduck_cve_edge(self, security_detail):
@@ -548,24 +550,24 @@ class Version(EntityBase):
                 to(g.V(security_detail.id)).\
                 toList()
 
-            log.logger.debug("add_blackduck_cve_edge(): %s - results: %s" %
+            logger.debug("add_blackduck_cve_edge(): %s - results: %s" %
                          (self.label, results))
             
-            log.logger.info("---Add_BLACKDUCK_DETAILS---To %s  = %d"%(self.label, self.id))
+            logger.info("---Add_BLACKDUCK_DETAILS---To %s  = %d"%(self.label, self.id))
 
             return results
 
         except Exception as e:
-            log.logger.error("add_blackduck_cve_edge() failed: %s" % e)
+            logger.error("add_blackduck_cve_edge() failed: %s" % e)
             return None
 
     def get_version_out_edge(self, edge_label):
             try:
                 g = self.g()
                 results = g.V(self.id).out(edge_label).toList()
-                log.logger.debug("results: %s" % results)
+                logger.debug("results: %s" % results)
                 return results
 
             except Exception as e:
-                log.logger.error("get_versions_of_package() failed: %s" % e)
+                logger.error("get_versions_of_package() failed: %s" % e)
                 return None

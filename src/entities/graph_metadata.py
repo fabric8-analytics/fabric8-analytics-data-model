@@ -2,7 +2,10 @@ from entities.entity_base import EntityBase
 from entities.utils import get_values as gv
 import config
 import traceback
-import set_logging as log
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class GraphMetaData(EntityBase):
     """
@@ -35,7 +38,7 @@ class GraphMetaData(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            log.logger.error("find_all() failed: %s" % e)
+            logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -44,7 +47,7 @@ class GraphMetaData(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            log.logger.error("count() failed: %s" % e)
+            logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -54,7 +57,7 @@ class GraphMetaData(EntityBase):
                 outE().count().toList()[0]
 
         except Exception as e:
-            log.logger.error("edge_count() failed: %s" % e)
+            logger.error("edge_count() failed: %s" % e)
 
     @classmethod
     def delete_all(cls):
@@ -62,7 +65,7 @@ class GraphMetaData(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete all() failed: %s" % e)
+            logger.error("delete all() failed: %s" % e)
             return None
 
     @classmethod
@@ -78,8 +81,8 @@ class GraphMetaData(EntityBase):
             for k, v in criteria_dict.items():
                 query = query.has(k, v)
             check_meta = query.toList()
-            log.logger.debug("query sent:------ %s" % query)
-            log.logger.debug("query_result:----- %s" % check_meta)
+            logger.debug("query sent:------ %s" % query)
+            logger.debug("query_result:----- %s" % check_meta)
 
             if len(check_meta) == 0:
                 return None
@@ -90,7 +93,7 @@ class GraphMetaData(EntityBase):
                                              values.get('last_imported_epv')[0])
 
         except Exception as e:
-            log.logger.error("find_by_criteria() failed: %s" % e)
+            logger.error("find_by_criteria() failed: %s" % e)
             return None
 
     def create(self):
@@ -105,19 +108,19 @@ class GraphMetaData(EntityBase):
                     property('last_incr_update_ts', self.last_incr_update_ts). \
                     property('last_imported_epv', self.last_imported_epv).\
                     toList()
-                log.logger.debug("create() %s - results: %s" % (self.label, results))
+                logger.debug("create() %s - results: %s" % (self.label, results))
 
                 self.id = results[0].id
-                log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+                logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
                 return self.id
 
             else:
-                log.logger.debug("Graph MetaData exists: %s " % present_metadata.id)
+                logger.debug("Graph MetaData exists: %s " % present_metadata.id)
                 self.id = present_metadata.id
                 return self.id
 
         except Exception as e:
-            log.logger.error("create() failed: %s" % e)
+            logger.error("create() failed: %s" % e)
             return None
 
     def update(self):
@@ -127,13 +130,13 @@ class GraphMetaData(EntityBase):
                 property('last_imported_epv', self.last_imported_epv).\
                 toList()
 
-            log.logger.debug("update() %s - results: %s" % (self.label, results))
-            log.logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
+            logger.debug("update() %s - results: %s" % (self.label, results))
+            logger.debug("Vertex ID : %s, %s: %s" % (self.id, self.label, self))
 
             return self.id
 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None
 
     def update_from_json(self, input_json):

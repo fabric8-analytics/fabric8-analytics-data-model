@@ -1,7 +1,8 @@
 from entities.entity_base import EntityBase
-import set_logging as log
 import time
+import logging
 
+logger = logging.getLogger(__name__)
 
 # TODO: Handle 1-language-multipe-modules
 # class CRModules:
@@ -57,16 +58,16 @@ class CodeMetricsLanguage(EntityBase):
                 property('last_updated', ts).\
                 toList()
 
-            log.logger.debug("create() CodeMetricsLanguage - results: %s" % results)
+            logger.debug("create() CodeMetricsLanguage - results: %s" % results)
 
             self.last_updated = ts
             self.id = results[0].id
-            log.logger.debug("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
+            logger.debug("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
 
             return self.id
 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None
 
     def update(self):
@@ -89,12 +90,12 @@ class CodeMetricsLanguage(EntityBase):
                 toList()
 
             self.last_updated = ts
-            log.logger.debug("update() CodeMetricsLanguage - results: %s" % results)
-            log.logger.debug("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
+            logger.debug("update() CodeMetricsLanguage - results: %s" % results)
+            logger.debug("Vertex ID : %s, CodeMetricsLanguage: %s" % (self.id, self))
             return self.id
 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None
 
     @classmethod
@@ -103,7 +104,7 @@ class CodeMetricsLanguage(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            log.logger.error("find_all() failed: %s" % e)
+            logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -112,7 +113,7 @@ class CodeMetricsLanguage(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            log.logger.error("count() failed: %s" % e)
+            logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -121,7 +122,7 @@ class CodeMetricsLanguage(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete all() failed: %s" % e)
+            logger.error("delete all() failed: %s" % e)
             return None
 
 
@@ -216,7 +217,7 @@ class CodeMetricsResult(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).toList()
 
         except Exception as e:
-            log.logger.error("find_all() failed: %s" % e)
+            logger.error("find_all() failed: %s" % e)
             return None
 
     @classmethod
@@ -225,7 +226,7 @@ class CodeMetricsResult(EntityBase):
             return len(cls.find_all())
 
         except Exception as e:
-            log.logger.error("count() failed: %s" % e)
+            logger.error("count() failed: %s" % e)
             return None
 
     @classmethod
@@ -234,7 +235,7 @@ class CodeMetricsResult(EntityBase):
             return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
 
         except Exception as e:
-            log.logger.error("delete all() failed: %s" % e)
+            logger.error("delete all() failed: %s" % e)
             return None
 
     def create(self):
@@ -247,11 +248,11 @@ class CodeMetricsResult(EntityBase):
                 property('last_updated', ts).\
                 toList()
 
-            log.logger.debug("create() CodeMetricsResult - results: %s" % results)
+            logger.debug("create() CodeMetricsResult - results: %s" % results)
 
             self.last_updated = ts
             self.id = results[0].id
-            log.logger.debug("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
+            logger.debug("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
 
             for lang in self.details.languages:
                 lang.save()
@@ -260,7 +261,7 @@ class CodeMetricsResult(EntityBase):
             return self.id
 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None
 
     def create_language_metrics_edge(self, v):
@@ -269,7 +270,7 @@ class CodeMetricsResult(EntityBase):
             return g.V(self.id).addE("has_language_metrics").property('last_updated', time.time()).to(g.V(v.id)).toList()
 
         except Exception as e:
-            log.logger.error("create_language_metrics_edge() failed: %s" % e)
+            logger.error("create_language_metrics_edge() failed: %s" % e)
             return None
 
     def update(self):
@@ -294,15 +295,15 @@ class CodeMetricsResult(EntityBase):
 
                 for lang in self.details.languages:
                     lang.save()
-                    log.logger.debug("update() CodeMetricsLanguage - results: %s" % lang.to_json())
+                    logger.debug("update() CodeMetricsLanguage - results: %s" % lang.to_json())
                     self.create_language_metrics_edge(lang)
 
-                log.logger.debug("update() CodeMetricsResult - results: %s" % results)
-                log.logger.debug("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
+                logger.debug("update() CodeMetricsResult - results: %s" % results)
+                logger.debug("Vertex ID : %s, CodeMetricsResult: %s" % (self.id, self))
                 return self.id
             except Exception as e:
                 raise Exception('Failed to delete and update the language code metric')
                 
         except Exception as e:
-            log.logger.error("update() failed: %s" % e)
+            logger.error("update() failed: %s" % e)
             return None

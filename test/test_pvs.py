@@ -1,6 +1,9 @@
 from entities.utils import test_utils
 from entities.version import Version
-import set_logging as log
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def test_package_version_basic_properties():
     test_npm_abbrev_1_0_4 = test_utils.load_package_version_values(
@@ -47,7 +50,7 @@ def test_version_dependency():
                 "supertest"]
     checker = [
         v["version"].ecosystem_package.name in dep_list for v in test_npm_serve_static_1_7_1.depends_on]
-    log.logger.debug("Serve-static dep values %s" % checker)
+    logger.debug("Serve-static dep values %s" % checker)
     assert all(checker)
     assert (len(test_npm_serve_static_1_7_1.depends_on) == 8)
 
@@ -92,7 +95,7 @@ def test_downstream_summary():
                 "nodejs-abbrev"]
     checker = [
         name in pck_list for name in test_npm_abbrev_1_0_4.is_packaged_in]
-    log.logger.debug("Abbrev packaged_in values %s" % checker)
+    logger.debug("Abbrev packaged_in values %s" % checker)
     assert (all(checker))
     assert (len(test_npm_abbrev_1_0_4.is_published_in) == 0)
 
@@ -103,6 +106,6 @@ def test_downstream_summary():
     pck_list = ["nodejs-serve-static"]
     checker = [
         name in pck_list for name in test_npm_serve_static_1_7_1.is_packaged_in]
-    log.logger.debug("Serve-static packaged_in values %s" % checker)
+    logger.debug("Serve-static packaged_in values %s" % checker)
     assert (all(checker))
     assert (len(test_npm_serve_static_1_7_1.is_published_in) == 0)
