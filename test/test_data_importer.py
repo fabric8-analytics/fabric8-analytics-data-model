@@ -1,5 +1,5 @@
 import os
-from data_importer import import_bulk
+from data_importer import import_bulk, import_from_folder
 from data_source.local_filesystem_data_source import LocalFileSystem
 from data_source.json_book_keeper import JsonBookKeeper
 
@@ -91,3 +91,151 @@ def test_full_import_and_incr_update():
     Version.delete_all()
     assert (Version.count() == 0)
 
+
+def test_package_import_from_folder():
+    package_dir = 'test/data/S3-data/maven/junit:junit'
+
+    packages = Package.find_all()
+    assert (len(packages) == 0)
+
+    versions = Version.find_all()
+    assert (len(versions) == 0)
+
+    p = Package()
+    assert (p.id is None)
+    assert (p.label == "Package")
+    assert p.last_updated is None
+
+    report = import_from_folder(package_dir)
+
+    assert(report.get('status') == 'Success')
+    assert(report.get('count_imported_EPVs') == 1)
+    assert(report.get('last_imported_EPV') == '4.8.2.json')
+    assert(report.get('max_finished_at') == '2017-02-24T13:42:29.665786')
+
+    criteria_dict = {'ecosystem': 'maven', 'name': 'junit:junit'}
+    p1 = Package.find_by_criteria('Package', criteria_dict)
+
+    assert p1 is not None
+    assert p1.id is not None
+    assert (p1.ecosystem == 'maven')
+    assert (p1.latest_version == '4.12')
+    assert (p1.package_dependents_count == -1)
+    assert (p1.name == 'junit:junit')
+
+    criteria_dict = {'pecosystem': 'maven', 'pname': 'junit:junit', 'version': '4.8.2'}
+    v1 = Version.find_by_criteria('Version', p1, criteria_dict)
+
+    assert v1 is not None
+    assert v1.ecosystem_package is not None
+    assert (v1.ecosystem_package.ecosystem == 'maven')
+
+    packages = Package.find_all()
+    assert (len(packages) == 1)
+
+    versions = Version.find_all()
+    assert (len(versions) == 1)
+
+    Package.delete_by_id(p1.id)
+    assert (Package.count() == 0)
+
+    Version.delete_by_id(v1.id)
+    assert (Version.count() == 0)
+
+    GraphMetaData.delete_all()
+    assert (GraphMetaData.count() == 0)
+
+
+def test_ecosystem_import_from_folder():
+    ecosystem_dir = 'test/data/S3-data/maven'
+
+    packages = Package.find_all()
+    assert (len(packages) == 0)
+
+    p = Package()
+    assert (p.id is None)
+    assert (p.label == "Package")
+    assert p.last_updated is None
+
+    report = import_from_folder(ecosystem_dir)
+
+    assert(report.get('status') == 'Success')
+    assert(report.get('count_imported_EPVs') == 2)
+    assert(report.get('last_imported_EPV') == 'org.slf4j:slf4j-api/1.5.6.json')
+    assert(report.get('max_finished_at') == '2017-02-24T13:43:11.872916')
+
+    criteria_dict = {'ecosystem': 'maven', 'name': 'junit:junit'}
+    p1 = Package.find_by_criteria('Package', criteria_dict)
+
+    criteria_dict = {'pecosystem': 'maven', 'pname': 'junit:junit', 'version': '3.8.1'}
+    v1 = Version.find_by_criteria('Version', p1, criteria_dict)
+
+    assert v1 is not None
+    assert v1.ecosystem_package is not None
+    assert (v1.ecosystem_package.ecosystem == 'maven')
+
+    packages = Package.find_all()
+    assert (len(packages) == 2)
+
+    versions = Version.find_all()
+    assert (len(versions) == 3)
+
+    Package.delete_all()
+    assert (Package.count() == 0)
+
+    Version.delete_all()
+    assert (Version.count() == 0)
+
+    GraphMetaData.delete_all()
+    assert (GraphMetaData.count() == 0)
+
+
+def test_bucket_import_from_folder():
+    bucket_dir = 'test/data/S3-data'
+
+    packages = Package.find_all()
+    assert (len(packages) == 0)
+
+    p = Package()
+    assert (p.id is None)
+    assert (p.label == "Package")
+    assert p.last_updated is None
+
+    report = import_from_folder(bucket_dir)
+
+    assert (report.get('status') == 'Success')
+    assert (report.get('count_imported_EPVs') == 3)
+    assert (report.get('last_imported_EPV') == 'npm/sequence/3.0.0.json')
+    assert (report.get('max_finished_at') == '2017-02-24T13:43:11.872916')
+
+    criteria_dict = {'ecosystem': 'npm', 'name': 'sequence'}
+    p1 = Package.find_by_criteria('Package', criteria_dict)
+
+    assert p1 is not None
+    assert p1.id is not None
+    assert (p1.ecosystem == 'npm')
+    assert (p1.latest_version == '3.0.0')
+    assert (p1.package_dependents_count == 22)
+    assert (p1.name == 'sequence')
+
+    criteria_dict = {'pecosystem': 'npm', 'pname': 'sequence', 'version': '3.0.0'}
+    v1 = Version.find_by_criteria('Version', p1, criteria_dict)
+
+    assert v1 is not None
+    assert v1.ecosystem_package is not None
+    assert (v1.ecosystem_package.ecosystem == 'npm')
+
+    packages = Package.find_all()
+    assert (len(packages) == 3)
+
+    versions = Version.find_all()
+    assert (len(versions) == 4)
+
+    Package.delete_all()
+    assert (Package.count() == 0)
+
+    Version.delete_all()
+    assert (Version.count() == 0)
+
+    GraphMetaData.delete_all()
+    assert (GraphMetaData.count() == 0)
