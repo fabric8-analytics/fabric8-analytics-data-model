@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class Package(EntityBase):
 
-    def __init__(self, ecosystem='', name='', package_relative_used='', package_dependents_count=-1, latest_version='', **github_dict):
+    def __init__(self, ecosystem='-1', name='-1', package_relative_used='-1', package_dependents_count=-1, latest_version='-1', **github_dict):
         super(Package, self).__init__()
         self.ecosystem = ecosystem
         self.name = name
@@ -18,6 +18,7 @@ class Package(EntityBase):
         self.package_dependents_count = package_dependents_count
         self.latest_version = latest_version
         if len(github_dict) is not 0:
+            self.gh_stargazers = github_dict.get("gh_stargazers",-1)
             self.gh_stargazers = github_dict.get("gh_stargazers",-1)
             self.gh_forks = github_dict.get("gh_forks",-1)
             self.gh_issues_last_year_opened = github_dict.get("gh_issues_last_year_opened",-1)
