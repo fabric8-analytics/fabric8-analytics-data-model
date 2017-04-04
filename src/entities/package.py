@@ -19,7 +19,6 @@ class Package(EntityBase):
         self.latest_version = latest_version
         if len(github_dict) is not 0:
             self.gh_stargazers = github_dict.get("gh_stargazers",-1)
-            self.gh_stargazers = github_dict.get("gh_stargazers",-1)
             self.gh_forks = github_dict.get("gh_forks",-1)
             self.gh_issues_last_year_opened = github_dict.get("gh_issues_last_year_opened",-1)
             self.gh_issues_last_year_closed = github_dict.get("gh_issues_last_year_closed",-1)
