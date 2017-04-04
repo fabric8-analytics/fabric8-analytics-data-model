@@ -1,12 +1,5 @@
-
 from entities.github_details import load_github_result_from_json
 from entities.utils import get_values as gv
-
-import config
-import logging
-
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 
 def test_github_details_empty():

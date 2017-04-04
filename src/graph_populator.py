@@ -9,9 +9,7 @@ from entities.support_vectors import LicenseDetails, SecurityDetails
 from entities.utils import version_dependencies as vdv
 from entities.utils import blackduck_cve as bl
 import logging
-import config
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 

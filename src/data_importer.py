@@ -1,8 +1,8 @@
 from graph_populator import GraphPopulator
+import logging
 import sys
 import config
 import traceback
-import logging
 import json
 import os
 from optparse import OptionParser
@@ -12,7 +12,6 @@ from data_source.local_filesystem_data_source import LocalFileSystem
 from data_source.s3_data_source import S3DataSource
 from data_source.rds_book_keeper import RDSBookKeeper
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -70,7 +69,7 @@ def _import_grouped_keys(data_source, dict_grouped_keys):
             obj = {"analyses": {}}
             first_key = v[0]
             logger.debug("Importing " + first_key)
-            logger.info("File---- %s  numbered---- %d  added:" % (first_key, counter))
+            logger.debug("File---- %s  numbered---- %d  added:" % (first_key, counter))
 
             t = data_source.read_json_file(first_key)
             cur_finished_at = t.get("finished_at")
@@ -182,7 +181,7 @@ def import_bulk(data_source, book_keeper):
                          report.get('max_finished_at'))
 
         if report.get('status') is 'Success':
-            logger.info(msg)
+            logger.debug(msg)
         else:
             # TODO: retry ??
             logger.error(msg)
@@ -225,7 +224,7 @@ def import_epv(data_source, list_epv):
                          report.get('max_finished_at'))
 
         if report.get('status') is 'Success':
-            logger.info(msg)
+            logger.debug(msg)
         else:
             # TODO: retry ??
             logger.error(msg)
@@ -272,7 +271,6 @@ def import_epv_from_folder(src_dir, list_epv):
 
 
 if __name__ == '__main__':
-
     parser = OptionParser()
     parser.add_option("-s", "--source", dest="source",
                       help="Source can be S3 or DIR", metavar="SOURCE")
@@ -283,12 +281,12 @@ if __name__ == '__main__':
 
     source = "S3"
     if options.source is None:
-        print ("No source provided")
+        logger.info ("No source provided")
     else:
         if options.source.upper() == "DIR":
             source = "DIR"
             if options.directory is None:
-                print ("Directory path not provided")
+                logger.info ("Directory path not provided")
                 sys.exit(-1)
 
     if source == "S3":
@@ -296,6 +294,6 @@ if __name__ == '__main__':
     elif source == "DIR":
         import_from_folder(options.directory)
     else:
-        print ("Invalid CLI arguments")
+        logger.info ("Invalid CLI arguments")
         sys.exit(-1)
 

@@ -1,13 +1,9 @@
-import config
-import logging
 from entities.package import Package
 from entities.utils import get_values as gv
 from entities.version import Version
 from entities.support_vectors import LicenseDetails
 import re
 
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 serve_static_json = gv.read_from_file('test/data/npm--serve-static-1.7.1.json')
 

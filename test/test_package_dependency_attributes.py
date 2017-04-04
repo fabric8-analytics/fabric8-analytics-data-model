@@ -1,11 +1,6 @@
 from entities.package import Package
 from entities.version import Version
 from data_importer import import_epv_from_folder
-import logging
-import config
-
-logging.basicConfig(filename=config.LOGFILE_PATH, level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 
 def test_create_package_entity():
