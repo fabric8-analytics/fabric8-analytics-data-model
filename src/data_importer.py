@@ -51,12 +51,12 @@ def _import_grouped_keys(data_source, dict_grouped_keys):
 
             t = data_source.read_json_file(first_key)
             cur_finished_at = t.get("finished_at")
-            obj["dependents_count"] = t.get("dependents_count", '')
+            obj["dependents_count"] = t.get("dependents_count", '-1')
             obj["package_info"] = t.get("package_info", {})
-            obj["version"] = t.get("version", '')
-            obj["latest_version"] = t.get("latest_version", '')
-            obj["ecosystem"] = t.get("ecosystem", '')
-            obj["package"] = t.get("package", '')
+            obj["version"] = t.get("version", '-1')
+            obj["latest_version"] = t.get("latest_version", '-1')
+            obj["ecosystem"] = t.get("ecosystem", '-1')
+            obj["package"] = t.get("package", '-1')
             for this_key in v[1:]:
                 value = data_source.read_json_file(this_key)
                 if this_key.endswith("source_licenses.json"):
