@@ -4,34 +4,34 @@ import re
 
 
 def get_version(input_json):
-    return input_json.get('version') or ''
+    return input_json.get('version') or '-1'
 
 
 def get_refstack_name(input_json):
-    return input_json.get('name') or ''
+    return input_json.get('name') or '-1'
 
 
 def get_ecosystem(input_json):
-    return input_json.get('ecosystem') or ''
+    return input_json.get('ecosystem') or '-1'
 
 
 def get_package(input_json):
-    return input_json.get('package') or ''
+    return input_json.get('package') or '-1'
 
 
 def get_refstack_license(input_json):
-    return input_json.get('license') or ''
+    return input_json.get('license') or '-1'
 
 
 def get_refstack_description(input_json):
-    return input_json.get('description') or ''
+    return input_json.get('description') or '-1'
 
 
 def get_description(input_json):
     result = ''
     if 'metadata' in input_json['analyses'] and 'details' in input_json['analyses']['metadata'] and len(input_json["analyses"]["metadata"]["details"]) != 0:
         result = input_json['analyses']['metadata'][
-            'details'][0].get('description') or ''
+            'details'][0].get('description') or '-1'
     return re.sub('[^A-Za-z0-9_ ]', '', result).lower()
 
 
@@ -40,7 +40,7 @@ def get_hashes(input_json):
 
 
 def get_latest_version(input_json):
-    return input_json.get('latest_version') or ''
+    return input_json.get('latest_version') or '-1'
 
 
 def get_version_dependents_count(input_json):
@@ -59,7 +59,7 @@ def get_package_info(input_json):
     result = ''
     result2 = -1
     if 'package_info' in input_json:
-        result = input_json['package_info'].get('relative_usage') or ''
+        result = input_json['package_info'].get('relative_usage') or '-1'
         result2 = input_json['package_info'].get('dependents_count') or -1
     return result, result2
 
