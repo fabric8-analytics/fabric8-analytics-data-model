@@ -7,3 +7,4 @@ config.py
 error.log
 env.txt
 tool/
+.idea/
