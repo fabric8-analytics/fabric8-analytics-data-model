@@ -1,15 +1,12 @@
-import glob
 from graph_populator import GraphPopulator
-from entities.utils import get_values as gv
 import logging
-import set_logging
 import sys
 import config
 import traceback
 import json
+import os
 from optparse import OptionParser
 from datetime import datetime
-from sqlalchemy import create_engine
 
 from data_source.local_filesystem_data_source import LocalFileSystem
 from data_source.s3_data_source import S3DataSource
@@ -18,17 +15,42 @@ from data_source.rds_book_keeper import RDSBookKeeper
 logger = logging.getLogger(__name__)
 
 
-def _group_keys_by_epv(all_keys):
-    d = {}
-    c = 0
-    for b in all_keys:
-        if len(b.split("/")) == 3:
-            c += 1
-            d[c] = []
-            d[c].append(b)
+def _group_keys_s3(all_keys):
+    grouped_keys = {}
+    counter = 0
+    for key in all_keys:
+        if len(key.split("/")) == 3:
+            counter += 1
+            grouped_keys[counter] = []
+            grouped_keys[counter].append(key)
         else:
-            d[c].append(b)
-    return d
+            grouped_keys[counter].append(key)
+    return grouped_keys
+
+
+def _group_keys_directory(all_keys, packages_path):
+    grouped_keys = {}
+    counter = 0
+    grouped_keys[counter] = []
+    version_json = json.load(open(os.path.join(packages_path, all_keys[0])))
+    version = version_json["version"]
+    for key in all_keys:
+        if version not in key:
+            counter += 1
+            version_json = json.load(open(os.path.join(packages_path, key)))
+            version = version_json["version"]
+            grouped_keys[counter] = []
+            grouped_keys[counter].append(key)
+        else:
+            grouped_keys[counter].append(key)
+    return grouped_keys
+
+
+def _group_keys_by_epv(all_keys, data_source):
+    if data_source.get_source_name() == "S3":
+        return _group_keys_s3(all_keys, 3)
+    else:
+        return _group_keys_directory(all_keys, data_source.src_dir)
 
 
 def _import_grouped_keys(data_source, dict_grouped_keys):
@@ -134,7 +156,7 @@ def import_bulk(data_source, book_keeper):
         # end of if graph_meta is None:
 
         # Import the S3 data
-        dict_grouped_keys = _group_keys_by_epv(list_keys)
+        dict_grouped_keys = _group_keys_by_epv(list_keys, data_source)
         report = _import_grouped_keys(data_source, dict_grouped_keys)
 
         # In the end, update the meta-data in the graph.
@@ -185,7 +207,7 @@ def import_epv(data_source, list_epv):
         # end of if graph_meta is None:
 
         # Import the S3 data
-        dict_grouped_keys = _group_keys_by_epv(list_keys)
+        dict_grouped_keys = _group_keys_by_epv(list_keys, data_source)
         report = _import_grouped_keys(data_source, dict_grouped_keys)
 
         # Log the report
