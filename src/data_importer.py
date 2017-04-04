@@ -39,9 +39,8 @@ def _group_keys_directory(all_keys, packages_path):
             version_json = json.load(open(os.path.join(packages_path, key)))
             version = version_json["version"]
             grouped_keys[counter] = []
-            grouped_keys[counter].append(key)
-        else:
-            grouped_keys[counter].append(key)
+        if key.endswith("json"):
+            grouped_keys[counter].append(key)    
     return grouped_keys
 
 
@@ -50,7 +49,6 @@ def _group_keys_by_epv(all_keys, data_source):
         return _group_keys_s3(all_keys, 3)
     else:
         return _group_keys_directory(all_keys, data_source.src_dir)
->>>>>>> upstream/master
 
 
 def _import_grouped_keys(data_source, dict_grouped_keys):
