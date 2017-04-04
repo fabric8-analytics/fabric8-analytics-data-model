@@ -25,9 +25,8 @@ def _group_keys_by_epv(all_keys):
         if len(b.split("/")) == 3:
             c += 1
             d[c] = []
-            d[c].append(b)
-        else:
-            d[c].append(b)
+        if b.endswith("json"):
+                d[c].append(b)
     return d
 
 
