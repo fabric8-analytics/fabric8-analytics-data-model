@@ -50,16 +50,18 @@ class GraphPopulator(object):
         package.create_version_edge(version)
 
         analyses = input_json["analyses"]
-        if "metadata" in analyses:
-            meta_data = analyses["metadata"]
+        if "dependency_snapshot" in analyses:
+            dependency_snapshot = analyses["dependency_snapshot"]
             dependency_pck_list, dependency_ver_list, dependency_type = vdv.load_dependencies(
-                version.ecosystem_package.ecosystem, meta_data)
+                version.ecosystem_package.ecosystem, dependency_snapshot)
             for d_pck, d_ver, d_type in zip(dependency_pck_list, dependency_ver_list, dependency_type):
                 d_pck.save()
                 d_ver.save()
                 d_pck.create_version_edge(d_ver)
                 version.add_edge_dependency(d_ver, d_type)
-
+        
+        if "metadata" in analyses:
+            meta_data = analyses["metadata"]
             print("  Adding authors_list")
             authors_list = Author.load_from_json(meta_data)
             for author in authors_list:

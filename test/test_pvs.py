@@ -43,16 +43,12 @@ def test_version_dependency():
     dep_list = ["escape-html",
                 "utils-merge",
                 "parseurl",
-                "send",
-                "mocha",
-                "should",
-                "istanbul",
-                "supertest"]
+                "send"]
     checker = [
         v["version"].ecosystem_package.name in dep_list for v in test_npm_serve_static_1_7_1.depends_on]
     logger.debug("Serve-static dep values %s" % checker)
     assert all(checker)
-    assert (len(test_npm_serve_static_1_7_1.depends_on) == 8)
+    assert (len(test_npm_serve_static_1_7_1.depends_on) == 4)
 
 
 def test_version_security():

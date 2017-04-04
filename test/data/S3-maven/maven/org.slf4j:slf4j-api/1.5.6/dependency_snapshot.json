@@ -1,0 +1,28 @@
+{
+  "_audit": {
+    "ended_at": "2017-03-17T17:23:16.810770",
+    "started_at": "2017-03-17T17:23:16.802015",
+    "version": "v1"
+  },
+  "_release": "maven:org.slf4j:slf4j-api:1.5.6",
+  "details": {
+    "runtime": [
+                {
+                  "ecosystem": "maven",
+                  "name": "junit:junit",
+                  "version": "4.12"
+                }
+  ]
+  },
+  "schema": {
+    "name": "dependency_snapshot",
+    "version": "1-0-0"
+  },
+  "status": "success",
+  "summary": {
+    "dependency_counts": {
+      "runtime": 0
+    },
+    "errors": []
+  }
+}
