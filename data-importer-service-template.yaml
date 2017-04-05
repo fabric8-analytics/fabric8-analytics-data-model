@@ -1,0 +1,176 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: data-importer-service
+metadata:
+  name: data-importer-service
+  annotations:
+    description: data-importer-service
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    labels:
+      service: data-importer-service
+    name: data-importer-service
+  spec:
+    ports:
+    - name: "9192"
+      port: 9192
+      protocol: TCP
+      targetPort: 9192
+    selector:
+      service: data-importer-service
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    labels:
+      service: data-importer-service
+    name: data-importer-service
+  spec:
+    replicas: 1
+    selector:
+      service: data-importer-service
+    strategy:
+      resources: {}
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          service: data-importer-service
+      spec:
+        containers:
+        - env:
+          - name: GREMLIN_USE_SECURE_CONNECTION
+            value: ${GREMLIN_USE_SECURE_CONNECTION}
+          - name: BAYESIAN_GREMLIN_HTTP_SERVICE_HOST
+            value: ${BAYESIAN_GREMLIN_HTTP_SERVICE_HOST}
+          - name: BAYESIAN_GREMLIN_HTTP_SERVICE_PORT
+            value: ${BAYESIAN_GREMLIN_HTTP_SERVICE_PORT}
+          - name: BAYESIAN_GREMLIN_WS_SERVICE_HOST
+            value: ${BAYESIAN_GREMLIN_WS_SERVICE_HOST}
+          - name: BAYESIAN_GREMLIN_WS_SERVICE_PORT
+            value: ${BAYESIAN_GREMLIN_WS_SERVICE_PORT}
+          - name: AWS_BUCKET
+            value: ${AWS_BUCKET}
+          - name: BAYESIAN_PGBOUNCER_SERVICE_HOST
+            value: ${BAYESIAN_PGBOUNCER_SERVICE_HOST}
+          - name: BAYESIAN_PGBOUNCER_SERVICE_PORT
+            value: ${BAYESIAN_PGBOUNCER_SERVICE_PORT}
+          - name: POSTGRESQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: coreapi-postgres
+                key: database
+          - name: POSTGRESQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: coreapi-postgres
+                key: password
+          - name: POSTGRESQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: coreapi-postgres
+                key: username
+          - name: AWS_S3_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: dynamodb-access-key-id
+          - name: AWS_S3_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws
+                key: dynamodb-secret-access-key
+          image: ${DATA_IMPORTER_IMAGE}
+          imagePullPolicy: Always
+          name: data-importer-service
+          ports:
+          - containerPort: 9192
+            protocol: TCP
+          resources:
+            requests:
+              memory: ${MEMORY_REQUEST}
+            limits:
+              memory: ${MEMORY_LIMIT}
+          readinessProbe:
+            httpGet:
+              path: /api/v1/readiness
+              port: 9192
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /api/v1/liveness
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 2
+        restartPolicy: Always
+    test: false
+    triggers:
+    - type: ConfigChange
+  status: {}
+parameters:
+- description: Whether to use secure connection or not ?
+  name: GREMLIN_USE_SECURE_CONNECTION
+  required: false
+  value: "false"
+
+- description: Gremlin HTTP service host
+  name: BAYESIAN_GREMLIN_HTTP_SERVICE_HOST
+  required: true
+  value: "localhost"
+
+- description: Gremlin HTTP service port
+  name: BAYESIAN_GREMLIN_HTTP_SERVICE_PORT
+  required: true
+  value: "8181"
+
+- description:
+  name: BAYESIAN_GREMLIN_WS_SERVICE_HOST
+  required: true
+  value: "localhost"
+
+- description:
+  name: BAYESIAN_GREMLIN_WS_SERVICE_PORT
+  required: true
+  value: "8182"
+
+- description:
+  name: AWS_BUCKET
+  required: true
+  value: ""
+
+- description:
+  name: BAYESIAN_PGBOUNCER_SERVICE_HOST
+  required: true
+  value: "localhost"
+
+- description:
+  name: BAYESIAN_PGBOUNCER_SERVICE_PORT
+  required: true
+  value: "5432"
+
+- description: GREMLIN_IMAGE
+  name: GREMLIN_IMAGE
+  required: true
+  value: ""
+
+- description: MEMORY_LIMIT
+  name: MEMORY_LIMIT
+  required: true
+  value: "1536Mi"
+
+- description: MEMORY_REQUEST
+  name: MEMORY_REQUEST
+  required: true
+  value: "1536Mi"
+

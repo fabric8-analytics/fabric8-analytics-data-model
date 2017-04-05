@@ -18,6 +18,17 @@ app.config.from_object('config')
 CORS(app)
 
 
+@app.route('/api/v1/readiness')
+def readiness():
+    return flask.jsonify({}), 200
+
+
+@app.route('/api/v1/liveness')
+def liveness():
+    # TODO Check graph database connection
+    return flask.jsonify({}), 200
+
+
 @app.route('/api/v1/import_epv_from_s3', methods=['POST'])
 def import_epv_from_s3():
     input_json = request.get_json()
