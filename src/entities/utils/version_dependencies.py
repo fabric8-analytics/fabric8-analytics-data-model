@@ -4,18 +4,17 @@ from entities.version import Version
 
 def get_dependencies(dependency_data):
     dep_list = {}
-    if 'details' in dependency_data and dependency_data['details'] is not None: #and len(dependency_data["details"]) != 0:
+    if dependency_data.get('details') is not None:
         details = dependency_data['details']
-    if 'runtime' in details and len(details['runtime']) != 0:
-        runtime_dep = []
-        runtime = details['runtime']
-        for r in runtime:
-            n = r.get('name')
-            v = r.get('version')
-            if n is None or v is None:
-                continue
-            runtime_dep.append(n + " " + v)
-        dep_list["direct_dependency"] = runtime_dep        
+        if len(details.get('runtime',[])) !=0:
+            runtime_dep = []
+            for r in details['runtime']:
+                n = r.get('name')
+                v = r.get('version')
+                if n is None or v is None:
+                    continue
+                runtime_dep.append(n + " " + v)
+            dep_list["direct_dependency"] = runtime_dep
 
     return dep_list
 
