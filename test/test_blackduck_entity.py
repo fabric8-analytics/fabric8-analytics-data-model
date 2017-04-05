@@ -34,7 +34,8 @@ def test_security_object():
 def test_blackduck_graph():
     bl_list = []
     p = Package.load_from_json(serve_static_json)
-    p.save()
+    assert p.save() is not None
+    
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
     p.create_version_edge(v)

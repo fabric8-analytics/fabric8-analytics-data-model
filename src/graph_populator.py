@@ -43,7 +43,8 @@ class GraphPopulator(object):
         logger.info("Saving package ...")
         pkg_id = package.save()
         logger.info(" Package node ID: %s" % pkg_id)
-
+        if pkg_id is  None:
+            return
         version = Version.load_from_json(input_json, package=package)
         ver_id = version.save()
         logger.info(" Version node ID: %s" % ver_id)
@@ -56,6 +57,8 @@ class GraphPopulator(object):
                 version.ecosystem_package.ecosystem, meta_data)
             for d_pck, d_ver, d_type in zip(dependency_pck_list, dependency_ver_list, dependency_type):
                 d_pck.save()
+                if d_pck is None:
+                    continue
                 d_ver.save()
                 d_pck.create_version_edge(d_ver)
                 version.add_edge_dependency(d_ver, d_type)

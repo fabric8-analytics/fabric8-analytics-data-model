@@ -10,7 +10,8 @@ serve_static_json = gv.read_from_file('test/data/npm--serve-static-1.7.1.json')
 
 def test_add_license_attr():
     p = Package.load_from_json(serve_static_json)
-    p.save()
+    assert p.save() is not None
+    
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
     p.create_version_edge(v)
