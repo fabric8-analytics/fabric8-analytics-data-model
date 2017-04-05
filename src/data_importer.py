@@ -22,8 +22,7 @@ def _group_keys_s3(all_keys):
         if len(key.split("/")) == 3:
             counter += 1
             grouped_keys[counter] = []
-            grouped_keys[counter].append(key)
-        else:
+        if key.endswith("json"):
             grouped_keys[counter].append(key)
     return grouped_keys
 
@@ -40,9 +39,8 @@ def _group_keys_directory(all_keys, packages_path):
             version_json = json.load(open(os.path.join(packages_path, key)))
             version = version_json["version"]
             grouped_keys[counter] = []
-            grouped_keys[counter].append(key)
-        else:
-            grouped_keys[counter].append(key)
+        if key.endswith("json"):
+            grouped_keys[counter].append(key)    
     return grouped_keys
 
 
