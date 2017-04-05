@@ -167,7 +167,7 @@ def test_ecosystem_import_from_folder():
     criteria_dict = {'ecosystem': 'maven', 'name': 'junit:junit'}
     p1 = Package.find_by_criteria('Package', criteria_dict)
 
-    criteria_dict = {'pecosystem': 'maven', 'pname': 'junit:junit', 'version': '3.8.1'}
+    criteria_dict = {'pecosystem': 'maven', 'pname': 'junit:junit', 'version': '4.8.2'}
     v1 = Version.find_by_criteria('Version', p1, criteria_dict)
 
     assert v1 is not None

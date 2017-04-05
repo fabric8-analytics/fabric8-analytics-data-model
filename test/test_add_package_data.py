@@ -288,7 +288,7 @@ def test_version_dependencies():
     v = Version.load_from_json(serve_static_json, package=p)
     v.save()
     p.create_version_edge(v)
-    dependency_data = serve_static_json["analyses"]["metadata"]
+    dependency_data = serve_static_json["analyses"]["dependency_snapshot"]
     dependency_pck_list, dependency_ver_list, dependency_type = \
         vdv.load_dependencies(v.ecosystem_package.ecosystem, dependency_data)
     for d_pck, d_ver, d_type in zip(dependency_pck_list, dependency_ver_list, dependency_type):
@@ -297,8 +297,8 @@ def test_version_dependencies():
         d_pck.create_version_edge(d_ver)
         v.add_edge_dependency(d_ver, d_type)
 
-    assert(Version.count_dependency(v.id) == 8)
-    assert (Version.count() + Package.count() == 18)
+    assert(Version.count_dependency(v.id) == 4)
+    assert (Version.count() + Package.count() == 10)
 
     for pd, vd in zip(dependency_pck_list, dependency_ver_list):
         Version.delete_by_id(vd.id)

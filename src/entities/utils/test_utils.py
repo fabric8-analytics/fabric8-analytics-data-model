@@ -37,7 +37,7 @@ def load_package_version_values(filename):
 
     objversion.licenses = license_names
 
-    dependency_data = input_json["analyses"]["metadata"]
+    dependency_data = input_json["analyses"]["dependency_snapshot"]
     _, dependency_ver_list, dependency_type = \
         vdv.load_dependencies(
             objversion.ecosystem_package.ecosystem, dependency_data)

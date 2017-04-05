@@ -91,6 +91,8 @@ def _import_grouped_keys(data_source, dict_grouped_keys):
                     obj["analyses"]["github_details"] = value
                 elif this_key.endswith("blackduck.json"):
                     obj["analyses"]["blackduck"] = value
+                elif this_key.endswith("dependency_snapshot.json"):
+                    obj["analyses"]["dependency_snapshot"] = value    
 
             GraphPopulator.populate_from_json(obj)
             count_imported_EPVs += 1
