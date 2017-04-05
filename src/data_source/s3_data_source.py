@@ -13,7 +13,7 @@ class S3DataSource(AbstractDataSource):
         self.bucket_name = src_bucket_name
 
     def get_source_name(self):
-        return "S3:" + self.bucket_name
+        return "S3"
 
     def read_json_file(self, filename):
         """Read JSON file from the data source"""

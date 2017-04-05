@@ -48,7 +48,7 @@ def _group_keys_directory(all_keys, packages_path):
 
 def _group_keys_by_epv(all_keys, data_source):
     if data_source.get_source_name() == "S3":
-        return _group_keys_s3(all_keys, 3)
+        return _group_keys_s3(all_keys)
     else:
         return _group_keys_directory(all_keys, data_source.src_dir)
 
