@@ -74,30 +74,32 @@ def _import_grouped_keys(data_source, dict_grouped_keys):
             cur_finished_at = t.get("finished_at")
             obj["dependents_count"] = t.get("dependents_count", '-1')
             obj["package_info"] = t.get("package_info", {})
-            obj["version"] = t.get("version", None)
+            obj["version"] = t.get("version")
             obj["latest_version"] = t.get("latest_version", '-1')
-            obj["ecosystem"] = t.get("ecosystem", None)
-            obj["package"] = t.get("package", None)
+            obj["ecosystem"] = t.get("ecosystem")
+            obj["package"] = t.get("package")
 
             #check if EPV is not None
             condition = [obj['package'] != None, obj['version'] != None, obj['ecosystem'] != None]
-            if all(condition):
-                for this_key in v[1:]:
-                    value = data_source.read_json_file(this_key)
-                    this_key = this_key.split("/")[-1]
-                    obj["analyses"][this_key[:-len('.json')]] = value
+            if not all(condition):
+                continue
+            
+            for this_key in v[1:]:
+                value = data_source.read_json_file(this_key)
+                this_key = this_key.split("/")[-1]
+                obj["analyses"][this_key[:-len('.json')]] = value
 
-                GraphPopulator.populate_from_json(obj)
-                count_imported_EPVs += 1
-                last_imported_EPV = first_key
-                if max_finished_at is None:
+            GraphPopulator.populate_from_json(obj)
+            count_imported_EPVs += 1
+            last_imported_EPV = first_key
+            if max_finished_at is None:
+                max_finished_at = cur_finished_at
+                max_datetime = datetime.strptime(max_finished_at, date_time_format)
+            else:
+                cur_datetime = datetime.strptime(cur_finished_at, date_time_format)
+                if cur_datetime > max_datetime:
                     max_finished_at = cur_finished_at
                     max_datetime = datetime.strptime(max_finished_at, date_time_format)
-                else:
-                    cur_datetime = datetime.strptime(cur_finished_at, date_time_format)
-                    if cur_datetime > max_datetime:
-                        max_finished_at = cur_finished_at
-                        max_datetime = datetime.strptime(max_finished_at, date_time_format)
 
     except Exception as e:
         msg = "The import failed with error '%s'." % e
@@ -135,28 +137,20 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
             cur_finished_at = t.get("finished_at")
             obj["dependents_count"] = t.get("dependents_count", '')
             obj["package_info"] = t.get("package_info", {})
-            obj["version"] = t.get("version", '')
+            obj["version"] = t.get("version")
             obj["latest_version"] = t.get("latest_version", '')
-            obj["ecosystem"] = t.get("ecosystem", '')
-            obj["package"] = t.get("package", '')
+            obj["ecosystem"] = t.get("ecosystem")
+            obj["package"] = t.get("package")
+            
+            #check if EPV is not None
+            condition = [obj['package'] != None, obj['version'] != None, obj['ecosystem'] != None]
+            if not all(condition):
+                continue
+            
             for this_key in v[1:]:
                 value = data_source.read_json_file(this_key)
-                if this_key.endswith("source_licenses.json"):
-                    obj["analyses"]["source_licenses"] = value
-                elif this_key.endswith("metadata.json"):
-                    obj["analyses"]["metadata"] = value
-                elif this_key.endswith("code_metrics.json"):
-                    obj["analyses"]["code_metrics"] = value
-                elif this_key.endswith("github_details.json"):
-                    obj["analyses"]["github_details"] = value
-                elif this_key.endswith("blackduck.json"):
-                    obj["analyses"]["blackduck"] = value
-                elif this_key.endswith("security_issues.json"):
-                    obj["analyses"]["security_issues"] = value
-                elif this_key.endswith("redhat_downstream.json"):
-                    obj["analyses"]["redhat_downstream"] = value
-                elif this_key.endswith("dependency_snapshot.json"):
-                    obj["analyses"]["dependency_snapshot"] = value
+                this_key = this_key.split("/")[-1]
+                obj["analyses"][this_key[:-len('.json')]] = value
 
             str_gremlin = GraphPopulator.create_query_string(obj)
 
