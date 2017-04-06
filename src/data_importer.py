@@ -163,10 +163,16 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
                     obj["analyses"]["redhat_downstream"] = value
 
             str_gremlin = GraphPopulator.create_query_string(obj)
+
             # Fire Gremlin HTTP query now
+            logger.info("Ingestion initialized for EPV - " +
+                        obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
+            print("Ingestion initialized for EPV - " +
+                  obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
             payload = {'gremlin': str_gremlin}
             response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload))
             resp = response.json()
+            print(resp)
             if resp['status']['code'] == 200:
                 count_imported_EPVs += 1
                 last_imported_EPV = first_key
