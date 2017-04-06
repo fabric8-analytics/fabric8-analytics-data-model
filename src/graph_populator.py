@@ -41,7 +41,7 @@ class GraphPopulator(object):
         ecosystem = input_json.get('ecosystem')
         version = input_json.get('version')
         ver_deps_count = str(input_json.get('dependents_count', -1))
-        description = input_json.get('analyses', {}).get('metadata', {}).get('details', [])[0]['description']
+        description = input_json.get('analyses', {}).get('metadata', {}).get('details', [])[0].get('description', '')
 
         # Get Code Metrics Details
         count = 0
@@ -99,26 +99,17 @@ class GraphPopulator(object):
         pkg_usage = input_json.get('package_info', {}).get('relative_usage', 'NA')
 
         # Get Github Details
-        gh_prs_last_year_opened = str(input_json.get('analyses', {}).get('github_details', {}).get('details', {})
-                                      .get('updated_pull_requests', {}).get('year', {}).get('opened', -1))
-        gh_prs_last_month_opened = str(input_json.get('analyses', {}).get('github_details', {}).get('details', {})
-                                       .get('updated_pull_requests', {}).get('month', {}).get('opened', -1))
-        gh_prs_last_year_closed = str(input_json.get('analyses', {}).get('github_details', {}).get('details', {})
-                                      .get('updated_pull_requests', {}).get('year', {}).get('closed', -1))
-        gh_prs_last_month_closed = str(input_json.get('analyses', {}).get('github_details', {}).get('details', {})
-                                       .get('updated_pull_requests', {}).get('month', {}).get('closed', -1))
-        gh_issues_last_year_opened = str(input_json.get('analyses', {}).get('github_details', {}).get('details', {})
-                                         .get('updated_issues', {}).get('year', {}).get('opened', -1))
-        gh_issues_last_month_opened = str(input_json.get('analyses', {}).get('github_details', {}).get('details', {})
-                                          .get('updated_issues', {}).get('month', {}).get('opened', -1))
-        gh_issues_last_year_closed = str(input_json.get('analyses', {}).get('github_details', {}).get('details', {})
-                                         .get('updated_issues', {}).get('year', {}).get('closed', -1))
-        gh_issues_last_month_closed = str(input_json.get('analyses', {}).get('github_details', {}).get('details', {})
-                                          .get('updated_issues', {}).get('month', {}).get('closed', -1))
-        gh_forks = str(input_json.get('analyses', {})
-                       .get('github_details', {}).get('details', {}).get('forks_count', -1))
-        gh_stargazers = str(input_json.get('analyses', {})
-                            .get('github_details', {}).get('details', {}).get('stargazers_count', -1))
+        gh_details = input_json.get('analyses', {}).get('github_details', {}).get('details', {})
+        gh_prs_last_year_opened = str(gh_details.get('updated_pull_requests', {}).get('year', {}).get('opened', -1))
+        gh_prs_last_month_opened = str(gh_details.get('updated_pull_requests', {}).get('month', {}).get('opened', -1))
+        gh_prs_last_year_closed = str(gh_details.get('updated_pull_requests', {}).get('year', {}).get('closed', -1))
+        gh_prs_last_month_closed = str(gh_details.get('updated_pull_requests', {}).get('month', {}).get('closed', -1))
+        gh_issues_last_year_opened = str(gh_details.get('updated_issues', {}).get('year', {}).get('opened', -1))
+        gh_issues_last_month_opened = str(gh_details.get('updated_issues', {}).get('month', {}).get('opened', -1))
+        gh_issues_last_year_closed = str(gh_details.get('updated_issues', {}).get('year', {}).get('closed', -1))
+        gh_issues_last_month_closed = str(gh_details.get('updated_issues', {}).get('month', {}).get('closed', -1))
+        gh_forks = str(gh_details.get('forks_count', -1))
+        gh_stargazers = str(gh_details.get('details', {}).get('stargazers_count', -1))
 
         # Create the query string
         str_package = "pkg = g.V().has('ecosystem','" + ecosystem + "').has('name','" + pkg_name + "').tryNext()" \

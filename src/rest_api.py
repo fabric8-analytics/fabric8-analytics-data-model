@@ -32,6 +32,9 @@ if not BayesianGraph.is_index_created():
             raise RuntimeError("Failed to setup graph schema")
         else:
             print("Ready to serve requests")
+else:
+    print("Ready to serve requests")
+
 
 @app.route('/api/v1/import_epv_from_s3', methods=['POST'])
 def import_epv_from_s3():
