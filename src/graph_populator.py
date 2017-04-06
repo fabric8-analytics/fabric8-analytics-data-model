@@ -41,7 +41,7 @@ class GraphPopulator(object):
         ecosystem = input_json.get('ecosystem')
         version = input_json.get('version')
         ver_deps_count = str(input_json.get('dependents_count', -1))
-        description = input_json.get('analyses', {}).get('metadata', {}).get('details', [])[0].get('description', '')
+        description = input_json.get('analyses', {}).get('metadata', {}).get('details', [{}])[0].get('description', '')
 
         # Get Code Metrics Details
         count = 0
