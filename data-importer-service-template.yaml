@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: data-importer-service
+  template: bayesian-data-importer-service
 metadata:
-  name: data-importer-service
+  name: bayesian-data-importer-service
   annotations:
-    description: data-importer-service
+    description: bayesian-data-importer-service
 objects:
 - apiVersion: v1
   kind: Service
   metadata:
     creationTimestamp: null
     labels:
-      service: data-importer-service
-    name: data-importer-service
+      service: bayesian-data-importer-service
+    name: bayesian-data-importer-service
   spec:
     ports:
     - name: "9192"
@@ -21,7 +21,7 @@ objects:
       protocol: TCP
       targetPort: 9192
     selector:
-      service: data-importer-service
+      service: bayesian-data-importer-service
   status:
     loadBalancer: {}
 - apiVersion: v1
@@ -29,19 +29,19 @@ objects:
   metadata:
     creationTimestamp: null
     labels:
-      service: data-importer-service
-    name: data-importer-service
+      service: bayesian-data-importer-service
+    name: bayesian-data-importer-service
   spec:
     replicas: 1
     selector:
-      service: data-importer-service
+      service: bayesian-data-importer-service
     strategy:
       resources: {}
     template:
       metadata:
         creationTimestamp: null
         labels:
-          service: data-importer-service
+          service: bayesian-data-importer-service
       spec:
         containers:
         - env:
@@ -92,7 +92,7 @@ objects:
                 key: dynamodb-secret-access-key
           image: ${DATA_IMPORTER_IMAGE}
           imagePullPolicy: Always
-          name: data-importer-service
+          name: bayesian-data-importer-service
           ports:
           - containerPort: 9192
             protocol: TCP
