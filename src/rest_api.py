@@ -6,6 +6,7 @@ import sys
 import codecs
 import urllib
 import data_importer
+from graph_manager import BayesianGraph
 
 # Python2.x: Make default encoding as UTF-8
 if sys.version_info.major == 2:
@@ -17,6 +18,20 @@ app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
 
+# Check whether schema is created or not
+# populate schema if not already done
+if not BayesianGraph.is_index_created():
+    print("Index is not created as yet, checking schema creation")
+    if not BayesianGraph.is_schema_defined():
+        print("Schema is not yet created, creating now...")
+        BayesianGraph.populate_schema()
+        # double check
+        schema_definition_success = BayesianGraph.is_schema_defined()
+        print("Double check: schema_definition_success %s" % schema_definition_success)
+        if not schema_definition_success:
+            raise RuntimeError("Failed to setup graph schema")
+        else:
+            print("Ready to serve requests")
 
 @app.route('/api/v1/import_epv_from_s3', methods=['POST'])
 def import_epv_from_s3():

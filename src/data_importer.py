@@ -161,6 +161,8 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
                     obj["analyses"]["security_issues"] = value
                 elif this_key.endswith("redhat_downstream.json"):
                     obj["analyses"]["redhat_downstream"] = value
+                elif this_key.endswith("dependency_snapshot.json"):
+                    obj["analyses"]["dependency_snapshot"] = value
 
             str_gremlin = GraphPopulator.create_query_string(obj)
 

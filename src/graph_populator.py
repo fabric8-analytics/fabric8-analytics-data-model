@@ -146,8 +146,8 @@ class GraphPopulator(object):
 
         # NPM packages with dependencies, versions i.e. Package version
         # creation of query string
-        str_gremlin = GraphPopulator.construct_package_query(input_json) + \
-                      GraphPopulator.construct_version_query(input_json)
+        str_gremlin = cls.construct_package_query(input_json) + \
+                      cls.construct_version_query(input_json)
 
         # Add edge from Package to Version
         str_gremlin += "edge_c = pkg.addEdge('has_version', ver);"
