@@ -1,4 +1,5 @@
 from graph_populator import GraphPopulator
+from entities.utils import get_values as gv
 import logging
 import sys
 import config
@@ -8,6 +9,7 @@ import os
 import requests
 from optparse import OptionParser
 from datetime import datetime
+import set_logging 
 
 from data_source.local_filesystem_data_source import LocalFileSystem
 from data_source.s3_data_source import S3DataSource
@@ -148,10 +150,10 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
     try:
         for counter, v in dict_grouped_keys.items():
             first_key = v[0]
-            obj = _first_key_info(first_key)
+            obj, cur_finished_at = _first_key_info(data_source, first_key)
             if obj is None:
                 continue
-            obj_returned = _other_key_info(other_keys=v[1:])
+            obj_returned = _other_key_info(data_source, other_keys=v[1:])
             obj.update(obj_returned)
 
             str_gremlin = GraphPopulator.create_query_string(obj)
@@ -168,7 +170,7 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
             if resp['status']['code'] == 200:
                 count_imported_EPVs += 1
                 last_imported_EPV = first_key
-                max_finished_at = _set_max_finished_at(max_finished_at, cur_finished_at)
+                max_finished_at = _set_max_finished_at(max_finished_at, cur_finished_at, max_datetime, date_time_format)
                 max_datetime = datetime.strptime(max_finished_at, date_time_format)
 
     except Exception as e:
