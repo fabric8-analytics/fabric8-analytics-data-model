@@ -37,17 +37,11 @@ node('gremlin') {
 if (env.BRANCH_NAME == 'master') {
     node('oc') {
         stage('Deploy - dev') {
-            rerunOpenShiftJob {
-                jobName = 'bayesian-data-model-importer'
-                cluster = 'dev'
-			}
+            sh 'oc --context=dev deploy bayesian-data-importer --latest'
         }
 
         stage('Deploy - rh-idev') {
-            rerunOpenShiftJob {
-                jobName = 'bayesian-data-model-importer'
-                cluster = 'rh-idev'
-            }
+            sh 'oc --context=rh-idev deploy bayesian-data-importer --latest'
         }
     }
 }
