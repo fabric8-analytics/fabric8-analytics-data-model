@@ -197,16 +197,10 @@ class SecurityDetails(EntityBase):
         security_obj_list = []
         cvss_list = []
         cve_id_list = []
-        if (security_data is not None and
-                'summary' in security_data and
-                len(security_data["summary"]) != 0):
+        if(len(security_data.get("summary", [])) != 0):
             security_list = []
             for security_value in security_data["details"]:
-                cvss = 0
-                if security_value.get("cvss") is not None:
-                    temp_cvss = security_value.get("cvss")
-                    if temp_cvss.get("score") is not None:
-                        cvss = temp_cvss.get("score")
+                cvss = security_value.get('cvss', {}).get('score', 0)
 
                 security_list.append((security_value.get('id'), cvss, security_value.get('summary'), security_value.get('references'),
                                       security_value.get('access'), security_value.get('impact')))
