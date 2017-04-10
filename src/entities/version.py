@@ -31,6 +31,7 @@ class Version(EntityBase):
         self.github_details = github_details
         self.is_packaged_in = set()
         self.is_published_in = set()
+        self.cve_ids = set()
         if len(add_data)>0:
             self.cve_ids = add_data.get("cve_ids", set())
             self.cvss_scores = add_data.get("cvss_scores",set())
@@ -490,21 +491,25 @@ class Version(EntityBase):
         cm_details["cm_loc"] = code_metrics.summary.total_lines
         cm_details["cm_num_files"] = code_metrics.summary.total_files
 
+        cm_details["cm_avg_cyclomatic_compl exity"] = -1
         code_complexity = 0.0
+        lang_count = 0
         for each in code_metrics.details.languages:
-            code_complexity += each.average_cyclomatic_complexity
-        cm_details["cm_avg_cyclomatic_complexity"] = code_complexity/len(code_metrics.details.languages)
+            if each.average_cyclomatic_complexity >= 0:
+                code_complexity += each.average_cyclomatic_complexity
+                lang_count += 1
+        if lang_count > 0:              
+            cm_details["cm_avg_cyclomatic_complexity"] = code_complexity/lang_count
         #cm_details["relative_used"] = code_metrics.relative_used # what should go here
 
         self.add_details = cm_details
 
         # self.licences = self.add_details.get("licences", [])
-
-        #self.cve_ids = self.add_details.get("cve_ids", [])
+        self.cve_ids = self.add_details.get("cve_ids", [])
         self.cm_loc = self.add_details.get("cm_loc", -1)
         self.cm_num_files = self.add_details.get("cm_num_files", -1)
         self.cm_avg_cyclomatic_complexity = self.add_details.\
-            get("cm_avg_cyclomatic_complexity", 0.0)
+            get("cm_avg_cyclomatic_complexity", -1)
         self.relative_used = self.add_details.get("relative_used", "")
         try:
             ts = time.time()
@@ -553,6 +558,7 @@ class Version(EntityBase):
             logger.error("add_license_attributes() failed: %s" % e)
             return None
 
+
     def add_cve_ids(self, cvss, cve_id):
         cve_to_add = []
         cve = ""
@@ -570,7 +576,6 @@ class Version(EntityBase):
 
 
         return cve
-
 
     def add_blackduck_cve_edge(self, security_detail):
         try:
