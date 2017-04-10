@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: bayesian-data-importer-service
+  template: bayesian-data-importer
 metadata:
-  name: bayesian-data-importer-service
+  name: bayesian-data-importer
   annotations:
-    description: bayesian-data-importer-service
+    description: bayesian-data-importer
 objects:
 - apiVersion: v1
   kind: Service
   metadata:
     creationTimestamp: null
     labels:
-      service: bayesian-data-importer-service
-    name: bayesian-data-importer-service
+      service: bayesian-data-importer
+    name: bayesian-data-importer
   spec:
     ports:
     - name: "9192"
@@ -21,7 +21,7 @@ objects:
       protocol: TCP
       targetPort: 9192
     selector:
-      service: bayesian-data-importer-service
+      service: bayesian-data-importer
   status:
     loadBalancer: {}
 - apiVersion: v1
@@ -29,19 +29,19 @@ objects:
   metadata:
     creationTimestamp: null
     labels:
-      service: bayesian-data-importer-service
-    name: bayesian-data-importer-service
+      service: bayesian-data-importer
+    name: bayesian-data-importer
   spec:
     replicas: 1
     selector:
-      service: bayesian-data-importer-service
+      service: bayesian-data-importer
     strategy:
       resources: {}
     template:
       metadata:
         creationTimestamp: null
         labels:
-          service: bayesian-data-importer-service
+          service: bayesian-data-importer
       spec:
         containers:
         - env:
@@ -51,20 +51,8 @@ objects:
             value: ${DATA_IMPORTER_SERVICE_TIMEOUT}
           - name: GREMLIN_USE_SECURE_CONNECTION
             value: ${GREMLIN_USE_SECURE_CONNECTION}
-          - name: BAYESIAN_GREMLIN_HTTP_SERVICE_HOST
-            value: ${BAYESIAN_GREMLIN_HTTP_SERVICE_HOST}
-          - name: BAYESIAN_GREMLIN_HTTP_SERVICE_PORT
-            value: ${BAYESIAN_GREMLIN_HTTP_SERVICE_PORT}
-          - name: BAYESIAN_GREMLIN_WS_SERVICE_HOST
-            value: ${BAYESIAN_GREMLIN_WS_SERVICE_HOST}
-          - name: BAYESIAN_GREMLIN_WS_SERVICE_PORT
-            value: ${BAYESIAN_GREMLIN_WS_SERVICE_PORT}
           - name: AWS_BUCKET
             value: ${AWS_BUCKET}
-          - name: BAYESIAN_PGBOUNCER_SERVICE_HOST
-            value: ${BAYESIAN_PGBOUNCER_SERVICE_HOST}
-          - name: BAYESIAN_PGBOUNCER_SERVICE_PORT
-            value: ${BAYESIAN_PGBOUNCER_SERVICE_PORT}
           - name: POSTGRESQL_DATABASE
             valueFrom:
               secretKeyRef:
@@ -92,7 +80,7 @@ objects:
                 key: dynamodb-secret-access-key
           image: ${DATA_IMPORTER_IMAGE}
           imagePullPolicy: Always
-          name: bayesian-data-importer-service
+          name: bayesian-data-importer
           ports:
           - containerPort: 9192
             protocol: TCP
@@ -138,43 +126,13 @@ parameters:
   required: false
   value: "false"
 
-- description: Gremlin HTTP service host
-  name: BAYESIAN_GREMLIN_HTTP_SERVICE_HOST
-  required: true
-  value: "localhost"
-
-- description: Gremlin HTTP service port
-  name: BAYESIAN_GREMLIN_HTTP_SERVICE_PORT
-  required: true
-  value: "8181"
-
-- description:
-  name: BAYESIAN_GREMLIN_WS_SERVICE_HOST
-  required: true
-  value: "localhost"
-
-- description:
-  name: BAYESIAN_GREMLIN_WS_SERVICE_PORT
-  required: true
-  value: "8182"
-
 - description:
   name: AWS_BUCKET
   required: true
   value: ""
 
-- description:
-  name: BAYESIAN_PGBOUNCER_SERVICE_HOST
-  required: true
-  value: "localhost"
-
-- description:
-  name: BAYESIAN_PGBOUNCER_SERVICE_PORT
-  required: true
-  value: "5432"
-
-- description: GREMLIN_IMAGE
-  name: GREMLIN_IMAGE
+- description: DATA_IMPORTER_IMAGE
+  name: DATA_IMPORTER_IMAGE
   required: true
   value: ""
 
