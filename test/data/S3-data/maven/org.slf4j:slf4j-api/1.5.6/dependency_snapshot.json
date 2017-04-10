@@ -1,0 +1,29 @@
+{
+  "_audit": {
+    "ended_at": "2017-04-04T07:25:55.966234",
+    "started_at": "2017-04-04T07:25:55.222363",
+    "version": "v1"
+  },
+  "details": {
+    "runtime": [
+      {
+        "declaration": "junit:junit 4.12",
+        "ecosystem": "maven",
+        "name": "junit:junit",
+        "resolved_at": "2017-04-04T07:25:55.247626",
+        "version": "4.12"
+      }
+    ]
+  },
+  "schema": {
+    "name": "dependency_snapshot",
+    "version": "1-0-0"
+  },
+  "status": "success",
+  "summary": {
+    "dependency_counts": {
+      "runtime": 4
+    },
+    "errors": []
+  }
+}

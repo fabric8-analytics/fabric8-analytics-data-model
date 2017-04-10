@@ -27,9 +27,9 @@ class LicenseDetails(EntityBase):
             distinct_licenses = license_data["summary"]["distinct_licenses"]
 
             for dl in distinct_licenses:
-                license_names.add(dl.get("license_name", ''))
+                license_names.add(dl.get("license_name", '-1'))
                 license_details_list.append(
-                    LicenseDetails(dl.get("license_name", '')))
+                    LicenseDetails(dl.get("license_name", '-1')))
                 counts_list.append(dl.get("count", -1))
 
         return license_details_list, counts_list, license_names
@@ -159,7 +159,7 @@ class LicenseDetails(EntityBase):
 class SecurityDetails(EntityBase):
     label = 'CVE'
 
-    def __init__(self, cve_id='', cvss='-1', summary='', **issue):
+    def __init__(self, cve_id='-1', cvss='-1', summary='-1', **issue):
         super(SecurityDetails, self).__init__()
         self.cve_id = cve_id
         self.cvss = float(cvss)
@@ -169,18 +169,18 @@ class SecurityDetails(EntityBase):
         self.impact = {}
         self.label = SecurityDetails.label
         if len(issue) is not 0:
-            self.bl_base_score = issue.get('baseScore', '')
-            self.bl_description = issue.get('description', '')
+            self.bl_base_score = issue.get('baseScore', -1)
+            self.bl_description = issue.get('description', '-1')
             self.bl_exploitability_subscore = issue.get('exploitabilitySubscore', -1)
             self.bl_impact_subscore = issue.get('impactSubscore', -1)
-            self.bl_remediation_status = issue.get('remediationStatus', '')
-            self.bl_remediation_updated_at = issue.get('remediationUpdatedAt', '')
-            self.bl_remediation_created_at = issue.get('remediationCreatedAt', '')
-            self.bl_severity = issue.get('severity', '')
-            self.bl_source = issue.get('source', '')
-            self.bl_vulnerability_name = issue.get('vulnerabilityName', '')
-            self.bl_vulnerability_published_date = issue.get('vulnerabilityPublishedDate', '')
-            self.bl_vulnerability_updated_date = issue.get('vulnerabilityUpdatedDate', '')
+            self.bl_remediation_status = issue.get('remediationStatus', '-1')
+            self.bl_remediation_updated_at = issue.get('remediationUpdatedAt', '-1')
+            self.bl_remediation_created_at = issue.get('remediationCreatedAt', '-1')
+            self.bl_severity = issue.get('severity', '-1')
+            self.bl_source = issue.get('source', '-1')
+            self.bl_vulnerability_name = issue.get('vulnerabilityName', '-1')
+            self.bl_vulnerability_published_date = issue.get('vulnerabilityPublishedDate', '-1')
+            self.bl_vulnerability_updated_date = issue.get('vulnerabilityUpdatedDate', '-1')
         self.last_updated = None
 
     def issue_has_references(self, link):
@@ -305,13 +305,13 @@ class SecurityDetails(EntityBase):
                     property('vertex_label', self.label). \
                     property('cve_id', self.cve_id).\
                     property('cvss', self.cvss).\
-                    property('summary', self.summary or '').\
-                    property('access_authentication', self.access.get('authentication') or '').\
-                    property('access_complexity', self.access.get('complexity') or '').\
-                    property('access_vector', self.access.get('vector') or '').\
-                    property('impact_availability', self.impact.get('availability') or '').\
-                    property('impact_confidentiality', self.impact.get('confidentiality') or '').\
-                    property('impact_integrity', self.impact.get('integrity') or '').\
+                    property('summary', self.summary or '-1').\
+                    property('access_authentication', self.access.get('authentication') or '-1').\
+                    property('access_complexity', self.access.get('complexity') or '-1').\
+                    property('access_vector', self.access.get('vector') or '-1').\
+                    property('impact_availability', self.impact.get('availability') or '-1').\
+                    property('impact_confidentiality', self.impact.get('confidentiality') or '-1').\
+                    property('impact_integrity', self.impact.get('integrity') or '-1').\
                     property('last_updated', ts)
 
                 for r in self.references:
@@ -378,18 +378,18 @@ class SecurityDetails(EntityBase):
 
     def add_blackduck_data(self, issue):
         if len(issue) is not 0:
-            self.bl_base_score = issue.get('baseScore', '')
-            self.bl_description = issue.get('description', '')
+            self.bl_base_score = issue.get('baseScore', -1)
+            self.bl_description = issue.get('description', '-1')
             self.bl_exploitability_subscore = issue.get('exploitabilitySubscore', -1)
             self.bl_impact_subscore = issue.get('impactSubscore', -1)
-            self.bl_remediation_status = issue.get('remediationStatus', '')
-            self.bl_remediation_updated_at = issue.get('remediationCreatedAt', '')
-            self.bl_remediation_created_at = issue.get('remediationUpdatedAt', '')
-            self.bl_severity = issue.get('severity', '')
-            self.bl_source = issue.get('source', '')
-            self.bl_vulnerability_name = issue.get('vulnerabilityName', '')
-            self.bl_vulnerability_published_date = issue.get('vulnerabilityPublishedDate', '')
-            self.bl_vulnerability_updated_date = issue.get('vulnerabilityUpdatedDate', '')
+            self.bl_remediation_status = issue.get('remediationStatus', '-1')
+            self.bl_remediation_updated_at = issue.get('remediationCreatedAt', '-1')
+            self.bl_remediation_created_at = issue.get('remediationUpdatedAt', '-1')
+            self.bl_severity = issue.get('severity', '-1')
+            self.bl_source = issue.get('source', '-1')
+            self.bl_vulnerability_name = issue.get('vulnerabilityName', '-1')
+            self.bl_vulnerability_published_date = issue.get('vulnerabilityPublishedDate', '-1')
+            self.bl_vulnerability_updated_date = issue.get('vulnerabilityUpdatedDate', '-1')
 
             try:
                 ts = time.time()

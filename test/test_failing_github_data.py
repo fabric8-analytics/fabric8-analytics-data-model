@@ -9,7 +9,7 @@ npm_sequence_3 = gv.read_from_file('test/data/npm-sequence-3.0.0.json')
 
 def test_empty_github_results():
     p = Package.load_from_json(npm_sequence_3)
-    p.save()
+    assert p.save() is not None
     v = Version.load_from_json(npm_sequence_3, package=p)
     v.save()
     p.create_version_edge(v)

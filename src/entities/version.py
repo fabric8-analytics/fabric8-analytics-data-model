@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Version(EntityBase):
 
-    def __init__(self, package,version='', hash_values='', description='', dependents_count=-1,
+    def __init__(self, package,version='-1', hash_values='-1', description='-1', dependents_count=-1,
                  shipped_as_downstream=False,
                  github_details=-1, **add_data):
         super(Version, self).__init__()
@@ -40,15 +40,15 @@ class Version(EntityBase):
             self.relative_used = add_data.get("relative_used", "")
         self.last_updated = None
 
-    def version_depends_on(self, version, dependency_type=''):
+    def version_depends_on(self, version, dependency_type='-1'):
         self.depends_on.append(
             {"version": version, "dependency_type": dependency_type})
 
-    def version_similar_to(self, version, similarity_score=''):
+    def version_similar_to(self, version, similarity_score=0):
         self.similar_to.append(
             {"version": version, "similarity_score": similarity_score})
 
-    def version_covered_under(self, license, license_count=''):
+    def version_covered_under(self, license, license_count=0):
         self.covered_under.append(
             {"license": license, "license_count": license_count})
 
