@@ -139,26 +139,16 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
             obj["latest_version"] = t.get("latest_version", '')
             obj["ecosystem"] = t.get("ecosystem", '')
             obj["package"] = t.get("package", '')
-            for this_key in v[1:]:
-                value = data_source.read_json_file(this_key)
-                if this_key.endswith("source_licenses.json"):
-                    obj["analyses"]["source_licenses"] = value
-                elif this_key.endswith("metadata.json"):
-                    obj["analyses"]["metadata"] = value
-                elif this_key.endswith("code_metrics.json"):
-                    obj["analyses"]["code_metrics"] = value
-                elif this_key.endswith("github_details.json"):
-                    obj["analyses"]["github_details"] = value
-                elif this_key.endswith("blackduck.json"):
-                    obj["analyses"]["blackduck"] = value
-                elif this_key.endswith("security_issues.json"):
-                    obj["analyses"]["security_issues"] = value
-                elif this_key.endswith("redhat_downstream.json"):
-                    obj["analyses"]["redhat_downstream"] = value
-                elif this_key.endswith("dependency_snapshot.json"):
-                    obj["analyses"]["dependency_snapshot"] = value
 
-            str_gremlin = GraphPopulator.create_query_string(obj)
+            # check if EPV is not None
+            condition = [obj['package'] != None, obj['version'] != None, obj['ecosystem'] != None]
+            if all(condition):
+                for this_key in v[1:]:
+                    value = data_source.read_json_file(this_key)
+                    this_key = this_key.split("/")[-1]
+                    obj["analyses"][this_key[:-len('.json')]] = value
+
+                str_gremlin = GraphPopulator.create_query_string(obj)
 
             # Fire Gremlin HTTP query now
             logger.info("Ingestion initialized for EPV - " +
@@ -169,6 +159,7 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
             response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload))
             resp = response.json()
             print(resp)
+            logger.info(resp)
             if resp['status']['code'] == 200:
                 count_imported_EPVs += 1
                 last_imported_EPV = first_key

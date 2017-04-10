@@ -22,18 +22,23 @@ CORS(app)
 # populate schema if not already done
 if not BayesianGraph.is_index_created():
     print("Index is not created as yet, checking schema creation")
+    app.logger.info("Index is not created as yet, checking schema creation")
     if not BayesianGraph.is_schema_defined():
         print("Schema is not yet created, creating now...")
+        app.logger.info("Schema is not yet created, creating now...")
         BayesianGraph.populate_schema()
         # double check
         schema_definition_success = BayesianGraph.is_schema_defined()
         print("Double check: schema_definition_success %s" % schema_definition_success)
+        app.logger.info("Double check: schema_definition_success %s" % schema_definition_success)
         if not schema_definition_success:
             raise RuntimeError("Failed to setup graph schema")
         else:
             print("Ready to serve requests")
+            app.logger.info("Ready to serve requests")
 else:
     print("Ready to serve requests")
+    app.logger.info("Ready to serve requests")
 
 
 @app.route('/api/v1/readiness')
@@ -81,6 +86,7 @@ def ingest_to_graph():
     report = data_importer.import_epv_from_s3_http(list_epv=input_json)
     response = {'message': report.get('message'),
                 'count_imported_EPVs': report.get('count_imported_EPVs')}
+    print(response)
     if report.get('status') is not 'Success':
         return flask.jsonify(response), 500
     else:
