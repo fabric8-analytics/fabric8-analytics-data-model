@@ -134,7 +134,7 @@ parameters:
 - description: DATA_IMPORTER_IMAGE
   name: DATA_IMPORTER_IMAGE
   required: true
-  value: ""
+  value: "registry.devshift.net/bayesian/data-model-importer"
 
 - description: MEMORY_LIMIT
   name: MEMORY_LIMIT
