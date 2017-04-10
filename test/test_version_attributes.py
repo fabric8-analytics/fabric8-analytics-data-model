@@ -55,7 +55,7 @@ def test_additional_data_as_attr():
     logger.info(present_version.__dict__)
     assert present_version.cm_loc == 1351
     assert present_version.cm_num_files == 16
-    assert present_version.cm_avg_cyclomatic_complexity == 0.0
+    assert present_version.cm_avg_cyclomatic_complexity == -1
     assert present_version.cve_ids ==  ['CVE-2015-1164:7.5']
     assert present_version.last_updated == ver_obj.last_updated
 
