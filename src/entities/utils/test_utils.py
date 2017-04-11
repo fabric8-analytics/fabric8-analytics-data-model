@@ -45,7 +45,7 @@ def load_package_version_values(filename):
         objversion.version_depends_on(d_ver, d_type)
 
     security_data = input_json["analyses"]["security_issues"]
-    security_list, __ = SecurityDetails.load_from_json(security_data)
+    security_list, __, _ = SecurityDetails.load_from_json(security_data)
     for objsecurity in security_list:
         objversion.version_has_nvd_issues(objsecurity)
 

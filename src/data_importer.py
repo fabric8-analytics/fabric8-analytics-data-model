@@ -157,6 +157,8 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
             obj.update(obj_returned)
 
             str_gremlin = GraphPopulator.create_query_string(obj)
+            logger.debug("Importing " + first_key)
+            logger.debug("File---- %s  numbered---- %d  added:" % (first_key, counter))
 
             # Fire Gremlin HTTP query now
             logger.info("Ingestion initialized for EPV - " +
@@ -167,6 +169,7 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
             response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload))
             resp = response.json()
             print(resp)
+            logger.info(resp)
             if resp['status']['code'] == 200:
                 count_imported_EPVs += 1
                 last_imported_EPV = first_key
@@ -371,4 +374,3 @@ if __name__ == '__main__':
     else:
         logger.info ("Invalid CLI arguments")
         sys.exit(-1)
-

@@ -395,7 +395,10 @@
                         "confidentiality": "NONE",
                         "availability": "NONE"
                     },
-                    "cvss": 4.3,
+                    "cvss": {
+                            "score": 7.5,
+                            "vector": "AV:N/AC:L/Au:?/C:P/I:P/A:P"
+                    },
                     "references": [
                         "https://github.com/expressjs/serve-static/issues/26",
                         "https://bugzilla.redhat.com/show_bug.cgi?id=1181917",
