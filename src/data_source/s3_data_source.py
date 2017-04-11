@@ -2,13 +2,24 @@ from abstract_data_source import AbstractDataSource
 import botocore
 import boto3
 import json
-
+import config
 
 class S3DataSource(AbstractDataSource):
+    _DEFAULT_REGION_NAME = 'us-east-1'
+    _DEFAULT_LOCAL_ENDPOINT = 'http://coreapi-s3:33000'
 
     def __init__(self, src_bucket_name, access_key, secret_key):
-        self.session = boto3.session.Session(aws_access_key_id=access_key, aws_secret_access_key=secret_key)
-        self.s3_resource = self.session.resource('s3', config=botocore.client.Config(signature_version='s3v4'))
+        self.is_local = config.AWS_S3_IS_LOCAL
+
+        if self.is_local:
+            self.session = boto3.session.Session(aws_access_key_id=access_key, aws_secret_access_key=secret_key,
+                                                 region_name=self._DEFAULT_REGION_NAME)
+            self.s3_resource = self.session.resource('s3', config=botocore.client.Config(signature_version='s3v4'),
+                                                     use_ssl=False, endpoint_url=self._DEFAULT_LOCAL_ENDPOINT)
+        else:
+            self.session = boto3.session.Session(aws_access_key_id=access_key, aws_secret_access_key=secret_key)
+            self.s3_resource = self.session.resource('s3', config=botocore.client.Config(signature_version='s3v4'))
+
         self.bucket = self.s3_resource.Bucket(src_bucket_name)
         self.bucket_name = src_bucket_name
 

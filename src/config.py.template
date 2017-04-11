@@ -31,3 +31,6 @@ POSTGRESQL_DATABASE = os.environ.get("POSTGRESQL_DATABASE", "")
 POSTGRESQL_HOST = os.environ.get("BAYESIAN_PGBOUNCER_SERVICE_HOST", "")
 POSTGRESQL_PORT = os.environ.get("BAYESIAN_PGBOUNCER_SERVICE_PORT", "")
 
+# if this variable is set, we are running AWS S3 locally ( via Minio )
+AWS_S3_IS_LOCAL = "AWS_S3_IS_LOCAL" in os.environ
+
