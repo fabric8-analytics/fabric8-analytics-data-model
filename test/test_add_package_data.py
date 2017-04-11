@@ -139,9 +139,9 @@ def test_support_vector_security():
     assert v.last_updated is not None
 
     security_data = serve_static_json["analyses"]["security_issues"]
-    security_list, cvss_score = SecurityDetails.load_from_json(security_data)
+    security_list, cvss_score, cve_ids = SecurityDetails.load_from_json(security_data)
     ts_list = []
-    for s, cvss in zip(security_list, cvss_score):
+    for s, cvss, cve in zip(security_list, cvss_score, cve_ids):
         s.save()
         assert s.last_updated is not None
         ts_list.append(s.last_updated)

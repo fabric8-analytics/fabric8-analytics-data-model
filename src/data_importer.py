@@ -413,4 +413,3 @@ if __name__ == '__main__':
     else:
         logger.info ("Invalid CLI arguments")
         sys.exit(-1)
-

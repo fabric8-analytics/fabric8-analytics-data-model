@@ -25,7 +25,7 @@ def test_code_metrics_non_empty():
     js_metrics = code_metrics.details.languages[4]
 
     assert(js_metrics.language == "JavaScript")
-    assert(js_metrics.average_cyclomatic_complexity == 2.196360153256705)
+    assert(js_metrics.average_cyclomatic_complexity == -1)
 
     log.logger.debug("js_lang_metrics: %s" %
                  js_metrics.average_cyclomatic_complexity)

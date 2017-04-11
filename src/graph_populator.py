@@ -47,9 +47,9 @@ class GraphPopulator(object):
         count = 0
         tot_complexity = 0.0
         for lang in input_json.get('analyses', {}).get('code_metrics', {}).get('details', {}).get('languages', []):
-            if lang.get('metrics', {}).get('functions', {}).get('average_cyclomatic_complexity'):
+            if lang.get('metrics', {}).get('average_cyclomatic_complexity'):
                 count += 1
-                tot_complexity += lang['metrics']['functions']['average_cyclomatic_complexity']
+                tot_complexity += lang['metrics']['average_cyclomatic_complexity']
         cm_avg_cyclomatic_complexity = str(tot_complexity / count) if count > 0 else '-1'
         cm_loc = str(input_json.get('analyses', {}).get('code_metrics', {}).get('summary', {}).get('total_lines', -1))
         cm_num_files = str(input_json.get('analyses', {})
@@ -209,12 +209,13 @@ class GraphPopulator(object):
         if "security_issues" in analyses:
             print("  Adding security_issues")
             security_data = analyses["security_issues"]
-            security_list, cvss_score = SecurityDetails.load_from_json(
+            security_list, cvss_score, cve_ids = SecurityDetails.load_from_json(
                 security_data)
-            for s, cvss in zip(security_list, cvss_score):
+            for s, cvss, cve_id in zip(security_list, cvss_score, cve_ids):
                 ss_id = s.save()
                 print("    security_data ID: %s" % ss_id)
                 version.add_security_edge(s, cvss)
+                version.add_cve_ids(cvss, cve_id)
 
         # GitHub Details
         if "github_details" in analyses:
@@ -229,15 +230,8 @@ class GraphPopulator(object):
             print("  Adding code_metrics")
             code_metrics_data = analyses["code_metrics"]
             code_metrics = CodeMetricsResult.load_from_json(code_metrics_data)
-            version.add_code_metrics_edge(code_metrics)
-            cm_details = {}
-            cm_details["cm_loc"] = code_metrics.summary.total_lines
-            cm_details["cm_num_files"] = code_metrics.summary.total_files
-            code_complexity = 0
-            for each in code_metrics.details.languages:
-               code_complexity += each.average_cyclomatic_complexity
-            cm_details["cm_avg_cyclomatic_complexity"] = code_complexity/len(code_metrics.details.languages)
-            version.add_additional_data_as_attr(cm_details)
+            version.add_code_metrics_edge(code_metrics) 
+            version.add_additional_data_as_attr(code_metrics)
 
         if "blackduck" in analyses:
             print("Adding extra security info via blackduck")
