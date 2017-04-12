@@ -2,7 +2,7 @@
 
 gc() {
   retval=$?
-  sudo docker-compose -f local-setup/docker-compose.yaml down || :
+  sudo docker-compose -f local-setup/docker-compose.yaml down -v || :
   exit $retval
 }
 trap gc EXIT SIGINT
