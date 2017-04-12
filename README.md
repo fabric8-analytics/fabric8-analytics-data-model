@@ -35,7 +35,7 @@ gunicorn --pythonpath src/ -b 0.0.0.0:5001 rest_api:app
 ---
 
 The HTTP-based endpoint to populate the graph is `/api/v1/ingest_to_graph`
-This endpoint creates a minimalistic graph having only P (Package) and V (Version).
+This endpoint creates a minimalistic graph having only P(Package) and V(Version).
 You can POST the following list as body of the request with `Content-Type: application/json` in the header:
 ```
 [
@@ -49,7 +49,7 @@ You can POST the following list as body of the request with `Content-Type: appli
 
 The websocket based endpoint to populate the graph is `/api/v1/import_epv_from_s3`
 This endpoint creates the entire graph.
-It uses the same input as described for the HTTP endpoint.
+It uses the same input format as described for the HTTP endpoint.
 
 
 ### How to run the tests?
