@@ -1,4 +1,5 @@
 from graph_populator import GraphPopulator
+from entities.utils import get_values as gv
 import logging
 import sys
 import config
@@ -8,6 +9,7 @@ import os
 import requests
 from optparse import OptionParser
 from datetime import datetime
+import set_logging 
 
 from data_source.local_filesystem_data_source import LocalFileSystem
 from data_source.s3_data_source import S3DataSource
@@ -52,6 +54,48 @@ def _group_keys_by_epv(all_keys, data_source):
         return _group_keys_directory(all_keys, data_source.src_dir)
 
 
+def _first_key_info(data_source, first_key):
+    obj = {}
+    t = data_source.read_json_file(first_key)
+    cur_finished_at = t.get("finished_at")
+    obj["dependents_count"] = t.get("dependents_count", '-1')
+    obj["package_info"] = t.get("package_info", {})
+    obj["version"] = t.get("version")
+    obj["latest_version"] = t.get("latest_version", '-1')
+    obj["ecosystem"] = t.get("ecosystem")
+    obj["package"] = t.get("package")
+    condition = [obj['package'] != None, obj['version'] != None, obj['ecosystem'] != None]
+    if not all(condition):
+        return None
+    return obj, cur_finished_at
+
+
+def _other_key_info(data_source, other_keys):
+    obj = {"analyses": {}}
+    for this_key in other_keys:
+        value = data_source.read_json_file(this_key)
+        this_key = this_key.split("/")[-1]
+        obj["analyses"][this_key[:-len('.json')]] = value
+    return obj
+    
+
+def _set_max_finished_at(max_finished_at, cur_finished_at, max_datetime, date_time_format):
+    if max_finished_at is None:
+        max_finished_at = cur_finished_at
+    else:
+        cur_datetime = datetime.strptime(cur_finished_at, date_time_format)
+        if cur_datetime > max_datetime:
+            max_finished_at = cur_finished_at
+    return max_finished_at        
+
+def _get_exception_msg(prefix, e):
+    msg = prefix + ": " + str(e)
+    logger.error(msg)
+    tb = traceback.format_exc()
+    logger.error("Traceback for latest failure in import call: %s" % tb)
+    return msg
+    
+
 def _import_grouped_keys(data_source, dict_grouped_keys):
     logger.debug("Begin import...")
     date_time_format = "%Y-%m-%dT%H:%M:%S.%f"
@@ -65,47 +109,26 @@ def _import_grouped_keys(data_source, dict_grouped_keys):
         report['message'] = 'Nothing to be imported! No data found on S3 to be imported!'
     try:
         for counter, v in dict_grouped_keys.items():
-            obj = {"analyses": {}}
             first_key = v[0]
             logger.debug("Importing " + first_key)
             logger.debug("File---- %s  numbered---- %d  added:" % (first_key, counter))
+            obj, cur_finished_at = _first_key_info(data_source, first_key)
+            if obj is None:
+                continue
+            obj_returned = _other_key_info(data_source, other_keys=v[1:])
+            obj.update(obj_returned)
 
-            t = data_source.read_json_file(first_key)
-            cur_finished_at = t.get("finished_at")
-            obj["dependents_count"] = t.get("dependents_count", '-1')
-            obj["package_info"] = t.get("package_info", {})
-            obj["version"] = t.get("version", None)
-            obj["latest_version"] = t.get("latest_version", '-1')
-            obj["ecosystem"] = t.get("ecosystem", None)
-            obj["package"] = t.get("package", None)
-
-            #check if EPV is not None
-            condition = [obj['package'] != None, obj['version'] != None, obj['ecosystem'] != None]
-            if all(condition):
-                for this_key in v[1:]:
-                    value = data_source.read_json_file(this_key)
-                    this_key = this_key.split("/")[-1]
-                    obj["analyses"][this_key[:-len('.json')]] = value
-
-                GraphPopulator.populate_from_json(obj)
-                count_imported_EPVs += 1
-                last_imported_EPV = first_key
-                if max_finished_at is None:
-                    max_finished_at = cur_finished_at
-                    max_datetime = datetime.strptime(max_finished_at, date_time_format)
-                else:
-                    cur_datetime = datetime.strptime(cur_finished_at, date_time_format)
-                    if cur_datetime > max_datetime:
-                        max_finished_at = cur_finished_at
-                        max_datetime = datetime.strptime(max_finished_at, date_time_format)
+            GraphPopulator.populate_from_json(obj)
+            count_imported_EPVs += 1
+            last_imported_EPV = first_key
+            
+            max_finished_at = _set_max_finished_at(max_finished_at, cur_finished_at, max_datetime, date_time_format)
+            max_datetime = datetime.strptime(max_finished_at, date_time_format)
 
     except Exception as e:
-        msg = "The import failed with error '%s'." % e
-        logger.error(msg)
-        tb = traceback.format_exc()
-        logger.error("Traceback for latest failure in import: %s" % tb)
+        msg = _get_exception_msg("The import failed", e)
         report['status'] = 'Failure'
-        report['message'] = msg
+        report['message'] = msg    
 
     report['count_imported_EPVs'] = count_imported_EPVs
     report['last_imported_EPV'] = last_imported_EPV
@@ -126,29 +149,16 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
         report['message'] = 'Nothing to be imported! No data found on S3 to be imported!'
     try:
         for counter, v in dict_grouped_keys.items():
-            obj = {"analyses": {}}
             first_key = v[0]
+            obj, cur_finished_at = _first_key_info(data_source, first_key)
+            if obj is None:
+                continue
+            obj_returned = _other_key_info(data_source, other_keys=v[1:])
+            obj.update(obj_returned)
+
+            str_gremlin = GraphPopulator.create_query_string(obj)
             logger.debug("Importing " + first_key)
             logger.debug("File---- %s  numbered---- %d  added:" % (first_key, counter))
-
-            t = data_source.read_json_file(first_key)
-            cur_finished_at = t.get("finished_at")
-            obj["dependents_count"] = t.get("dependents_count", '')
-            obj["package_info"] = t.get("package_info", {})
-            obj["version"] = t.get("version", '')
-            obj["latest_version"] = t.get("latest_version", '')
-            obj["ecosystem"] = t.get("ecosystem", '')
-            obj["package"] = t.get("package", '')
-
-            # check if EPV is not None
-            condition = [obj['package'] != None, obj['version'] != None, obj['ecosystem'] != None]
-            if all(condition):
-                for this_key in v[1:]:
-                    value = data_source.read_json_file(this_key)
-                    this_key = this_key.split("/")[-1]
-                    obj["analyses"][this_key[:-len('.json')]] = value
-
-                str_gremlin = GraphPopulator.create_query_string(obj)
 
             # Fire Gremlin HTTP query now
             logger.info("Ingestion initialized for EPV - " +
@@ -163,20 +173,11 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
             if resp['status']['code'] == 200:
                 count_imported_EPVs += 1
                 last_imported_EPV = first_key
-                if max_finished_at is None:
-                    max_finished_at = cur_finished_at
-                    max_datetime = datetime.strptime(max_finished_at, date_time_format)
-                else:
-                    cur_datetime = datetime.strptime(cur_finished_at, date_time_format)
-                    if cur_datetime > max_datetime:
-                        max_finished_at = cur_finished_at
-                        max_datetime = datetime.strptime(max_finished_at, date_time_format)
+                max_finished_at = _set_max_finished_at(max_finished_at, cur_finished_at, max_datetime, date_time_format)
+                max_datetime = datetime.strptime(max_finished_at, date_time_format)
 
     except Exception as e:
-        msg = "The import failed with error '%s'." % e
-        logger.error(msg)
-        tb = traceback.format_exc()
-        logger.error("Traceback for latest failure in import: %s" % tb)
+        msg = _get_exception_msg("The import failed", e)
         report['status'] = 'Failure'
         report['message'] = msg
 
@@ -184,6 +185,27 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
     report['last_imported_EPV'] = last_imported_EPV
     report['max_finished_at'] = max_finished_at
     return report
+
+
+def _log_report_msg(import_type, report):
+    # Log the report
+    msg = """
+        Report from {}:
+        {}
+        Total number of EPVs imported: {}
+        The last successfully imported EPV: {}
+        Max value of 'finished_at' among all imported EPVs: {}
+    """
+    msg = msg.format(import_type, report.get('message'),
+                     report.get('count_imported_EPVs'),
+                     report.get('last_imported_EPV'),
+                     report.get('max_finished_at'))
+
+    if report.get('status') is 'Success':
+        logger.debug(msg)
+    else:
+        # TODO: retry??
+        logger.error(msg)  
 
 
 def import_bulk(data_source, book_keeper):
@@ -234,31 +256,10 @@ def import_bulk(data_source, book_keeper):
                 'last_imported_epv': report.get('last_imported_EPV')
             }
             GraphPopulator.update_metadata(dict_graph_meta)
-
-        # Log the report
-        msg = """
-            Report from import_bulk():
-            {}
-            Total number of EPVs imported: {}
-            The last successfully imported EPV: {}
-            Max value of 'finished_at' among all imported EPVs: {}
-        """
-        msg = msg.format(report.get('message'),
-                         report.get('count_imported_EPVs'),
-                         report.get('last_imported_EPV'),
-                         report.get('max_finished_at'))
-
-        if report.get('status') is 'Success':
-            logger.debug(msg)
-        else:
-            # TODO: retry ??
-            logger.error(msg)
+        _log_report_msg("import_bulk()", report)
 
     except Exception as e:
-        msg = "import_bulk() failed with error: %s" % e
-        logger.error(msg)
-        tb = traceback.format_exc()
-        logger.error("Traceback for latest failure in import_bulk(): %s" % tb)
+        msg = _get_exception_msg("import_bulk() failed with error", e)
         raise RuntimeError(msg)
 
     return report
@@ -278,30 +279,10 @@ def import_epv(data_source, list_epv):
         dict_grouped_keys = _group_keys_by_epv(list_keys, data_source)
         report = _import_grouped_keys(data_source, dict_grouped_keys)
 
-        # Log the report
-        msg = """
-            Report from import_epv():
-            {}
-            Total number of EPVs imported: {}
-            The last successfully imported EPV: {}
-            Max value of 'finished_at' among all imported EPVs: {}
-        """
-        msg = msg.format(report.get('message'),
-                         report.get('count_imported_EPVs'),
-                         report.get('last_imported_EPV'),
-                         report.get('max_finished_at'))
-
-        if report.get('status') is 'Success':
-            logger.debug(msg)
-        else:
-            # TODO: retry ??
-            logger.error(msg)
+        _log_report_msg("import epv()", report)
 
     except Exception as e:
-        msg = "import_epv() failed with error: %s" % e
-        logger.error(msg)
-        tb = traceback.format_exc()
-        logger.error("Traceback for the latest failure in import_epv(): %s" % tb)
+        msg = _get_exception_msg("import_epv() failed with error", e)
         raise RuntimeError(msg)
 
     return report
@@ -321,31 +302,11 @@ def import_epv_http(data_source, list_epv):
         report = _import_grouped_keys_http(data_source, dict_grouped_keys)
 
         # Log the report
-        msg = """
-            Report from import_epv():
-            {}
-            Total number of EPVs imported: {}
-            The last successfully imported EPV: {}
-            Max value of 'finished_at' among all imported EPVs: {}
-        """
-        msg = msg.format(report.get('message'),
-                         report.get('count_imported_EPVs'),
-                         report.get('last_imported_EPV'),
-                         report.get('max_finished_at'))
-
-        if report.get('status') is 'Success':
-            logger.debug(msg)
-        else:
-            # TODO: retry ??
-            logger.error(msg)
+        _log_report_msg("import_epv()", report)
 
     except Exception as e:
-        msg = "import_epv() failed with error: %s" % e
-        logger.error(msg)
-        tb = traceback.format_exc()
-        logger.error("Traceback for the latest failure in import_epv(): %s" % tb)
+        msg = _get_exception_msg("import_epv() failed with error", e)
         raise RuntimeError(msg)
-
     return report
 
 
