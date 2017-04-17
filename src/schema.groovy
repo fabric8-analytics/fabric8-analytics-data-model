@@ -348,6 +348,11 @@
             vulnerability_updated_date = mgmt.makePropertyKey('vulnerability_updated_date').dataType(String.class).make();
         }
 
+        tokens = mgmt.getPropertyKey('tokens');
+        if(tokens == null) {
+            tokens = mgmt.makePropertyKey('tokens').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
         // # for indexes
         if(null == mgmt.getGraphIndex('CVEidIndex')) {
             mgmt.buildIndex('CVEidIndex', Vertex.class).addKey(cve_id).unique().buildCompositeIndex();
@@ -409,9 +414,10 @@
                 //'remediation_created_at',
                 //'severity',
                 //'source',
-                'vulnerability_name'
+                'vulnerability_name',
                 //'vulnerability_published_date',
                 //'vulnerability_updated_date',
+                'tokens'
         ]
 
         allKeys.each { k ->

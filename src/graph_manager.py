@@ -69,7 +69,7 @@ class BayesianGraph(object):
         str_gremlin_dsl = """
         // obtain references reference to graph management instance
         mgmt = graph.openManagement();
-        i = mgmt.getGraphIndex('index_prop_key_vulnerability_name');
+        i = mgmt.getGraphIndex('index_prop_key_tokens');
         mgmt.commit();
         i != null
         """
@@ -84,7 +84,7 @@ class BayesianGraph(object):
         str_gremlin_dsl = """
         // obtain references reference to graph management instance
         mgmt = graph.openManagement();
-        k = mgmt.getPropertyKey('vulnerability_updated_date');
+        k = mgmt.getPropertyKey('tokens');
         mgmt.commit()
 
         // if this is true then we have already created the schema
