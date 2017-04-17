@@ -344,15 +344,15 @@ class SecurityDetails(EntityBase):
             query = self.g().V(self.id).\
                 property('vertex_label', self.label). \
                 property('cvss', self.cvss).\
-                property('summary', self.summary).\
-                property('access_authentication', self.access.get('authentication')).\
-                property('access_complexity', self.access.get('complexity')).\
-                property('access_vector', self.access.get('vector')).\
-                property('impact_availability', self.impact.get('availability')).\
-                property('impact_confidentiality', self.impact.get('confidentiality')).\
-                property('impact_integrity', self.impact.get('integrity')).\
+                property('summary', self.summary or '-1').\
+                property('access_authentication', self.access.get('authentication') or '-1').\
+                property('access_complexity', self.access.get('complexity') or '-1').\
+                property('access_vector', self.access.get('vector') or '-1').\
+                property('impact_availability', self.impact.get('availability') or '-1').\
+                property('impact_confidentiality', self.impact.get('confidentiality') or '-1').\
+                property('impact_integrity', self.impact.get('integrity') or '-1').\
                 property('last_updated', ts)
-
+                
             for r in self.references:
                 query.property('references', r)
 
