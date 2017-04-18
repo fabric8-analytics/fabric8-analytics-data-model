@@ -25,20 +25,16 @@ if not BayesianGraph.is_index_created():
     app.logger.info("Index is not created as yet, checking schema creation")
     if not BayesianGraph.is_schema_defined():
         print("Schema is not yet created, creating now...")
-        # app.logger.info("Schema is not yet created, creating now...")
         BayesianGraph.populate_schema()
         # double check
         schema_definition_success = BayesianGraph.is_schema_defined()
         print("Double check: schema_definition_success %s" % schema_definition_success)
-        # app.logger.info("Double check: schema_definition_success %s" % schema_definition_success)
         if not schema_definition_success:
             raise RuntimeError("Failed to setup graph schema")
         else:
             print("Ready to serve requests")
-            # app.logger.info("Ready to serve requests")
 else:
     print("Ready to serve requests")
-    # app.logger.info("Ready to serve requests")
 
 
 @app.route('/api/v1/readiness')
