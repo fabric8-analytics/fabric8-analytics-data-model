@@ -98,33 +98,6 @@ class CodeMetricsLanguage(EntityBase):
             logger.error("update() failed: %s" % e)
             return None
 
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
-
 
 class CodeMetricsDetails:
     def __init__(self, languages=[]):
@@ -213,33 +186,6 @@ class CodeMetricsResult(EntityBase):
             code_metrics_result = CodeMetricsResult(None, status=status, summary=summary, details=details)
 
         return code_metrics_result
-
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
 
     def create(self):
         try:

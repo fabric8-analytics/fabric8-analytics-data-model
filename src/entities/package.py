@@ -46,24 +46,6 @@ class Package(EntityBase):
         return objpackage
 
     @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
     def edge_count(cls):
         try:
             return cls.g().V().has('vertex_label', cls._get_label()). \
@@ -71,15 +53,6 @@ class Package(EntityBase):
 
         except Exception as e:
             logger.error("edge_count() failed: %s" % e)
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
 
     @classmethod
     def return_entity_obj(cls, ecosystem, name, package_relative_used, package_dependents_count, latest_version, id, last_updated, **github_dict):
@@ -283,6 +256,3 @@ class Package(EntityBase):
                 logger.error("add_github_details_as_attr() failed: %s" % e)
 
         return self.github_details
-
-
-

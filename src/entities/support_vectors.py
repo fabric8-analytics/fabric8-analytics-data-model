@@ -34,33 +34,6 @@ class LicenseDetails(EntityBase):
 
         return license_details_list, counts_list, license_names
 
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
-
     def save(self):
         license_criteria = {'lname': self.name}
         present_license = LicenseDetails.find_by_criteria(
@@ -220,33 +193,6 @@ class SecurityDetails(EntityBase):
                 cve_id_list.append(objsecurity.cve_id)
 
         return security_obj_list, cvss_list, cve_id_list
-
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
 
     def save(self):
         security_criteria = {'cve_id': self.cve_id}
@@ -410,4 +356,3 @@ class SecurityDetails(EntityBase):
 
             except Exception as e:
                 logger.error("add_blackduck_cve() failed: %s" % e)
-

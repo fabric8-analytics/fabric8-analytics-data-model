@@ -47,20 +47,32 @@ class EntityBase(object):
     def update(self):
         raise NotImplementedError()
 
-    def delete(self):
-        self.delete()
-
     @classmethod
     def delete_all(cls):
-        raise NotImplementedError()
+        try:
+            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
+
+        except Exception as e:
+            logger.error("delete all() failed: %s" % e)
+            return None
 
     @classmethod
-    def find_all(self):
-        raise NotImplementedError()
+    def find_all(cls):
+        try:
+            return cls.g().V().has('vertex_label', cls._get_label()).toList()
+
+        except Exception as e:
+            logger.error("find_all() failed: %s" % e)
+            return None
 
     @classmethod
-    def count(self):
-        raise NotImplementedError()
+    def count(cls):
+        try:
+            return len(cls.find_all())
+
+        except Exception as e:
+            logger.error("count() failed: %s" % e)
+            return None
 
     @classmethod
     def find_by_criteria(self, label, criteria_dict):

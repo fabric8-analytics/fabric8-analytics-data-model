@@ -33,24 +33,6 @@ class GraphMetaData(EntityBase):
                              gv.get_last_imported_epv(input_json))
 
     @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
     def edge_count(cls):
         try:
             return cls.g().V().has('vertex_label', cls._get_label()). \
@@ -58,15 +40,6 @@ class GraphMetaData(EntityBase):
 
         except Exception as e:
             logger.error("edge_count() failed: %s" % e)
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
 
     @classmethod
     def return_entity_obj(cls, vertex_id, last_incr_update_ts, last_imported_epv):

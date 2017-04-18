@@ -68,24 +68,6 @@ class Version(EntityBase):
         return cls.load_from_json(input_json)
 
     @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
     def count_dependency(cls, version_id):
         try:
             return cls.g().V(version_id).outE().hasLabel("depends_on").count().toList()[0]
@@ -110,24 +92,6 @@ class Version(EntityBase):
         objversion.is_packaged_in = downstream_pck_names
         objversion.is_published_in = downstream_channels
         return objversion
-
-    def delete(self):
-        try:
-            if self.id is not None:
-                return self.g().V(self.id).drop().toList()
-
-        except Exception as e:
-            logger.error("delete() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
 
     def save(self):
         package_criteria = {
@@ -500,11 +464,8 @@ class Version(EntityBase):
                 lang_count += 1
         if lang_count > 0:              
             cm_details["cm_avg_cyclomatic_complexity"] = code_complexity/lang_count
-        #cm_details["relative_used"] = code_metrics.relative_used # what should go here
-
+        
         self.add_details = cm_details
-
-        # self.licences = self.add_details.get("licences", [])
         self.cve_ids = self.add_details.get("cve_ids", [])
         self.cm_loc = self.add_details.get("cm_loc", -1)
         self.cm_num_files = self.add_details.get("cm_num_files", -1)
