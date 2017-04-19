@@ -49,25 +49,12 @@ class GraphMetaData(EntityBase):
 
     @classmethod
     def find_by_criteria(cls, label, criteria_dict):
-        try:
-            query = cls.g().V().has('vertex_label', label)
-            for k, v in criteria_dict.items():
-                query = query.has(k, v)
-            check_meta = query.toList()
-            logger.debug("query sent:------ %s" % query)
-            logger.debug("query_result:----- %s" % check_meta)
-
-            if len(check_meta) == 0:
-                return None
-            else:
-                values = cls.g().V(check_meta[0].id).valueMap().toList()[0]
-                return cls.return_entity_obj(check_meta[0].id,
-                                             values.get('last_incr_update_ts')[0],
-                                             values.get('last_imported_epv')[0])
-
-        except Exception as e:
-            logger.error("find_by_criteria() failed: %s" % e)
+        values = super(GraphMetaData, cls).find_by_criteria(label, criteria_dict)
+        if values is None:
             return None
+        return cls.return_entity_obj(values.get('id'),
+                                     values.get('last_incr_update_ts')[0],
+                                     values.get('last_imported_epv')[0])
 
     def create(self):
         try:
