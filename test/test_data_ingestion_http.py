@@ -22,7 +22,8 @@ def test_create_package_entity():
     assert p is not None
     assert p.ecosystem == 'npm'
     assert p.name == 'serve-static'
-    assert p.count() == 1
     assert p.tokens == ['serve', 'static']
 
-    Package.delete_by_id(p, )
+    assert Package.count() == 1
+    Package.delete_by_id(p.id)
+    assert Package.count() == 0
