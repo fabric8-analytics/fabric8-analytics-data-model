@@ -5,7 +5,7 @@ from entities.package import Package
 
 def test_create_package_entity():
 
-    src_dir = 'data/full_import/npm/serve-static'
+    src_dir = 'test/data/full_import/npm/serve-static'
     data_source = LocalFileSystem(src_dir)
     list_keys = data_source.list_files()
     grouped_keys = _group_keys_directory(list_keys, data_source.src_dir)
@@ -24,3 +24,5 @@ def test_create_package_entity():
     assert p.name == 'serve-static'
     assert p.count() == 1
     assert p.tokens == ['serve', 'static']
+
+    Package.delete_by_id(p, )
