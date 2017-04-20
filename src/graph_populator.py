@@ -75,7 +75,7 @@ class GraphPopulator(object):
 
         # Add license details
         licenses = input_json.get('analyses', {}).get('source_licenses', {}).get('summary', {}).get('sure_licenses', [])
-        str_lic = " ".join(map(lambda x: "ver.property('licecnses', '" + x + "');", licenses))
+        str_lic = " ".join(map(lambda x: "ver.property('licenses', '" + x + "');", licenses))
         str_version += str_lic
 
         # Add CVE property if it exists
