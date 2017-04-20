@@ -1,0 +1,1 @@
+{"is_ref_stack": "true", "description": "Starter for using Reactor Netty as the embedded reactive HTTP server.", "version": "1.0", "ecosystem": "maven", "name": "Spring Boot Reactor Netty Starter", "license": "Apache-2.0", "source": "manually curated", "dependencies": {"io.projectreactor.ipc:reactor-netty": "0.6.2.RELEASE"}, "usage": "1"}
