@@ -4,7 +4,6 @@ import logging
 from entities.utils import get_values as gv
 
 logger = logging.getLogger(__name__)
-check_set = set(['CodeMetricsLanguage', 'GraphMetaData'])
 
 
 def default_json_decoder(self):
@@ -38,11 +37,6 @@ class EntityBase(object):
         return self.id
 
     def save(self, criteria_dict=None):
-        if self.__class__.__name__ in check_set:
-            if self.id is None:
-                return self.create()
-            return self.update()
-        
         present_node = self.__class__.find_by_criteria(
                 self.label, criteria_dict)
         if present_node is None:

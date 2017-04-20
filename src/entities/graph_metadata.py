@@ -56,6 +56,11 @@ class GraphMetaData(EntityBase):
                                      values.get('last_incr_update_ts')[0],
                                      values.get('last_imported_epv')[0])
 
+    def save(self):
+        if self.id is None:
+                return self.create()
+        return self.update()
+        
     def create(self):
         try:
             # Note: we explicitly pass empty dictionary to find_by_criteria()

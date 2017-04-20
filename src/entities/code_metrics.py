@@ -39,6 +39,11 @@ class CodeMetricsLanguage(EntityBase):
         self.first_order_density = first_order_density or -1
         self.last_updated= None
 
+    def save(self):
+        if self.id is None:
+                return self.create()
+        return self.update()
+       
     def create(self):
         try:
             ts = time.time()
