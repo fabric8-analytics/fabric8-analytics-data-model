@@ -36,13 +36,7 @@ class LicenseDetails(EntityBase):
 
     def save(self):
         license_criteria = {'lname': self.name}
-        present_license = LicenseDetails.find_by_criteria(
-            self.label, license_criteria)
-        if present_license is None:
-            return self.create()
-        else:
-            self.id = present_license.id
-            return self.update()
+        return super(LicenseDetails, self).save(criteria_dict=license_criteria)
 
     @classmethod
     def return_entity_obj(cls, name, id, last_updated):
@@ -184,13 +178,7 @@ class SecurityDetails(EntityBase):
 
     def save(self):
         security_criteria = {'cve_id': self.cve_id}
-        present_security = SecurityDetails.find_by_criteria(
-            self.label, security_criteria)
-        if present_security is None:
-            return self.create()
-        else:
-            self.id = present_security.id
-            return self.update()
+        return super(SecurityDetails, self).save(criteria_dict=security_criteria)
 
     @classmethod
     def return_entity_obj(cls, cve_id, cvss, summary, references, id, last_updated):

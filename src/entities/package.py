@@ -59,14 +59,8 @@ class Package(EntityBase):
 
     def save(self):
         package_criteria = {'ecosystem': self.ecosystem, 'name': self.name}
-        present_package = Package.find_by_criteria(
-                self.label, package_criteria)
-        if present_package is None:
-            return self.create()
-        else:
-            self.id = present_package.id
-            return self.update()
-
+        return super(Package, self).save(criteria_dict=package_criteria)
+        
     @classmethod
     def find_by_criteria(cls, label, criteria_dict):
         github_dict ={}

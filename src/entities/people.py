@@ -26,13 +26,7 @@ class Person(EntityBase):
 
     def save(self):
         person_criteria = {'name': self.name, 'email': self.email}
-        present_person = Person.find_by_criteria(
-            self.label, person_criteria)
-        if present_person is None:
-            return self.create()
-        else:
-            self.id = present_person.id
-            return self.update()
+        return super(Person, self).save(criteria_dict=person_criteria)
 
     @classmethod
     def return_entity_author(cls, name, email, id, last_updated):

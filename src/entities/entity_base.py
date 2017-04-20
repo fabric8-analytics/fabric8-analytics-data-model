@@ -4,6 +4,7 @@ import logging
 from entities.utils import get_values as gv
 
 logger = logging.getLogger(__name__)
+check_set = set(['CodeMetricsLanguage', 'GraphMetaData'])
 
 
 def default_json_decoder(self):
@@ -14,7 +15,7 @@ def default_json_decoder(self):
 #TODO: Code refactor to PEP8
 class EntityBase(object):
     label = None
-
+    
     def __init__(self):
         self.id = None
         self.label = self.__class__._get_label()
@@ -36,11 +37,18 @@ class EntityBase(object):
     def get_id(self):
         return self.id
 
-    def save(self):
-        if self.id is None:
-            return self.create()
-        else:
+    def save(self, criteria_dict=None):
+        if self.__class__.__name__ in check_set:
+            if self.id is None:
+                return self.create()
             return self.update()
+        
+        present_node = self.__class__.find_by_criteria(
+                self.label, criteria_dict)
+        if present_node is None:
+            return self.create()
+        self.id = present_node.id
+        return self.update()
 
     def create(self):
         raise NotImplementedError()
