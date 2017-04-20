@@ -1,6 +1,7 @@
 import json
 from graph_manager import BayesianGraph
 import logging
+from entities.utils import get_values as gv
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ def default_json_decoder(self):
 #TODO: Code refactor to PEP8
 class EntityBase(object):
     label = None
-
+    
     def __init__(self):
         self.id = None
         self.label = self.__class__._get_label()
@@ -35,11 +36,13 @@ class EntityBase(object):
     def get_id(self):
         return self.id
 
-    def save(self):
-        if self.id is None:
+    def save(self, criteria_dict=None):
+        present_node = self.__class__.find_by_criteria(
+                self.label, criteria_dict)
+        if present_node is None:
             return self.create()
-        else:
-            return self.update()
+        self.id = present_node.id
+        return self.update()
 
     def create(self):
         raise NotImplementedError()
@@ -47,24 +50,52 @@ class EntityBase(object):
     def update(self):
         raise NotImplementedError()
 
-    def delete(self):
-        self.delete()
-
     @classmethod
     def delete_all(cls):
-        raise NotImplementedError()
+        try:
+            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
+
+        except Exception as e:
+            logger.error("delete all() failed: %s" % e)
+            return None
 
     @classmethod
-    def find_all(self):
-        raise NotImplementedError()
+    def find_all(cls):
+        try:
+            return cls.g().V().has('vertex_label', cls._get_label()).toList()
+
+        except Exception as e:
+            logger.error("find_all() failed: %s" % e)
+            return None
 
     @classmethod
-    def count(self):
-        raise NotImplementedError()
+    def count(cls):
+        try:
+            return len(cls.find_all())
+
+        except Exception as e:
+            logger.error("count() failed: %s" % e)
+            return None
 
     @classmethod
-    def find_by_criteria(self, label, criteria_dict):
-        raise NotImplementedError()
+    def find_by_criteria(cls, label, criteria_dict):
+        try:
+            query = cls.g().V().has('vertex_label', label)
+            for k, v in criteria_dict.items():
+                query = query.has(k, v)
+            check_pck = query.toList()
+            logger.debug("query sent:------ %s" % query)
+            logger.debug("query_result:----- %s" % check_pck)
+
+            if len(check_pck) == 0:
+                return None
+            values = cls.g().V(check_pck[0].id).valueMap().toList()[0]
+            values['id'] = check_pck[0].id
+            return values
+    
+        except Exception as e:
+            logger.error("find_by_criteria() failed: %s" % e)
+            return None
 
     @classmethod
     def return_entity_obj(self):
@@ -87,3 +118,8 @@ class EntityBase(object):
         except Exception as e:
             logger.error("delete() failed: %s" % e)
             return None
+
+    @classmethod
+    def load_from_file(cls, file_name):
+        input_json = gv.read_from_file(file_name)
+        return cls.load_from_json(input_json)         

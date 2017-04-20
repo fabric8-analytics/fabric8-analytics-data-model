@@ -39,6 +39,11 @@ class CodeMetricsLanguage(EntityBase):
         self.first_order_density = first_order_density or -1
         self.last_updated= None
 
+    def save(self):
+        if self.id is None:
+                return self.create()
+        return self.update()
+       
     def create(self):
         try:
             ts = time.time()
@@ -96,33 +101,6 @@ class CodeMetricsLanguage(EntityBase):
 
         except Exception as e:
             logger.error("update() failed: %s" % e)
-            return None
-
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
             return None
 
 
@@ -213,33 +191,6 @@ class CodeMetricsResult(EntityBase):
             code_metrics_result = CodeMetricsResult(None, status=status, summary=summary, details=details)
 
         return code_metrics_result
-
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
 
     def create(self):
         try:
