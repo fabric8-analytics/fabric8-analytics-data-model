@@ -92,6 +92,7 @@ class GraphPopulator(object):
     def construct_package_query(cls, input_json):
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
+        pkg_name_tokens = re.split('\W+', pkg_name)
 
         # Get Metadata Details
         latest_version = input_json.get('latest_version') or ''
@@ -129,6 +130,11 @@ class GraphPopulator(object):
                       "pkg.property('package_relative_used', '" + pkg_usage + "');" \
                       "pkg.property('package_dependents_count', " + pkg_deps_count + ");" \
                       "pkg.property('last_updated', " + str(time.time()) + ");"
+
+        # Add tokens for a package
+        for tkn in pkg_name_tokens:
+            if tkn:
+                str_package += "pkg.property('tokens', '" + tkn + "');"
 
         return str_package
 

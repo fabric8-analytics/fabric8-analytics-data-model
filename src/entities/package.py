@@ -10,24 +10,26 @@ logger = logging.getLogger(__name__)
 
 class Package(EntityBase):
 
-    def __init__(self, ecosystem='-1', name='-1', package_relative_used='-1', package_dependents_count=-1, latest_version='-1', **github_dict):
+    def __init__(self, ecosystem='-1', name='-1', package_relative_used='-1', package_dependents_count=-1,
+                 latest_version='-1', tokens=[], **github_dict):
         super(Package, self).__init__()
         self.ecosystem = ecosystem
         self.name = name
         self.package_relative_used = package_relative_used
         self.package_dependents_count = package_dependents_count
         self.latest_version = latest_version
+        self.tokens = tokens
         if len(github_dict) is not 0:
             self.gh_stargazers = github_dict.get("gh_stargazers",-1)
             self.gh_forks = github_dict.get("gh_forks",-1)
-            self.gh_issues_last_year_opened = github_dict.get("gh_issues_last_year_opened",-1)
-            self.gh_issues_last_year_closed = github_dict.get("gh_issues_last_year_closed",-1)
-            self.gh_issues_last_month_opened = github_dict.get("gh_issues_last_month_opened",-1)
-            self.gh_issues_last_month_closed = github_dict.get("gh_issues_last_month_closed",-1)
-            self.gh_prs_last_year_opened = github_dict.get("gh_prs_last_year_opened",-1)
-            self.gh_prs_last_year_closed = github_dict.get("gh_prs_last_year_closed",-1)
-            self.gh_prs_last_month_opened = github_dict.get("gh_prs_last_month_opened",-1)
-            self.gh_prs_last_month_closed = github_dict.get("gh_prs_last_month_closed",-1)
+            self.gh_issues_last_year_opened = github_dict.get("gh_issues_last_year_opened", -1)
+            self.gh_issues_last_year_closed = github_dict.get("gh_issues_last_year_closed", -1)
+            self.gh_issues_last_month_opened = github_dict.get("gh_issues_last_month_opened", -1)
+            self.gh_issues_last_month_closed = github_dict.get("gh_issues_last_month_closed", -1)
+            self.gh_prs_last_year_opened = github_dict.get("gh_prs_last_year_opened", -1)
+            self.gh_prs_last_year_closed = github_dict.get("gh_prs_last_year_closed", -1)
+            self.gh_prs_last_month_opened = github_dict.get("gh_prs_last_month_opened", -1)
+            self.gh_prs_last_month_closed = github_dict.get("gh_prs_last_month_closed", -1)
         self.last_updated = None
 
     @classmethod
@@ -50,9 +52,10 @@ class Package(EntityBase):
             logger.error("edge_count() failed: %s" % e)
 
     @classmethod
-    def return_entity_obj(cls, ecosystem, name, package_relative_used, package_dependents_count, latest_version, id, last_updated, **github_dict):
+    def return_entity_obj(cls, ecosystem, name, package_relative_used, package_dependents_count,
+                            latest_version, id, last_updated, tokens, **github_dict):
         objpackage = Package(ecosystem, name, package_relative_used,
-                             package_dependents_count, latest_version, **github_dict)
+                             package_dependents_count, latest_version, tokens, **github_dict)
         objpackage.last_updated = last_updated
         objpackage.id = id
         return objpackage
@@ -75,7 +78,7 @@ class Package(EntityBase):
                 github_dict[each]=values.get(each)[0]
 
         return cls.return_entity_obj(values.get('ecosystem')[0], values.get('name')[0], values.get('package_relative_used')[0], values.get('package_dependents_count')[0],
-                                     values.get('latest_version')[0], values.get('id'), values.get('last_updated')[0], **github_dict)
+                                     values.get('latest_version')[0], values.get('id'), values.get('last_updated')[0], values.get('tokens'), **github_dict)
 
     def create(self):
         try:
