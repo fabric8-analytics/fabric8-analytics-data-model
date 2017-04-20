@@ -45,7 +45,10 @@ objects:
           - name: GREMLIN_USE_SECURE_CONNECTION
             value: ${GREMLIN_USE_SECURE_CONNECTION}
           - name: AWS_BUCKET
-            value: ${AWS_BUCKET}
+            valueFrom:
+              configMapKeyRef:
+                name: bayesian-config
+                key: s3-bucket-for-analyses
           - name: POSTGRESQL_DATABASE
             valueFrom:
               secretKeyRef:
@@ -117,11 +120,6 @@ parameters:
   name: GREMLIN_USE_SECURE_CONNECTION
   required: false
   value: "false"
-
-- description:
-  name: AWS_BUCKET
-  required: true
-  value: ""
 
 - description: MEMORY_LIMIT
   name: MEMORY_LIMIT

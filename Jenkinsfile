@@ -45,16 +45,14 @@ node('gremlin') {
 
 if (env.BRANCH_NAME == 'master') {
     node('oc') {
-        def bucket = 'bayesian-core-data'
-
         stage('Deploy - dev') {
             unstash 'template'
-            sh "oc --context=dev process -v AWS_BUCKET=DEV-${bucket} -f template.yaml | oc --context=dev apply -f -"
+            sh "oc --context=dev process -f template.yaml | oc --context=dev apply -f -"
         }
 
         stage('Deploy - rh-idev') {
             unstash 'template'
-            sh "oc --context=rh-idev process -v AWS_BUCKET=STAGE-${bucket} -f template.yaml | oc --context=rh-idev apply -f -"
+            sh "oc --context=rh-idev process -f template.yaml | oc --context=rh-idev apply -f -"
         }
     }
 }
