@@ -1,0 +1,19 @@
+{
+	"source": "manually curated",
+	"usage": "1",
+	"dependencies": {
+		"io.vertx:vertx-core": "3.4.1",
+		"io.vertx:vertx-jdbc-client": "3.4.1",
+		"io.vertx:vertx-rx-java": "3.4.1",
+		"io.vertx:vertx-web-client": "3.4.1",
+		"io.vertx:vertx-web-templ-freemarker": "3.4.1",
+		"io.vertx:vertx-web-templ-handlebars": "3.4.1",
+		"io.vertx:vertx-web": "3.4.1"
+	},
+	"name": "Vert.x Bare Web",
+	"license": "Apache-2.0",
+	"version": "1.0",
+	"ecosystem": "maven",
+	"is_ref_stack": "true",
+	"description": "A bare Vert.x stack for writing web applications."
+}

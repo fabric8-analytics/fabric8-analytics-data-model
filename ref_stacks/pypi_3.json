@@ -1,0 +1,15 @@
+{
+	"source": "manually curated",
+	"usage": "1",
+	"dependencies": {
+		"flask": "0.12.1",
+		"flask-pymongo": "0.4.1",
+		"flask-wtf": "0.14.2"
+	},
+	"name": "flask-mongo",
+	"license": "Apache-2.0",
+	"version": "1.0",
+	"ecosystem": "pypi",
+	"is_ref_stack": "true",
+	"description": "Create web server based application talking to Database using Python Flask"
+}

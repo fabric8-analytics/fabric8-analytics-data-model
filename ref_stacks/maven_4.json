@@ -1,0 +1,22 @@
+{
+	"source": "manually curated",
+	"usage": "1",
+	"dependencies": {
+		"io.vertx:vertx-config-kubernetes-configmap": "3.4.1",
+		"io.vertx:vertx-config-yaml": "3.4.1",
+		"io.vertx:vertx-config": "3.4.1",
+		"io.vertx:vertx-core": "3.4.1",
+		"io.vertx:vertx-health-check": "3.4.1",
+		"io.vertx:vertx-rx-java": "3.4.1",
+		"io.vertx:vertx-service-discovery-bridge-kubernetes": "3.4.1",
+		"io.vertx:vertx-service-discovery": "3.4.1",
+		"io.vertx:vertx-web-client": "3.4.1",
+		"io.vertx:vertx-web": "3.4.1"
+	},
+	"name": "Vert.x Bare OpenShift",
+	"license": "Apache-2.0",
+	"version": "1.0",
+	"ecosystem": "maven",
+	"is_ref_stack": "true",
+	"description": "A bare Vert.x stack for writing OpenShift applications."
+}

@@ -1,0 +1,14 @@
+{
+	"source": "manually curated",
+	"usage": "1",
+	"dependencies": {
+		"Django": "1.11",
+		"psycopg2": "2.7.1"
+	},
+	"name": "django-postgres",
+	"license": "Apache-2.0",
+	"version": "1.0",
+	"ecosystem": "pypi",
+	"is_ref_stack": "true",
+	"description": "Create web server based application using Python Django framework talking to Postgres Backend"
+}

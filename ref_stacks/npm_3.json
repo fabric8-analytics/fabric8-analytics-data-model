@@ -1,0 +1,23 @@
+{
+	"source": "manually curated",
+	"usage": "1",
+	"dependencies": {
+		"async": "0.2.9",
+		"body-parser": "1.17.1",
+		"cors": "2.1.0",
+		"express": "4.15.2",
+		"fh-amqp-js": "0.7.1",
+		"fh-mbaas-client": "0.16.5",
+		"fh-reportingclient": "0.5.5",
+		"multer": "0.1.8",
+		"request": "2.81.0",
+		"type-is": "1.1.0",
+		"underscore": "1.5.1"
+	},
+	"name": "feedhenry-mbaas-express",
+	"license": "Apache-2.0",
+	"version": "1.0",
+	"ecosystem": "npm",
+	"is_ref_stack": "true",
+	"description": "fh-mbaas-express is the FeedHenry MBaaS running on top of Express."
+}
