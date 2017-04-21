@@ -1,0 +1,17 @@
+{
+	"source": "manually curated",
+	"usage": "1",
+	"dependencies": {
+		"flask": "0.12.1",
+		"flask-migrate": "2.0.3",
+		"flask-wtf": "0.14.2",
+		"flask-sqlalchemy": "2.2",
+		"psycopg2": "2.7.1"
+	},
+	"name": "flask-postgres",
+	"license": "Apache-2.0",
+	"version": "1.0",
+	"ecosystem": "pypi",
+	"is_ref_stack": "true",
+	"description": "Create web server based application using Python Flask talking to Postgres DB"
+}

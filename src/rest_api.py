@@ -81,6 +81,7 @@ def ingest_to_graph():
 
     report = data_importer.import_epv_from_s3_http(list_epv=input_json)
     response = {'message': report.get('message'),
+                'epv': report.get('epv'),
                 'count_imported_EPVs': report.get('count_imported_EPVs')}
     print(response)
     if report.get('status') is not 'Success':

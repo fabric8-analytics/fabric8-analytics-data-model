@@ -1,0 +1,16 @@
+{
+	"source": "manually curated",
+	"usage": "1",
+	"dependencies": {
+		"io.vertx:vertx-core": "3.4.1",
+		"io.vertx:vertx-hazelcast": "3.4.1",
+		"io.vertx:examples-utils": "3.4.1",
+		"io.vertx:vertx-web": "3.4.1"
+	},
+	"name": "Vert.x HTTP Booster",
+	"license": "Apache-2.0",
+	"version": "1.0",
+	"ecosystem": "maven",
+	"is_ref_stack": "true",
+	"description": "A Vert.x http booster stack for writing web applications."
+}

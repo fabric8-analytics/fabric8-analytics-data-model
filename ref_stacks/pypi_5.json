@@ -1,0 +1,15 @@
+{
+	"source": "manually curated",
+	"usage": "1",
+	"dependencies": {
+		"flask": "0.12.1",
+		"flask-httpauth": "3.2.2",
+		"flask-restful": "0.3.5"
+	},
+	"name": "flask-api",
+	"license": "Apache-2.0",
+	"version": "1.0",
+	"ecosystem": "pypi",
+	"is_ref_stack": "true",
+	"description": "Create web server based application using Python Flask"
+}
