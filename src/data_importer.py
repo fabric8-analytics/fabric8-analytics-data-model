@@ -145,6 +145,7 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
     max_finished_at = None
     max_datetime = None
     last_imported_EPV = None
+    epv = []
     if len(dict_grouped_keys.items()) == 0:
         report['message'] = 'Nothing to be imported! No data found on S3 to be imported!'
     try:
@@ -163,18 +164,18 @@ def _import_grouped_keys_http(data_source, dict_grouped_keys):
             # Fire Gremlin HTTP query now
             logger.info("Ingestion initialized for EPV - " +
                         obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
-            print("Ingestion initialized for EPV - " +
-                  obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
+            epv.append(obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
             payload = {'gremlin': str_gremlin}
             response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload))
             resp = response.json()
-            print(resp)
-            logger.info(resp)
+
             if resp['status']['code'] == 200:
                 count_imported_EPVs += 1
                 last_imported_EPV = first_key
                 max_finished_at = _set_max_finished_at(max_finished_at, cur_finished_at, max_datetime, date_time_format)
                 max_datetime = datetime.strptime(max_finished_at, date_time_format)
+
+        report['epv'] = epv
 
     except Exception as e:
         msg = _get_exception_msg("The import failed", e)
