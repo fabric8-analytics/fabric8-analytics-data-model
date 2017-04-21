@@ -63,29 +63,6 @@ class Version(EntityBase):
         self.has_nvd_issues.append(security)
 
     @classmethod
-    def load_from_file(cls, file_name):
-        input_json = gv.read_from_file(file_name)
-        return cls.load_from_json(input_json)
-
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
     def count_dependency(cls, version_id):
         try:
             return cls.g().V(version_id).outE().hasLabel("depends_on").count().toList()[0]
@@ -110,24 +87,6 @@ class Version(EntityBase):
         objversion.is_packaged_in = downstream_pck_names
         objversion.is_published_in = downstream_channels
         return objversion
-
-    def delete(self):
-        try:
-            if self.id is not None:
-                return self.g().V(self.id).drop().toList()
-
-        except Exception as e:
-            logger.error("delete() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
 
     def save(self):
         package_criteria = {
@@ -161,37 +120,25 @@ class Version(EntityBase):
     @classmethod
     def find_by_criteria(cls, label, pck_obj, criteria_dict):
         add_data_dict = {}
-        try:
-            query = cls.g().V().has('vertex_label', label)
-            for k, v in criteria_dict.items():
-                query = query.has(k, v)
-            check_ver = query.toList()
-            logger.debug("query sent:------ %s" % query)
-            logger.debug("query_result:----- %s" % check_ver)
-            if len(check_ver) == 0:
-                return None
-            else:
-                values = cls.g().V(check_ver[0].id).valueMap().toList()[0]
-                add_data_list = ["cm_loc","cm_num_files","cm_avg_cyclomatic_complexity","relative_used", "cve_ids"]
-                for each in add_data_list:
-                    if each in values.keys():
-                        if each is "cve_ids":
-                            add_data_dict[each]=values.get(each)
-                        else:
-                            add_data_dict[each]=values.get(each)[0]
-
-                return cls.return_entity_obj(pck_obj, values.get('version')[0],
-                                             values.get('description')[0],
-                                             values.get('dependents_count')[0],
-                                             values.get('shipped_as_downstream')[0],
-                                             values.get('licenses', '[]'),
-                                             values.get('is_packaged_in'),
-                                             values.get('is_published_in'),
-                                             check_ver[0].id,  values.get('last_updated')[0], **add_data_dict)
-
-        except Exception as e:
-            logger.error("find_by_criteria() failed: %s" % e)
+        values = super(Version, cls).find_by_criteria(label, criteria_dict)
+        if values is None:
             return None
+        add_data_list = ["cm_loc","cm_num_files","cm_avg_cyclomatic_complexity","relative_used", "cve_ids"]
+        for each in add_data_list:
+            if each in values.keys():
+                if each is "cve_ids":
+                    add_data_dict[each]=values.get(each)
+                else:
+                    add_data_dict[each]=values.get(each)[0]
+
+        return cls.return_entity_obj(pck_obj, values.get('version')[0],
+                                     values.get('description')[0],
+                                     values.get('dependents_count')[0],
+                                     values.get('shipped_as_downstream')[0],
+                                     values.get('licenses', '[]'),
+                                     values.get('is_packaged_in'),
+                                     values.get('is_published_in'),
+                                     values.get('id'),  values.get('last_updated')[0], **add_data_dict)
 
     def create(self):
         logger.debug("create() %s - data:\n%s\n" %
@@ -500,11 +447,8 @@ class Version(EntityBase):
                 lang_count += 1
         if lang_count > 0:              
             cm_details["cm_avg_cyclomatic_complexity"] = code_complexity/lang_count
-        #cm_details["relative_used"] = code_metrics.relative_used # what should go here
-
+        
         self.add_details = cm_details
-
-        # self.licences = self.add_details.get("licences", [])
         self.cve_ids = self.add_details.get("cve_ids", [])
         self.cm_loc = self.add_details.get("cm_loc", -1)
         self.cm_num_files = self.add_details.get("cm_num_files", -1)

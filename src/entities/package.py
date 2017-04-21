@@ -33,11 +33,6 @@ class Package(EntityBase):
         self.last_updated = None
 
     @classmethod
-    def load_from_file(cls, file_name):
-        input_json = gv.read_from_file(file_name)
-        return cls.load_from_json(input_json)
-
-    @classmethod
     def load_from_json(cls, input_json):
         pck_info = gv.get_package_info(input_json)
         objpackage = Package(gv.get_ecosystem(input_json),
@@ -48,24 +43,6 @@ class Package(EntityBase):
         return objpackage
 
     @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
     def edge_count(cls):
         try:
             return cls.g().V().has('vertex_label', cls._get_label()). \
@@ -73,15 +50,6 @@ class Package(EntityBase):
 
         except Exception as e:
             logger.error("edge_count() failed: %s" % e)
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
 
     @classmethod
     def return_entity_obj(cls, ecosystem, name, package_relative_used, package_dependents_count,
@@ -94,44 +62,24 @@ class Package(EntityBase):
 
     def save(self):
         package_criteria = {'ecosystem': self.ecosystem, 'name': self.name}
-        present_package = Package.find_by_criteria(
-                self.label, package_criteria)
-        if present_package is None:
-            return self.create()
-        else:
-            self.id = present_package.id
-            return self.update()
-
+        return super(Package, self).save(criteria_dict=package_criteria)
+        
     @classmethod
     def find_by_criteria(cls, label, criteria_dict):
         github_dict ={}
-        try:
-            query = cls.g().V().has('vertex_label', label)
-            for k, v in criteria_dict.items():
-                query = query.has(k, v)
-            check_pck = query.toList()
-            logger.debug("query sent:------ %s" % query)
-            logger.debug("query_result:----- %s" % check_pck)
-
-            if len(check_pck) == 0:
-                return None
-            else:
-                values = cls.g().V(check_pck[0].id).valueMap().toList()[0]
-                gh_list = ["gh_issues_last_year_opened", "gh_issues_last_year_closed","gh_issues_last_month_opened", "gh_issues_last_month_closed",
-                           "gh_prs_last_month_opened", "gh_prs_last_month_closed", "gh_prs_last_year_opened", "gh_prs_last_year_closed",
-                           "gh_forks", "gh_stargazers"]
-                for each in gh_list:
-                    if each in values.keys():
-                        github_dict[each]=values.get(each)[0]
-
-                return cls.return_entity_obj(values.get('ecosystem')[0], values.get('name')[0], values.get('package_relative_used')[0], values.get('package_dependents_count')[0],
-                                             values.get('latest_version')[0], check_pck[0].id, values.get('last_updated')[0], values.get('tokens'), **github_dict)
-
-        except Exception as e:
-            logger.error("find_by_criteria() failed: %s" % e)
+        values = super(Package, cls).find_by_criteria(label, criteria_dict)
+        if values is None:
             return None
+        gh_list = ["gh_issues_last_year_opened","gh_issues_last_year_closed","gh_issues_last_month_opened", "gh_issues_last_month_closed",
+                   "gh_prs_last_month_opened","gh_prs_last_month_closed","gh_prs_last_year_opened","gh_prs_last_year_closed",
+                    "gh_forks","gh_stargazers"]
+        for each in gh_list:
+            if each in values.keys():
+                github_dict[each]=values.get(each)[0]
 
-    #TODO: refactor redundant functions of create, update, count etc
+        return cls.return_entity_obj(values.get('ecosystem')[0], values.get('name')[0], values.get('package_relative_used')[0], values.get('package_dependents_count')[0],
+                                     values.get('latest_version')[0], values.get('id'), values.get('last_updated')[0], values.get('tokens'), **github_dict)
+
     def create(self):
         try:
             package_criteria = {'ecosystem': self.ecosystem, 'name': self.name}
@@ -286,6 +234,3 @@ class Package(EntityBase):
                 logger.error("add_github_details_as_attr() failed: %s" % e)
 
         return self.github_details
-
-
-

@@ -34,42 +34,9 @@ class LicenseDetails(EntityBase):
 
         return license_details_list, counts_list, license_names
 
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
-
     def save(self):
         license_criteria = {'lname': self.name}
-        present_license = LicenseDetails.find_by_criteria(
-            self.label, license_criteria)
-        if present_license is None:
-            return self.create()
-        else:
-            self.id = present_license.id
-            return self.update()
+        return super(LicenseDetails, self).save(criteria_dict=license_criteria)
 
     @classmethod
     def return_entity_obj(cls, name, id, last_updated):
@@ -80,22 +47,10 @@ class LicenseDetails(EntityBase):
 
     @classmethod
     def find_by_criteria(cls, label, criteria_dict):
-        try:
-            query = cls.g().V().has('vertex_label', label)
-            for k, v in criteria_dict.items():
-                query = query.has(k, v)
-            check_license = query.toList()
-            logger.debug("query sent:------ %s" % query)
-            logger.debug("query_result:----- %s" % check_license)
-            if len(check_license) == 0:
-                return None
-            else:
-                values = cls.g().V(check_license[0].id).valueMap().toList()[0]
-                return cls.return_entity_obj(values.get('lname')[0], check_license[0].id, values.get('last_updated')[0])
-
-        except Exception as e:
-            logger.error("find_by_criteria() failed: %s" % e)
+        values = super(LicenseDetails, cls).find_by_criteria(label, criteria_dict)
+        if values is None:
             return None
+        return cls.return_entity_obj(values.get('lname')[0], values.get('id'), values.get('last_updated')[0])
 
     def create(self):
         try:
@@ -221,42 +176,9 @@ class SecurityDetails(EntityBase):
 
         return security_obj_list, cvss_list, cve_id_list
 
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
-
     def save(self):
         security_criteria = {'cve_id': self.cve_id}
-        present_security = SecurityDetails.find_by_criteria(
-            self.label, security_criteria)
-        if present_security is None:
-            return self.create()
-        else:
-            self.id = present_security.id
-            return self.update()
+        return super(SecurityDetails, self).save(criteria_dict=security_criteria)
 
     @classmethod
     def return_entity_obj(cls, cve_id, cvss, summary, references, id, last_updated):
@@ -268,26 +190,14 @@ class SecurityDetails(EntityBase):
 
     @classmethod
     def find_by_criteria(cls, label, criteria_dict):
-        try:
-            query = cls.g().V().has('vertex_label', label)
-            for k, v in criteria_dict.items():
-                query = query.has(k, v)
-            check_security = query.toList()
-            logger.debug("query sent:------ %s" % query)
-            logger.debug("query_result:----- %s" % check_security)
-            if len(check_security) == 0:
-                return None
-            else:
-                values = cls.g().V(check_security[0].id).valueMap().toList()[0]
-                return cls.return_entity_obj(values.get('cve_id')[0], values.get('cvss')[0], 
-                                            values.get('summary')[0], 
-                                            values.get('references'),
-                                            check_security[0].id, values.get('last_updated')[0])
-
-        except Exception as e:
-            logger.error("find_by_criteria() failed: %s" % e)
+        values = super(SecurityDetails, cls).find_by_criteria(label, criteria_dict)
+        if values is None:
             return None
-
+        return cls.return_entity_obj(values.get('cve_id')[0], values.get('cvss')[0], 
+                                    values.get('summary')[0], 
+                                    values.get('references'),
+                                    values.get('id'), values.get('last_updated')[0])
+        
     def create(self):
         try:
             security_criteria = {'cve_id': self.cve_id}
@@ -410,4 +320,3 @@ class SecurityDetails(EntityBase):
 
             except Exception as e:
                 logger.error("add_blackduck_cve() failed: %s" % e)
-

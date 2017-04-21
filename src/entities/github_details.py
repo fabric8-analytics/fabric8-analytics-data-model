@@ -132,36 +132,6 @@ class GithubResult(EntityBase):
 
         return github_result
 
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls, id=None):
-        try:
-            if id is not None:
-                return cls.g().V(id).drop().toList()
-            else:
-                return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
-
     def create(self):
         try:
             ts = time.time()
@@ -213,8 +183,4 @@ def load_github_result_from_json(input_json):
     github_data = input_json["analyses"]["github_details"]
     github_result = GithubResult.load_from_json(github_data)
     return github_result
-
-
-
-
-
+    

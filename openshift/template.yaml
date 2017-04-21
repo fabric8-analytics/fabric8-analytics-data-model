@@ -10,7 +10,6 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    creationTimestamp: null
     labels:
       service: bayesian-data-importer
     name: bayesian-data-importer
@@ -22,12 +21,9 @@ objects:
       targetPort: 9192
     selector:
       service: bayesian-data-importer
-  status:
-    loadBalancer: {}
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
-    creationTimestamp: null
     labels:
       service: bayesian-data-importer
     name: bayesian-data-importer
@@ -35,11 +31,8 @@ objects:
     replicas: 1
     selector:
       service: bayesian-data-importer
-    strategy:
-      resources: {}
     template:
       metadata:
-        creationTimestamp: null
         labels:
           service: bayesian-data-importer
       spec:
@@ -52,7 +45,10 @@ objects:
           - name: GREMLIN_USE_SECURE_CONNECTION
             value: ${GREMLIN_USE_SECURE_CONNECTION}
           - name: AWS_BUCKET
-            value: ${AWS_BUCKET}
+            valueFrom:
+              configMapKeyRef:
+                name: bayesian-config
+                key: s3-bucket-for-analyses
           - name: POSTGRESQL_DATABASE
             valueFrom:
               secretKeyRef:
@@ -72,13 +68,13 @@ objects:
             valueFrom:
               secretKeyRef:
                 name: aws
-                key: dynamodb-access-key-id
+                key: s3-access-key-id
           - name: AWS_S3_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
                 name: aws
-                key: dynamodb-secret-access-key
-          image: ${DATA_IMPORTER_IMAGE}
+                key: s3-secret-access-key
+          image: "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${IMAGE_TAG}"
           imagePullPolicy: Always
           name: bayesian-data-importer
           ports:
@@ -96,20 +92,19 @@ objects:
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 60
-            timeoutSeconds: 2
+            timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /api/v1/liveness
-              port: 5000
+              port: 9192
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 60
-            timeoutSeconds: 2
+            timeoutSeconds: 5
         restartPolicy: Always
     test: false
     triggers:
     - type: ConfigChange
-  status: {}
 parameters:
 - description: Port number that data importer service will listen to
   name: DATA_IMPORTER_SERVICE_PORT
@@ -126,16 +121,6 @@ parameters:
   required: false
   value: "false"
 
-- description:
-  name: AWS_BUCKET
-  required: true
-  value: ""
-
-- description: DATA_IMPORTER_IMAGE
-  name: DATA_IMPORTER_IMAGE
-  required: true
-  value: "registry.devshift.net/bayesian/data-model-importer"
-
 - description: MEMORY_LIMIT
   name: MEMORY_LIMIT
   required: true
@@ -146,3 +131,20 @@ parameters:
   required: true
   value: "1536Mi"
 
+- description: Docker registry where the image is
+  displayName: Docker registry
+  required: true
+  name: DOCKER_REGISTRY
+  value: "registry.devshift.net"
+
+- description: Docker image to use
+  displayName: Docker image
+  required: true
+  name: DOCKER_IMAGE
+  value: "bayesian/data-model-importer"
+
+- description: Image tag
+  displayName: Image tag
+  required: true
+  name: IMAGE_TAG
+  value: "latest"  # image-tag

@@ -15,38 +15,6 @@ class Person(EntityBase):
         self.email = email
         self.last_updated = None
 
-    @classmethod
-    def load_from_file(cls, file_name):
-        input_json = gv.read_from_file(file_name)
-        return cls.load_from_json(input_json)
-
-    @classmethod
-    def find_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).toList()
-
-        except Exception as e:
-            logger.error("find_all() failed: %s" % e)
-            return None
-
-    @classmethod
-    def count(cls):
-        try:
-            return len(cls.find_all())
-
-        except Exception as e:
-            logger.error("count() failed: %s" % e)
-            return None
-
-    @classmethod
-    def delete_all(cls):
-        try:
-            return cls.g().V().has('vertex_label', cls._get_label()).drop().toList()
-
-        except Exception as e:
-            logger.error("delete all() failed: %s" % e)
-            return None
-
 # TODO: remove redundancy in return_entity_obj
 
     @classmethod
@@ -58,13 +26,7 @@ class Person(EntityBase):
 
     def save(self):
         person_criteria = {'name': self.name, 'email': self.email}
-        present_person = Person.find_by_criteria(
-            self.label, person_criteria)
-        if present_person is None:
-            return self.create()
-        else:
-            self.id = present_person.id
-            return self.update()
+        return super(Person, self).save(criteria_dict=person_criteria)
 
     @classmethod
     def return_entity_author(cls, name, email, id, last_updated):
@@ -75,27 +37,15 @@ class Person(EntityBase):
 
     @classmethod
     def find_by_criteria(cls, label, criteria_dict):
-        try:
-            query = cls.g().V().has('vertex_label', label)
-            for k, v in criteria_dict.items():
-                query = query.has(k, v)
-            check_person = query.toList()
-            logger.debug("query sent:------ %s" % query)
-            logger.debug("query_result:----- %s" % check_person)
-            if len(check_person) == 0:
-                return None
-            else:
-                values = cls.g().V(check_person[0].id).valueMap().toList()[0]
-                if label == 'Author':
-                    return cls.return_entity_author(values.get('name')[0],
-                                                    values.get('email')[0], check_person[0].id, values.get('last_updated')[0])
-                else:
-                    return cls.return_entity_contributor(values.get('name')[0],
-                                                         values.get('email')[0], check_person[0].id, values.get('last_updated')[0])
-
-        except Exception as e:
-            logger.error("find_by_criteria() failed: %s" % e)
+        values = super(Person, cls).find_by_criteria(label, criteria_dict)
+        if values is None:
             return None
+        if label == 'Author':
+            return cls.return_entity_author(values.get('name')[0],
+                            values.get('email')[0], values.get('id'), values.get('last_updated')[0])
+        else:
+            return cls.return_entity_contributor(values.get('name')[0],
+                                 values.get('email')[0], values.get('id'), values.get('last_updated')[0])
 
     def create(self):
         try:
