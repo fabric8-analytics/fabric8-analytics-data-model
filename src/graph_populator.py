@@ -67,7 +67,7 @@ class GraphPopulator(object):
                       "'vertex_label', 'Version')};" \
                       "ver.property('last_updated'," + str(time.time()) + ");" \
                       "ver.property('shipped_as_downstream'," + shipped_as_downstream + ");" \
-                      "ver.property('description','" + re.sub('[^A-Za-z0-9_ ]', '', description).lower() + "');" \
+                      "ver.property('description','" + re.sub('[^A-Za-z0-9_ ]', '', description or '').lower() + "');" \
                       "ver.property('dependents_count'," + ver_deps_count + ");" \
                       "ver.property('cm_num_files'," + cm_num_files + ");" \
                       "ver.property('cm_avg_cyclomatic_complexity'," + cm_avg_cyclomatic_complexity + ");" \
