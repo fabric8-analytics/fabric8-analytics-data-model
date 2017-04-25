@@ -47,9 +47,9 @@ class GraphPopulator(object):
         count = 0
         tot_complexity = 0.0
         for lang in input_json.get('analyses', {}).get('code_metrics', {}).get('details', {}).get('languages', []):
-            if lang.get('metrics', {}).get('average_cyclomatic_complexity'):
+            if lang.get('metrics', {}).get('functions', {}).get('average_cyclomatic_complexity'):
                 count += 1
-                tot_complexity += lang['metrics']['average_cyclomatic_complexity']
+                tot_complexity += lang['metrics']['functions']['average_cyclomatic_complexity']
         cm_avg_cyclomatic_complexity = str(tot_complexity / count) if count > 0 else '-1'
         cm_loc = str(input_json.get('analyses', {}).get('code_metrics', {}).get('summary', {}).get('total_lines', -1))
         cm_num_files = str(input_json.get('analyses', {})
