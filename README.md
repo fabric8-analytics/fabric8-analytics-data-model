@@ -1,6 +1,6 @@
 # Bayesian Data Models
 
-This repository serves as a base for our data modeling work. You can easily connect to our graphing engine (Gremlin + DynamoDB) running remotely in containers and import models to explore the graphs representing Bayesian data.
+This repository serves as a base for our data modeling work. You can easily connect to graphing engine (Gremlin + DynamoDB) running remotely in containers and import models to explore the graphs representing Bayesian data.
 
 ## Configuration parameters
 
@@ -17,7 +17,7 @@ AWS_SECRET_ACCESS_KEY=<dynamodb-secret-access-key>
 ```
 
 
-## HowTOs
+## HowTos
 
 ## How to run run REST API:
 
@@ -64,7 +64,7 @@ PYTHONPATH=`pwd`/src py.test test/ -s
 
 ### How to run importer script?
 
-We can import data into graph from a folder where such JSON files are present. To prepare for such a setup, we can first load data from S3 onto a local folder.
+We can import data into graph from a directory where such JSON files are present. To prepare for such setup, we can first load data from S3 into a local directory.
 
 Example commands that can be used are:
 
@@ -82,7 +82,7 @@ $ aws s3 cp --recursive "s3://bayesian-bayesian-core-data/" s3-data/
 $ cd -
 ```
 
-If such a folder with JSON files is located at `../s3-data/` we can invoke the importer script as below:
+If a directory with JSON files is located at `../s3-data/` we can invoke the importer script as below:
 
 ```
 PYTHONPATH=`pwd`/src python src/data_importer.py -s DIR -d ../s3-data/
@@ -114,7 +114,7 @@ sudo docker-compose -f docker-compose-server.yml up
 oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=0 -v CHANNELIZER=ws | oc create -f -
 ```
 
-  * HTTP endpoint
+ * HTTP endpoint
 
 ```
 oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=1 -v CHANNELIZER=http | oc create -f -
@@ -130,8 +130,6 @@ To locally build the container images, one way would be to use the following com
 
 `docker-compose -f <path to docker compose file> build <service name, optional>`
 
-Keep in mind that the tracking repository is publicly hosted, so at any point in time, credentials, sensitive data or code that is not supposed to be publicly accessible must not be pushed there.
-
 ### Deploying the application
 
 #### Server
@@ -142,12 +140,12 @@ There are 2 Gremlin servers defined in `docker-compose-server.yml`
 
 To deploy these locally, set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables in your local environment or store the same in the .env file in the same directory as `docker-compose-server.yml`
 
-These variables will contain the required AWS credentials to connect to a remote DynamoDB instance. In OpenShift enviroment, the credentials are stored as [OpenShift secrets](https://docs.openshift.com/container-platform/3.4/dev_guide/secrets.html).
+These variables will contain the required AWS credentials to connect on a remote DynamoDB instance. In OpenShift environment, the credentials are stored as [OpenShift secrets](https://docs.openshift.com/container-platform/3.4/dev_guide/secrets.html).
 
 
-To specify a `dynamodb_prefix` use `$DYNAMODB_PREFIX` environment variable. This will allow you to create your own graph and not collide with others in a dynamodb instance.
+To specify a `dynamodb_prefix` use `$DYNAMODB_PREFIX` environment variable. This will allow you to create your own graph and not collide with others in a DynamoDB instance.
 
-Now, to deploy on:
+Now, to deploy:
 
 - Docker Compose, run -
 
@@ -179,7 +177,7 @@ Now, to deploy on:
 
 #### Client
 
-There are 2 Gremlin clients defined in `docker-compose-client.yml`
+There are 2 Gremlin clients defined in `docker-compose-client.yml`:
 - `client-ipython` starts an iPython shell, using which you can connect to the server.
 
 - `client-console` starts the gremlin console.
@@ -268,9 +266,7 @@ oc process -v AWS_S3_ACCESS_KEY_ID=`echo -n 'myKey' | base64` -v AWS_S3_SECRET_A
 set -o history
 ```
 
-To deploy this on an OpenShift cluster, use the following command -
-
-
+To deploy this on an OpenShift cluster, use the following command:
 ```
 oc process -f data-model-importer-openshift-template.yaml -v AWS_BUCKET=<value> | oc create -f -
 ```
