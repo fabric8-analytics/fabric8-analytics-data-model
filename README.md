@@ -2,6 +2,10 @@
 
 This repository serves as a base for our data modeling work. You can easily connect to our graphing engine (Gremlin + DynamoDB) running remotely in containers and import models to explore the graphs representing Bayesian data.
 
+## Contributing
+
+See our [contributing guidelines](https://github.com/fabric8-analytics/common/blob/master/CONTRIBUTING.md) for more info.
+
 ## Configuration parameters
 
 Keep proper configuration values handy ( preferably in `.env` file for docker compose):
