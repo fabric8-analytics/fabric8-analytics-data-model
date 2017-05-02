@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 
 class GraphPopulator(object):
-
     @classmethod
     def update_metadata(cls, input_json):
         logger.info("Instantiating graph metadata ...")
@@ -63,7 +62,7 @@ class GraphPopulator(object):
 
         str_version = "ver = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
                       ".has('version','" + version + "').tryNext().orElseGet{graph.addVertex('pecosystem','" \
-                       + ecosystem + "', 'pname','" + pkg_name + "', 'version','" + version + "', " \
+                      + ecosystem + "', 'pname','" + pkg_name + "', 'version','" + version + "', " \
                       "'vertex_label', 'Version')};" \
                       "ver.property('last_updated'," + str(time.time()) + ");" \
                       "ver.property('shipped_as_downstream'," + shipped_as_downstream + ");" \
@@ -142,12 +141,17 @@ class GraphPopulator(object):
     def create_query_string(cls, input_json):
 
         # NPM packages with dependencies, versions i.e. Package version
+        pkg_name = input_json.get('package')
+        ecosystem = input_json.get('ecosystem')
+        version = input_json.get('version')
         # creation of query string
         str_gremlin = cls.construct_package_query(input_json) + \
                       cls.construct_version_query(input_json)
 
         # Add edge from Package to Version
-        str_gremlin += "edge_c = pkg.addEdge('has_version', ver);"
+        str_gremlin += "edge_c = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
+                       ".has('version','" + version + "').in('has_version').tryNext()" \
+                       ".orElseGet{pkg.addEdge('has_version', ver)};"
         print(str_gremlin)
         return str_gremlin
 
@@ -180,7 +184,7 @@ class GraphPopulator(object):
                 d_ver.save()
                 d_pck.create_version_edge(d_ver)
                 version.add_edge_dependency(d_ver, d_type)
-        
+
         if "metadata" in analyses:
             meta_data = analyses["metadata"]
             print("  Adding authors_list")
@@ -236,7 +240,7 @@ class GraphPopulator(object):
             print("  Adding code_metrics")
             code_metrics_data = analyses["code_metrics"]
             code_metrics = CodeMetricsResult.load_from_json(code_metrics_data)
-            version.add_code_metrics_edge(code_metrics) 
+            version.add_code_metrics_edge(code_metrics)
             version.add_additional_data_as_attr(code_metrics)
 
         if "blackduck" in analyses:
