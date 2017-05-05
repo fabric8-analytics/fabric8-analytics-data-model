@@ -23,7 +23,14 @@ AWS_SECRET_ACCESS_KEY=<dynamodb-secret-access-key>
 ```
 
 
-## HowTos
+## How Tos
+
+## How to test and develop locally?
+```
+cd local-setup
+docker-compose up
+```
+Now you can run the tests or the REST API on another terminal
 
 ## How to run run REST API:
 
