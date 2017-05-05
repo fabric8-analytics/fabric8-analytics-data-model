@@ -78,8 +78,7 @@
             ],
             "schema": {
                 "version": "1-0-0",
-                "name": "languages",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/languages/1-0-0/"
+                "name": "languages"
             },
             "status": "success",
             "summary": [],
@@ -119,8 +118,7 @@
             },
             "schema": {
                 "version": "2-0-0",
-                "name": "redhat_downstream",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/redhat_downstream/2-0-0/"
+                "name": "redhat_downstream"
             },
             "status": "success",
             "summary": {
@@ -200,8 +198,7 @@
             "details": [],
             "schema": {
                 "version": "2-0-0",
-                "name": "security_issues",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/security_issues/2-0-0/"
+                "name": "security_issues"
             },
             "status": "success",
             "summary": [],
@@ -245,8 +242,7 @@
             ],
             "schema": {
                 "version": "1-0-0",
-                "name": "binary_data",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/binary_data/1-0-0/"
+                "name": "binary_data"
             },
             "status": "success",
             "summary": [],
@@ -256,8 +252,7 @@
             "details": [],
             "schema": {
                 "version": "1-0-0",
-                "name": "crypto_algorithms",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/crypto_algorithms/1-0-0/"
+                "name": "crypto_algorithms"
             },
             "status": "success",
             "summary": {
@@ -314,8 +309,7 @@
             ],
             "schema": {
                 "version": "1-0-0",
-                "name": "digests",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/digests/1-0-0/"
+                "name": "digests"
             },
             "status": "success",
             "summary": [],
@@ -353,8 +347,7 @@
             },
             "schema": {
                 "version": "2-0-0",
-                "name": "source_licenses",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/source_licenses/2-0-0/"
+                "name": "source_licenses"
             },
             "status": "success",
             "summary": {
@@ -407,8 +400,7 @@
             ],
             "schema": {
                 "version": "2-1-1",
-                "name": "metadata",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/metadata/2-1-1/"
+                "name": "metadata"
             },
             "_release": "npm:abbrev:1.0.4"
         },
@@ -418,8 +410,7 @@
             },
             "schema": {
                 "version": "1-0-0",
-                "name": "dependency_snapshot",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/dependency_snapshot/1-0-0/"
+                "name": "dependency_snapshot"
             },
             "status": "success",
             "summary": {
@@ -434,8 +425,7 @@
             "details": {},
             "schema": {
                 "version": "1-0-1",
-                "name": "github_details",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/github_details/1-0-1/"
+                "name": "github_details"
             },
             "status": "unknown",
             "summary": [],
@@ -444,8 +434,7 @@
     },
     "schema": {
         "version": "1-1-2",
-        "name": "component_analyses",
-        "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/api/component_analyses/1-1-2/"
+        "name": "component_analyses"
     },
     "package_info": {
         "dependents_count": 204,
