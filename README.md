@@ -67,6 +67,8 @@ It uses the same input format as described for the HTTP endpoint.
 
 ### How to run the tests?
 
+NOTE: Makre sure to perform test on a fresh instance of graph. i.e `g.V().count == 0`
+
 ```
 virtualenv --python /usr/bin/python2.7 env
 source env/bin/activate
