@@ -13,7 +13,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "digests",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/digests/1-0-0/",
                 "version": "1-0-0"
             },
             "details": [
@@ -75,7 +74,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "metadata",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/metadata/2-1-0/",
                 "version": "2-1-0"
             },
             "details": [
@@ -137,7 +135,6 @@
             "totalCount": 2,
             "schema": {
                 "name": "blackduck",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/blackduck/1-0-0/",
                 "version": "1-0-0"
             },
             "_meta": {
@@ -244,7 +241,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "binary_data",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/binary_data/1-0-0/",
                 "version": "1-0-0"
             },
             "details": [
@@ -304,7 +300,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "dependency_snapshot",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/dependency_snapshot/1-0-0/",
                 "version": "1-0-0"
             },
             "details": {
@@ -351,7 +346,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "redhat_downstream",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/redhat_downstream/2-0-0/",
                 "version": "2-0-0"
             },
             "details": {
@@ -384,7 +378,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "security_issues",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/security_issues/2-0-0/",
                 "version": "2-0-0"
             },
             "details": [
@@ -423,7 +416,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "github_details",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/github_details/1-0-1/",
                 "version": "1-0-1"
             },
             "details": {
@@ -516,7 +508,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "languages",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/languages/1-0-0/",
                 "version": "1-0-0"
             },
             "details": [
@@ -613,7 +604,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "crypto_algorithms",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/crypto_algorithms/1-0-0/",
                 "version": "1-0-0"
             },
             "details": [],
@@ -627,7 +617,6 @@
             "_release": "npm:serve-static:1.7.1",
             "schema": {
                 "name": "source_licenses",
-                "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/component_analyses/source_licenses/2-0-0/",
                 "version": "2-0-0"
             },
             "details": {
@@ -683,7 +672,6 @@
     },
     "schema": {
         "name": "component_analyses",
-        "url": "http://cucos-01.lab.eng.brq.redhat.com:32000/api/v1/schemas/api/component_analyses/1-1-2/",
         "version": "1-1-2"
     }
 }
