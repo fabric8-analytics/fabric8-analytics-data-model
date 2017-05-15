@@ -23,8 +23,6 @@ AWS_SECRET_ACCESS_KEY=<dynamodb-secret-access-key>
 ```
 
 
-## How Tos
-
 ## How to test and develop locally?
 ```
 cd local-setup
@@ -32,7 +30,7 @@ docker-compose up
 ```
 Now you can run the tests or the REST API on another terminal
 
-## How to run run REST API:
+### How to run run REST API:
 
 This REST API serves as a language-independent interface to data-model functionality such as importing the given list
 of EPVs. It enables the consumers like UI-component to easily invoke data-model APIs.
@@ -67,7 +65,7 @@ It uses the same input format as described for the HTTP endpoint.
 
 ### How to run the tests?
 
-NOTE: Makre sure to perform test on a fresh instance of graph. i.e `g.V().count == 0`
+NOTE: Make sure to perform test on a fresh instance of graph. i.e `g.V().count == 0`
 
 ```
 virtualenv --python /usr/bin/python2.7 env
