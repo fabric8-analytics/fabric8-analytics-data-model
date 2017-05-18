@@ -1,7 +1,7 @@
 # from graph_manager import BayesianGraph
 # import config
 #
-# from cucoslib.models import Analysis, Ecosystem, Version, Package
+# from f8a_worker.models import Analysis, Ecosystem, Version, Package
 # from sqlalchemy import create_engine
 # from sqlalchemy.orm import sessionmaker
 # from sqlalchemy.orm.exc import NoResultFound

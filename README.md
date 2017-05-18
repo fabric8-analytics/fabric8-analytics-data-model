@@ -2,8 +2,6 @@
 
 This repository serves as a base for our data modeling work. You can easily connect to graphing engine (Gremlin + DynamoDB) running remotely in containers and import models to explore the graphs representing Fabric8-Analytics data.
 
-*Note on naming: The Fabric8-Analytics project has evolved from 2 different projects called "cucos" and "bayesian". We're currently in process of renaming the modules and updating documentation. Until that is completed, please consider "cucos" and "bayesian" to be synonyms of "Fabric8-Analytics".*
-
 ## Contributing
 
 See our [contributing guidelines](https://github.com/fabric8-analytics/common/blob/master/CONTRIBUTING.md) for more info.
