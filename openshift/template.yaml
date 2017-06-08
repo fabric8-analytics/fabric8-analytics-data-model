@@ -28,7 +28,6 @@ objects:
       service: bayesian-data-importer
     name: bayesian-data-importer
   spec:
-    replicas: 1
     selector:
       service: bayesian-data-importer
     template:
