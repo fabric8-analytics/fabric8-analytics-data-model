@@ -28,7 +28,6 @@ objects:
       service: bayesian-data-importer
     name: bayesian-data-importer
   spec:
-    replicas: 1
     selector:
       service: bayesian-data-importer
     template:
@@ -105,6 +104,8 @@ objects:
     test: false
     triggers:
     - type: ConfigChange
+    replicas: ${REPLICAS}
+
 parameters:
 - description: Port number that data importer service will listen to
   name: DATA_IMPORTER_SERVICE_PORT
@@ -124,12 +125,12 @@ parameters:
 - description: MEMORY_LIMIT
   name: MEMORY_LIMIT
   required: true
-  value: "1536Mi"
+  value: "512Mi"
 
 - description: MEMORY_REQUEST
   name: MEMORY_REQUEST
   required: true
-  value: "1536Mi"
+  value: "512Mi"
 
 - description: Docker registry where the image is
   displayName: Docker registry
@@ -148,3 +149,9 @@ parameters:
   required: true
   name: IMAGE_TAG
   value: "latest"  # image-tag
+
+- description: Number of deployment replicas
+  displayName: Number of deployment replicas
+  required: true
+  name: REPLICAS
+  value: "1"
