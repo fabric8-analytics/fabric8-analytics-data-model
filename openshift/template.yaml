@@ -91,7 +91,7 @@ objects:
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 60
-            timeoutSeconds: 5
+            timeoutSeconds: 30
           livenessProbe:
             httpGet:
               path: /api/v1/liveness
@@ -99,7 +99,7 @@ objects:
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 60
-            timeoutSeconds: 5
+            timeoutSeconds: 30
         restartPolicy: Always
     test: false
     triggers:
