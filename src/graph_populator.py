@@ -60,7 +60,9 @@ class GraphPopulator(object):
                        .get('summary', {}).get('all_rhsm_product_names', [])) > 0:
             shipped_as_downstream = 'true'
 
-        str_version = "ver = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
+        str_version = "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
+                      ".has('version','" + version + "').properties('licenses','cve_ids').drop().iterate();"\
+                      "ver = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
                       ".has('version','" + version + "').tryNext().orElseGet{graph.addVertex('pecosystem','" \
                       + ecosystem + "', 'pname','" + pkg_name + "', 'version','" + version + "', " \
                       "'vertex_label', 'Version')};" \
