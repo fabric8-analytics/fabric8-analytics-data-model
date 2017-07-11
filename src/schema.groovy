@@ -480,6 +480,8 @@
                 //libio_latest_release,
                 //libio_first_release,
                 //libio_usedby,
+                //user_id,
+                'organization'
         ]
 
         allKeys.each { k ->
