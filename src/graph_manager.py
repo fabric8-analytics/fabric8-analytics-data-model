@@ -69,7 +69,7 @@ class BayesianGraph(object):
         str_gremlin_dsl = """
         // obtain references reference to graph management instance
         mgmt = graph.openManagement();
-        i = mgmt.getGraphIndex('index_prop_key_tokens');
+        i = mgmt.getGraphIndex('UseridIndex');
         mgmt.commit();
         i != null
         """
@@ -84,7 +84,7 @@ class BayesianGraph(object):
         str_gremlin_dsl = """
         // obtain references reference to graph management instance
         mgmt = graph.openManagement();
-        k = mgmt.getPropertyKey('tokens');
+        k = mgmt.getPropertyKey('organization');
         mgmt.commit()
 
         // if this is true then we have already created the schema

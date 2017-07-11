@@ -353,6 +353,56 @@
             tokens = mgmt.makePropertyKey('tokens').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
+        topics = mgmt.getPropertyKey('topics');
+        if(topics == null) {
+            topics = mgmt.makePropertyKey('topics').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        categories = mgmt.getPropertyKey('categories');
+        if(categories == null) {
+            categories = mgmt.makePropertyKey('categories').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        libio_dependents_projects = mgmt.getPropertyKey('libio_dependents_projects');
+        if(libio_dependents_projects == null){
+            libio_dependents_projects = mgmt.makePropertyKey('libio_dependents_projects').dataType(String.class).make();
+        }
+
+        libio_dependents_repos = mgmt.getPropertyKey('libio_dependents_repos');
+        if(libio_dependents_repos == null){
+            libio_dependents_repos = mgmt.makePropertyKey('libio_dependents_repos').dataType(String.class).make();
+        }
+
+        libio_total_releases = mgmt.getPropertyKey('libio_total_releases');
+        if(libio_total_releases == null){
+            libio_total_releases = mgmt.makePropertyKey('libio_total_releases').dataType(String.class).make();
+        }
+
+        libio_latest_release = mgmt.getPropertyKey('libio_latest_release');
+        if(libio_latest_release == null){
+            libio_latest_release = mgmt.makePropertyKey('libio_latest_release').dataType(Double.class).make();
+        }
+
+        libio_first_release = mgmt.getPropertyKey('libio_first_release');
+        if(libio_first_release == null){
+            libio_first_release = mgmt.makePropertyKey('libio_first_release').dataType(Double.class).make();
+        }
+
+        libio_usedby = mgmt.getPropertyKey('libio_usedby');
+        if(libio_usedby == null) {
+            libio_usedby = mgmt.makePropertyKey('libio_usedby').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        user_id = mgmt.getPropertyKey('user_id');
+        if(user_id == null) {
+            user_id = mgmt.makePropertyKey('user_id').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        organization = mgmt.getPropertyKey('organization');
+        if(organization == null) {
+            organization = mgmt.makePropertyKey('organization').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
         // # for indexes
         if(null == mgmt.getGraphIndex('CVEidIndex')) {
             mgmt.buildIndex('CVEidIndex', Vertex.class).addKey(cve_id).unique().buildCompositeIndex();
@@ -368,6 +418,10 @@
 
         if(null == mgmt.getGraphIndex('NameEcosystemVersionIndex')) {
             mgmt.buildIndex('NameEcosystemVersionIndex', Vertex.class).addKey(pname).addKey(pecosystem).addKey(version).unique().buildCompositeIndex();
+        }
+
+        if(null == mgmt.getGraphIndex('UseridIndex')) {
+            mgmt.buildIndex('UseridIndex', Vertex.class).addKey(user_id).unique().buildCompositeIndex();
         }
 
 
@@ -417,7 +471,15 @@
                 'vulnerability_name',
                 //'vulnerability_published_date',
                 //'vulnerability_updated_date',
-                'tokens'
+                'tokens',
+                'topics',
+                'categories',
+                //libio_dependents_projects,
+                //libio_dependents_repos,
+                //libio_total_releases,
+                //libio_latest_release,
+                //libio_first_release,
+                //libio_usedby,
         ]
 
         allKeys.each { k ->
