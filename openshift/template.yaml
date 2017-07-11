@@ -39,6 +39,8 @@ objects:
         - env:
           - name: DATA_IMPORTER_SERVICE_PORT
             value: ${DATA_IMPORTER_SERVICE_PORT}
+          - name: NUMBER_WORKER_PROCESS
+            value: ${NUMBER_WORKER_PROCESS}
           - name: DATA_IMPORTER_SERVICE_TIMEOUT
             value: ${DATA_IMPORTER_SERVICE_TIMEOUT}
           - name: GREMLIN_USE_SECURE_CONNECTION
@@ -116,6 +118,11 @@ parameters:
   name: DATA_IMPORTER_SERVICE_TIMEOUT
   required: true
   value: "3600"
+
+- description: Number of worker process for the data importer service
+  name: NUMBER_WORKER_PROCESS
+  required: true
+  value: "2"
 
 - description: Whether to use secure connection or not ?
   name: GREMLIN_USE_SECURE_CONNECTION
