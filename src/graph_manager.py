@@ -104,5 +104,7 @@ class BayesianGraph(object):
         str_gremlin_dsl = ''''''
         with open(schema_file_path, 'r') as f:
             str_gremlin_dsl = f.read()
-        cls.execute(str_gremlin_dsl)
+            return cls.execute(str_gremlin_dsl)
+
+
 
