@@ -21,10 +21,15 @@ CORS(app)
 # Check whether schema is created or not
 # populate schema if not already done
 try:
-    BayesianGraph.populate_schema()
-    app.logger.info("Ready to serve requests")
+
+    status, json_result = BayesianGraph.populate_schema()
+    if status:
+        app.logger.info("Ready to serve requests")
+    else:
+        app.logger.error(json_result)
+        raise RuntimeError("Failed to setup graph schema")
 except:
-    raise RuntimeError("Failed to setup graph schema")
+    raise RuntimeError("Failed to initialized graph schema")
 
 
 @app.route('/api/v1/readiness')
