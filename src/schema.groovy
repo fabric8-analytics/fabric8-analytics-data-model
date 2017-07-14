@@ -388,19 +388,39 @@
             libio_first_release = mgmt.makePropertyKey('libio_first_release').dataType(Double.class).make();
         }
 
+        libio_watchers = mgmt.getPropertyKey('libio_watchers');
+        if(libio_watchers == null){
+            libio_watchers = mgmt.makePropertyKey('libio_watchers').dataType(Double.class).make();
+        }
+
+        libio_contributors = mgmt.getPropertyKey('libio_contributors');
+        if(libio_contributors == null){
+            libio_contributors = mgmt.makePropertyKey('libio_contributors').dataType(Double.class).make();
+        }
+
         libio_usedby = mgmt.getPropertyKey('libio_usedby');
         if(libio_usedby == null) {
             libio_usedby = mgmt.makePropertyKey('libio_usedby').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
-        user_id = mgmt.getPropertyKey('user_id');
-        if(user_id == null) {
-            user_id = mgmt.makePropertyKey('user_id').dataType(String.class).cardinality(Cardinality.SET).make();
+        userid = mgmt.getPropertyKey('userid');
+        if(userid == null) {
+            userid = mgmt.makePropertyKey('userid').dataType(String.class).make();
         }
 
-        organization = mgmt.getPropertyKey('organization');
-        if(organization == null) {
-            organization = mgmt.makePropertyKey('organization').dataType(String.class).cardinality(Cardinality.SET).make();
+        company = mgmt.getPropertyKey('company');
+        if(company == null) {
+            company = mgmt.makePropertyKey('company').dataType(String.class).make();
+        }
+
+        recent_requests = mgmt.getPropertyKey('recent_requests');
+        if(recent_requests == null) {
+            recent_requests = mgmt.makePropertyKey('recent_requests').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        osio_usage_count = mgmt.getPropertyKey('osio_usage_count');
+        if(osio_usage_count == null) {
+            osio_usage_count = mgmt.makePropertyKey('osio_usage_count').dataType(Integer.class).make();
         }
 
         // # for indexes
@@ -420,10 +440,13 @@
             mgmt.buildIndex('NameEcosystemVersionIndex', Vertex.class).addKey(pname).addKey(pecosystem).addKey(version).unique().buildCompositeIndex();
         }
 
-        if(null == mgmt.getGraphIndex('UseridIndex')) {
-            mgmt.buildIndex('UseridIndex', Vertex.class).addKey(user_id).unique().buildCompositeIndex();
+        if(null == mgmt.getGraphIndex('UserIndex')) {
+            mgmt.buildIndex('UserIndex', Vertex.class).addKey(userid).unique().buildCompositeIndex();
         }
 
+        if(null == mgmt.getGraphIndex('CompanyIndex')) {
+            mgmt.buildIndex('CompanyIndex', Vertex.class).addKey(company).buildCompositeIndex();
+        }
 
         List<String> allKeys = [
                 'ecosystem',
@@ -478,10 +501,14 @@
                 //libio_dependents_repos,
                 //libio_total_releases,
                 //libio_latest_release,
+                //'libio_watchers',
+                //'libio_contributors',
                 //libio_first_release,
                 //libio_usedby,
                 //user_id,
-                'organization'
+                //'company',
+                'recent_requests',
+                //'osio_usage_count'
         ]
 
         allKeys.each { k ->
