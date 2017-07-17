@@ -27,6 +27,7 @@ def _group_keys_s3(all_keys):
             grouped_keys[counter] = []
         if key.endswith("json"):
             grouped_keys[counter].append(key)
+
     return grouped_keys
 
 
@@ -54,9 +55,9 @@ def _group_keys_by_epv(all_keys, data_source):
         return _group_keys_directory(all_keys, data_source.src_dir)
 
 
-def _first_key_info(data_source, first_key):
+def _first_key_info(data_source, first_key, bucket_name=None):
     obj = {}
-    t = data_source.read_json_file(first_key)
+    t = data_source.read_json_file(first_key, bucket_name)
     cur_finished_at = t.get("finished_at")
     obj["dependents_count"] = t.get("dependents_count", '-1')
     obj["package_info"] = t.get("package_info", {})
@@ -70,10 +71,10 @@ def _first_key_info(data_source, first_key):
     return obj, cur_finished_at
 
 
-def _other_key_info(data_source, other_keys):
+def _other_key_info(data_source, other_keys, bucket_name=None):
     obj = {"analyses": {}}
     for this_key in other_keys:
-        value = data_source.read_json_file(this_key)
+        value = data_source.read_json_file(this_key, bucket_name)
         this_key = this_key.split("/")[-1]
         obj["analyses"][this_key[:-len('.json')]] = value
     return obj
@@ -87,6 +88,7 @@ def _set_max_finished_at(max_finished_at, cur_finished_at, max_datetime, date_ti
         if cur_datetime > max_datetime:
             max_finished_at = cur_finished_at
     return max_finished_at        
+
 
 def _get_exception_msg(prefix, e):
     msg = prefix + ": " + str(e)
@@ -133,6 +135,67 @@ def _import_grouped_keys(data_source, dict_grouped_keys):
     report['count_imported_EPVs'] = count_imported_EPVs
     report['last_imported_EPV'] = last_imported_EPV
     report['max_finished_at'] = max_finished_at
+    return report
+
+
+def _import_keys_from_s3_http(data_source, epv_list):
+    logger.debug("Begin import...")
+    date_time_format = "%Y-%m-%dT%H:%M:%S.%f"
+
+    report = {'status': 'Success', 'message': 'The import finished successfully!'}
+    count_imported_EPVs = 0
+    max_finished_at = None
+    max_datetime = None
+    last_imported_EPV = None
+    epv = []
+    for epv_key in epv_list:
+        for key, contents in epv_key.items():
+            if len(contents.get('package')) == 0 and len(contents.get('version')) == 0:
+                report['message'] = 'Nothing to be imported! No data found on S3 to be imported!'
+                continue
+            try:
+                # Check whether EPV meta is present and not error out
+                first_key = contents['ver_key_prefix'] + '.json'
+                obj, cur_finished_at = _first_key_info(data_source, first_key, config.AWS_EPV_BUCKET)
+                if obj is None:
+                    continue
+                # Check other Version level information and add it to common object
+                if len(contents.get('version')) > 0:
+                    ver_obj = _other_key_info(data_source, contents.get('version'), config.AWS_EPV_BUCKET)
+                    obj.update(ver_obj)
+
+                # Check Package related information and add it to package object
+                if len(contents.get('package')) > 0:
+                    pkg_obj = _other_key_info(data_source, contents.get('package'), config.AWS_PKG_BUCKET)
+                    obj.update(pkg_obj)
+
+                # Create Gremlin Query
+                str_gremlin = GraphPopulator.create_query_string(obj)
+
+                # Fire Gremlin HTTP query now
+                logger.info("Ingestion initialized for EPV - " +
+                            obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
+                epv.append(obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
+                payload = {'gremlin': str_gremlin}
+                response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload))
+                resp = response.json()
+
+                if resp['status']['code'] == 200:
+                    count_imported_EPVs += 1
+                    last_imported_EPV = first_key
+                    max_finished_at = _set_max_finished_at(max_finished_at, cur_finished_at, max_datetime, date_time_format)
+                    max_datetime = datetime.strptime(max_finished_at, date_time_format)
+
+            except Exception as e:
+                msg = _get_exception_msg("The import failed", e)
+                report['status'] = 'Failure'
+                report['message'] = msg
+
+    report['epv'] = epv
+    report['count_imported_EPVs'] = count_imported_EPVs
+    report['last_imported_EPV'] = last_imported_EPV
+    report['max_finished_at'] = max_finished_at
+
     return report
 
 
@@ -292,15 +355,31 @@ def import_epv(data_source, list_epv):
 def import_epv_http(data_source, list_epv):
     try:
         # Collect relevant files from data-source and group them by package-version.
+
         list_keys = []
         for epv in list_epv:
-            key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/" + epv.get('version')
-            list_keys.extend(data_source.list_files(prefix=key_prefix))
+            dict_keys = {}
+            ver_list_keys = []
+            pkg_list_keys = []
+            # Get EPV level keys
+            ver_key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/" + epv.get('version')
+            ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET, prefix=ver_key_prefix))
+            # Get Package level keys
+            pkg_key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/"
+            pkg_list_keys.extend(data_source.list_files(bucket_name=config.AWS_PKG_BUCKET, prefix=pkg_key_prefix))
+
+            dict_keys[ver_key_prefix] = {
+                'version': ver_list_keys,
+                'ver_key_prefix': ver_key_prefix,
+                'package': pkg_list_keys,
+                'pkg_key_prefix': pkg_key_prefix
+            }
+            list_keys.append(dict_keys)
+
         # end of if graph_meta is None:
 
         # Import the S3 data
-        dict_grouped_keys = _group_keys_by_epv(list_keys, data_source)
-        report = _import_grouped_keys_http(data_source, dict_grouped_keys)
+        report = _import_keys_from_s3_http(data_source, list_keys)
 
         # Log the report
         _log_report_msg("import_epv()", report)
