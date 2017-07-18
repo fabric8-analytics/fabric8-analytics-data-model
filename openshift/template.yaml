@@ -45,11 +45,16 @@ objects:
             value: ${DATA_IMPORTER_SERVICE_TIMEOUT}
           - name: GREMLIN_USE_SECURE_CONNECTION
             value: ${GREMLIN_USE_SECURE_CONNECTION}
-          - name: AWS_BUCKET
+          - name: AWS_EPV_BUCKET
             valueFrom:
               configMapKeyRef:
                 name: bayesian-config
                 key: s3-bucket-for-analyses
+          - name: AWS_PKG_BUCKET
+            valueFrom:
+              configMapKeyRef:
+                name: bayesian-config
+                key: s3-bucket-for-package-analyses
           - name: POSTGRESQL_DATABASE
             valueFrom:
               secretKeyRef:
