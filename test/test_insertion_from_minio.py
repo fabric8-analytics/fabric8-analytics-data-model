@@ -25,13 +25,11 @@ def test_create_minio_bucket():
     # Create Necessary Config Parameters
     config.AWS_PKG_BUCKET = "test-bayesian-core-package-data"
     config.AWS_EPV_BUCKET = "test-bayesian-core-data"
-    config.LOCAL_MINIO_ENDPOINT = "localhost:33000"
 
     minioClient = Minio(config.LOCAL_MINIO_ENDPOINT,
                         access_key=config.MINIO_ACCESS_KEY,
                         secret_key=config.MINIO_SECRET_KEY,
                         secure=False)
-    # Creates a bucket with name mybucket.
     try:
         minioClient.make_bucket(config.AWS_EPV_BUCKET, location="us-east-1")
         minioClient.make_bucket(config.AWS_PKG_BUCKET, location="us-east-1")
@@ -42,7 +40,6 @@ def test_create_minio_bucket():
     except ResponseError as err:
         logger.error(err)
 
-    # Upload an object 'myobject.ogg' with contents from '/home/john/myfilepath.ogg'.
     try:
         minioClient.fput_object(config.AWS_PKG_BUCKET, 'pypi/access_points/github_details.json',
                                 'test/data/S3-data/pypi/access_points/github_details.json')

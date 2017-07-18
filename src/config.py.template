@@ -23,7 +23,7 @@ AWS_EPV_BUCKET = os.environ.get("AWS_EPV_BUCKET", "")
 AWS_PKG_BUCKET = os.environ.get("AWS_PKG_BUCKET", "")
 
 # Local Minio
-LOCAL_MINIO_ENDPOINT = os.environ.get("LOCAL_MINIO_ENDPOINT")
+LOCAL_MINIO_ENDPOINT = os.environ.get("LOCAL_MINIO_ENDPOINT","localhost:33000")
 MINIO_ACCESS_KEY = "GNV3SAHAHA3DOT99GQII"
 MINIO_SECRET_KEY = "ZmvMwngonaDK5ymlCd6ptaalDdJsCn3aSSxASPaZ"
 # if this variable is set, we are running AWS S3 locally ( via Minio )

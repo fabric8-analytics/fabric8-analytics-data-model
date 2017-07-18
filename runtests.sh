@@ -12,7 +12,7 @@ trap gc EXIT SIGINT
 function start_gremlin_http {
     pushd local-setup/
     echo "Invoke Docker Compose Start Gremlin HTTP and WebSocket services"
-    sudo docker-compose -f docker-compose.yaml up --force-recreate -d gremlin-http
+    sudo docker-compose -f docker-compose.yaml up --force-recreate -d 
     popd
 }
 
