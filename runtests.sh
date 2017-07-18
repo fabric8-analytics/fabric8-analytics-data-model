@@ -50,9 +50,5 @@ python src/sanitycheck.py || exit -1
 
 py.test -s test/
 
-# Print all the logs for inspection
-
-cat $LOGFILE_PATH
-
 rm -rf env-test/
 
