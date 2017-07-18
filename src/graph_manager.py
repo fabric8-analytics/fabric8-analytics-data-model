@@ -29,7 +29,7 @@ class BayesianGraph(object):
                 logger.info ("Index is not created as yet, checking schema creation")
                 if not cls.is_schema_defined():
                     logger.info("Schema is not yet created, creating now...")
-                    cls.populate_schema()
+                    populate_schema = cls.populate_schema()
                     ## double check
                     schema_definition_success = cls.is_schema_defined()
                     logger.info("Double check: schema_definition_success %s" % schema_definition_success)
@@ -84,7 +84,7 @@ class BayesianGraph(object):
         str_gremlin_dsl = """
         // obtain references reference to graph management instance
         mgmt = graph.openManagement();
-        k = mgmt.getPropertyKey('organization');
+        k = mgmt.getPropertyKey('company');
         mgmt.commit()
 
         // if this is true then we have already created the schema
@@ -104,7 +104,7 @@ class BayesianGraph(object):
         str_gremlin_dsl = ''''''
         with open(schema_file_path, 'r') as f:
             str_gremlin_dsl = f.read()
-            return cls.execute(str_gremlin_dsl)
+        return cls.execute(str_gremlin_dsl)
 
 
 
