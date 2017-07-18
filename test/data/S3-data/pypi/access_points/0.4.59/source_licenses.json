@@ -1,0 +1,39 @@
+{
+  "_audit": {
+    "ended_at": "2017-07-17T09:59:08.643223",
+    "started_at": "2017-07-17T09:58:52.419276",
+    "version": "v1"
+  },
+  "_release": "pypi:access_points:0.4.59",
+  "details": {
+    "files_count": 3,
+    "licenses": {
+      "GPL 3.0": {
+        "category": "Copyleft",
+        "dejacode_url": "https://enterprise.dejacode.com/urn/urn:dje:license:gpl-3.0",
+        "homepage_url": "http://www.gnu.org/licenses/gpl-3.0.html",
+        "owner": "Free Software Foundation (FSF)",
+        "paths": [
+          "access_points-0.4.59/PKG-INFO",
+          "access_points-0.4.59/access_points.egg-info/PKG-INFO",
+          "access_points-0.4.59/setup.py"
+        ],
+        "spdx_license_key": "GPL-3.0",
+        "spdx_url": "https://spdx.org/licenses/GPL-3.0",
+        "text_url": "http://www.gnu.org/licenses/gpl-3.0-standalone.html"
+      }
+    },
+    "scancode_notice": "Generated with ScanCode and provided on an \"AS IS\" BASIS, WITHOUT WARRANTIES\nOR CONDITIONS OF ANY KIND, either express or implied. No content created from\nScanCode should be considered or used as legal advice. Consult an Attorney\nfor any legal advice.\nScanCode is a free software code scanning tool from nexB Inc. and others.\nVisit https://github.com/nexB/scancode-toolkit/ for support and download.",
+    "scancode_version": "2.0.1"
+  },
+  "schema": {
+    "name": "source_licenses",
+    "version": "3-0-0"
+  },
+  "status": "success",
+  "summary": {
+    "sure_licenses": [
+      "GPL 3.0"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "_audit": {
+    "ended_at": "2017-07-17T10:00:38.272933",
+    "started_at": "2017-07-17T10:00:23.327978",
+    "version": "v1"
+  },
+  "_release": "pypi:access_points:0.4.59",
+  "details": [
+    {
+      "author": "Pascal van Kooten <kootenpv@gmail.com>",
+      "code_repository": {
+        "type": "git",
+        "url": "https://github.com/kootenpv/access_points"
+      },
+      "declared_license": "MIT",
+      "dependencies": [],
+      "description": "Scan your WiFi and get access point information and signal quality.",
+      "ecosystem": "python-dist",
+      "homepage": "https://github.com/kootenpv/access_points",
+      "keywords": [],
+      "name": "access-points",
+      "platform": "any",
+      "version": "0.4.59"
+    }
+  ],
+  "schema": {
+    "name": "metadata",
+    "version": "3-1-1"
+  },
+  "status": "success",
+  "summary": []
+}

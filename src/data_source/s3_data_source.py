@@ -6,7 +6,6 @@ import config
 
 class S3DataSource(AbstractDataSource):
     _DEFAULT_REGION_NAME = 'us-east-1'
-    _DEFAULT_LOCAL_ENDPOINT = 'http://coreapi-s3:33000'
 
     def __init__(self, src_bucket_name, access_key, secret_key):
         self.is_local = config.AWS_S3_IS_LOCAL
@@ -15,7 +14,7 @@ class S3DataSource(AbstractDataSource):
             self.session = boto3.session.Session(aws_access_key_id=access_key, aws_secret_access_key=secret_key,
                                                  region_name=self._DEFAULT_REGION_NAME)
             self.s3_resource = self.session.resource('s3', config=botocore.client.Config(signature_version='s3v4'),
-                                                     use_ssl=False, endpoint_url=self._DEFAULT_LOCAL_ENDPOINT)
+                                                     use_ssl=False, endpoint_url="http://"+config.LOCAL_MINIO_ENDPOINT)
         else:
             self.session = boto3.session.Session(aws_access_key_id=access_key, aws_secret_access_key=secret_key)
             self.s3_resource = self.session.resource('s3', config=botocore.client.Config(signature_version='s3v4'))
@@ -55,5 +54,5 @@ class S3DataSource(AbstractDataSource):
         else:
             for obj in bucket.objects.filter(Prefix=prefix):
                 list_filenames.append(obj.key)
-
+        
         return list_filenames

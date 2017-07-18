@@ -1,0 +1,22 @@
+{
+  "_audit": {
+    "ended_at": "2017-07-17T10:26:41.707878",
+    "started_at": "2017-07-17T10:26:41.703246",
+    "version": "v1"
+  },
+  "_release": "pypi:access_points:0.4.59",
+  "details": {
+    "runtime": []
+  },
+  "schema": {
+    "name": "dependency_snapshot",
+    "version": "1-0-0"
+  },
+  "status": "success",
+  "summary": {
+    "dependency_counts": {
+      "runtime": 0
+    },
+    "errors": []
+  }
+}

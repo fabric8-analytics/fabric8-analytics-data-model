@@ -20,22 +20,6 @@ class BayesianGraph(object):
     @classmethod
     def instance(cls):
         if cls._instances['graph'] is None:
-            logger.info("BayesianGraph instance creating...")
-            graph = Graph()
-            g = graph.traversal().withRemote(DriverRemoteConnection(config.GREMLIN_SERVER_URL_WEBSOCKET, 'g'))
-
-            # populate schema if not already done
-            if not cls.is_index_created():
-                logger.info ("Index is not created as yet, checking schema creation")
-                if not cls.is_schema_defined():
-                    logger.info("Schema is not yet created, creating now...")
-                    populate_schema = cls.populate_schema()
-                    ## double check
-                    schema_definition_success = cls.is_schema_defined()
-                    logger.info("Double check: schema_definition_success %s" % schema_definition_success)
-                    if not schema_definition_success:
-                        raise RuntimeError("Failed to setup graph schema")
-
             cls._instances['graph'] = g
         return cls._instances['graph']
 

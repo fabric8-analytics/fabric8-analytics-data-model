@@ -1,0 +1,35 @@
+{
+  "_audit": {
+    "ended_at": "2017-07-17T10:42:50.045444",
+    "started_at": "2017-07-17T10:42:49.161994",
+    "version": "v1"
+  },
+  "_release": "pypi:access_points:None",
+  "details": {
+    "dependent_repositories": {
+      "count": "8",
+      "top": {
+        "WyldPhyr/whereami": "1",
+        "fw1121/whereami": "0",
+        "harikishen/whereami": "0",
+        "kootenpv/whereami": "2777",
+        "pipelidis/IndoorMapping": "0",
+        "pirate/whereami": "4",
+        "renjithsraj/whereami": "0",
+        "tessazglue/whereami": "0",
+        "yashwanthbabu/whereami": "0"
+      }
+    },
+    "dependents": {
+      "count": "0"
+    },
+    "releases": {
+      "count": "29",
+      "latest": {
+        "published_at": "2017-05-14T16:28:30Z"
+      }
+    }
+  },
+  "status": "success",
+  "summary": []
+}

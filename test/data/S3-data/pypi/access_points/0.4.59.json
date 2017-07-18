@@ -1,0 +1,25 @@
+{
+  "analyses": [
+    "dependency_snapshot",
+    "code_metrics",
+    "digests",
+    "source_licenses",
+    "metadata",
+    "security_issues"
+  ],
+  "audit": null,
+  "dependents_count": -1,
+  "ecosystem": "pypi",
+  "finished_at": "2017-07-17T11:05:46.233057",
+  "id": 1114142,
+  "latest_version": "0.4.56",
+  "package": "access_points",
+  "package_info": {
+    "dependents_count": -1,
+    "relative_usage": "not used"
+  },
+  "release": "pypi:access_points:0.4.59",
+  "started_at": "2017-07-17T08:45:28.700658",
+  "subtasks": null,
+  "version": "0.4.59"
+}

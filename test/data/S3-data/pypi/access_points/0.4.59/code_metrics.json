@@ -1,0 +1,320 @@
+{
+  "_audit": {
+    "ended_at": "2017-07-17T10:03:03.188307",
+    "started_at": "2017-07-17T10:03:02.114203",
+    "version": "v1"
+  },
+  "_release": "pypi:access_points:0.4.59",
+  "details": {
+    "languages": [
+      {
+        "blank_lines": 127,
+        "code_lines": 686,
+        "comment_lines": 21,
+        "files_count": 4,
+        "language": "Python",
+        "metrics": {
+          "files": [
+            {
+              "average_cyclomatic_complexity": 0,
+              "functions": [],
+              "name": "access_points-0.4.59/setup.py"
+            },
+            {
+              "average_cyclomatic_complexity": 0,
+              "functions": [],
+              "name": "access_points-0.4.59/data/__init__.py"
+            },
+            {
+              "average_cyclomatic_complexity": 0,
+              "functions": [],
+              "name": "access_points-0.4.59/tests/__init__.py"
+            },
+            {
+              "average_cyclomatic_complexity": 1.5,
+              "functions": [
+                {
+                  "complexity": 1,
+                  "name": "test_scan"
+                },
+                {
+                  "complexity": 1,
+                  "name": "test_osx"
+                },
+                {
+                  "complexity": 1,
+                  "name": "read_output"
+                },
+                {
+                  "complexity": 2,
+                  "name": "get_data_path"
+                },
+                {
+                  "complexity": 2,
+                  "name": "assert_access_point"
+                },
+                {
+                  "complexity": 1,
+                  "name": "parse_output"
+                },
+                {
+                  "complexity": 1,
+                  "name": "test_windows"
+                },
+                {
+                  "complexity": 1,
+                  "name": "test_iwlist"
+                },
+                {
+                  "complexity": 3,
+                  "name": "10"
+                },
+                {
+                  "complexity": 1,
+                  "name": "test_nmcli"
+                },
+                {
+                  "complexity": 2,
+                  "name": "assert_all_included"
+                }
+              ],
+              "name": "access_points-0.4.59/tests/all_test.py"
+            },
+            {
+              "average_cyclomatic_complexity": 2.4,
+              "functions": [
+                {
+                  "complexity": 1,
+                  "name": "WindowsWifiScanner.get_cmd"
+                },
+                {
+                  "complexity": 8,
+                  "name": "WindowsWifiScanner.parse_output"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.get_access_points"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__init__"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__getstate__"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.get_cmd"
+                },
+                {
+                  "complexity": 3,
+                  "name": "main"
+                },
+                {
+                  "complexity": 5,
+                  "name": "split_escaped"
+                },
+                {
+                  "complexity": 2,
+                  "name": "267"
+                },
+                {
+                  "complexity": 4,
+                  "name": "ensure_str"
+                },
+                {
+                  "complexity": 3,
+                  "name": "NetworkManagerWifiScanner.is_available"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.__init__"
+                },
+                {
+                  "complexity": 8,
+                  "name": "IwlistWifiScanner.parse_output"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.call_subprocess"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__setstate__"
+                },
+                {
+                  "complexity": 1,
+                  "name": "IwlistWifiScanner.get_cmd"
+                },
+                {
+                  "complexity": 2,
+                  "name": "NetworkManagerWifiScanner.parse_output"
+                },
+                {
+                  "complexity": 6,
+                  "name": "OSXWifiScanner.parse_output"
+                },
+                {
+                  "complexity": 1,
+                  "name": "rssi_to_quality"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__getattr__"
+                },
+                {
+                  "complexity": 1,
+                  "name": "NetworkManagerWifiScanner.get_cmd"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.parse_output"
+                },
+                {
+                  "complexity": 1,
+                  "name": "print_version"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__repr__"
+                },
+                {
+                  "complexity": 1,
+                  "name": "OSXWifiScanner.get_cmd"
+                },
+                {
+                  "complexity": 5,
+                  "name": "get_scanner"
+                }
+              ],
+              "name": "access_points-0.4.59/access_points/__init__.py"
+            },
+            {
+              "average_cyclomatic_complexity": 2.4,
+              "functions": [
+                {
+                  "complexity": 2,
+                  "name": "NetworkManagerWifiScanner.parse_output"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.parse_output"
+                },
+                {
+                  "complexity": 3,
+                  "name": "NetworkManagerWifiScanner.is_available"
+                },
+                {
+                  "complexity": 8,
+                  "name": "IwlistWifiScanner.parse_output"
+                },
+                {
+                  "complexity": 1,
+                  "name": "rssi_to_quality"
+                },
+                {
+                  "complexity": 1,
+                  "name": "print_version"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__setstate__"
+                },
+                {
+                  "complexity": 8,
+                  "name": "WindowsWifiScanner.parse_output"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__getattr__"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__init__"
+                },
+                {
+                  "complexity": 4,
+                  "name": "ensure_str"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WindowsWifiScanner.get_cmd"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.get_access_points"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.__init__"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__repr__"
+                },
+                {
+                  "complexity": 3,
+                  "name": "main"
+                },
+                {
+                  "complexity": 1,
+                  "name": "NetworkManagerWifiScanner.get_cmd"
+                },
+                {
+                  "complexity": 6,
+                  "name": "OSXWifiScanner.parse_output"
+                },
+                {
+                  "complexity": 1,
+                  "name": "AccessPoint.__getstate__"
+                },
+                {
+                  "complexity": 5,
+                  "name": "split_escaped"
+                },
+                {
+                  "complexity": 1,
+                  "name": "OSXWifiScanner.get_cmd"
+                },
+                {
+                  "complexity": 1,
+                  "name": "IwlistWifiScanner.get_cmd"
+                },
+                {
+                  "complexity": 2,
+                  "name": "267"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.call_subprocess"
+                },
+                {
+                  "complexity": 5,
+                  "name": "get_scanner"
+                },
+                {
+                  "complexity": 1,
+                  "name": "WifiScanner.get_cmd"
+                }
+              ],
+              "name": "access_points-0.4.59/access_points/__init___flymake.py"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "schema": {
+    "name": "code_metrics",
+    "version": "1-0-0"
+  },
+  "status": "success",
+  "summary": {
+    "blank_lines": 127,
+    "code_lines": 686,
+    "comment_lines": 21,
+    "total_files": 4,
+    "total_lines": 834
+  }
+}

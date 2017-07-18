@@ -1,0 +1,129 @@
+{
+  "_audit": {
+    "ended_at": "2017-07-17T09:57:01.616068",
+    "started_at": "2017-07-17T09:57:00.829916",
+    "version": "v1"
+  },
+  "_release": "pypi:access_points:0.4.59",
+  "details": [
+    {
+      "md5": "9579239f63198a917ba6b5b065135308",
+      "path": "access_points-0.4.59/setup.cfg",
+      "sha1": "3dbc273a982f9ee5e38e82d40bab5f9bec5da8d6",
+      "sha256": "18c2957305de148c88a0042882e37e86217a816be5afb1b50bae038d2b1cedd4",
+      "ssdeep": "3:kECbGXUN+no33ogQOwVex8oQoogQO+AZveSEJFFNtEC6HZJBYi5BERAFYv3:sbGkIo9XgLbqX+02SgHr6bwgYf"
+    },
+    {
+      "md5": "d10b3b53c1eb3e9ff544e94cfc7baf82",
+      "path": "access_points-0.4.59/README.rst",
+      "sha1": "acd93fb4a88718643f28c493270fe12b3acbb50a",
+      "sha256": "da164b9d39ad6e200c4dd103d17f29875f3152a1f528d0677d559231e1bde576",
+      "ssdeep": "3:vGzNxOFIK4GXRFVXl2LWXI4MKLFE1sMXFJ8RIVKrFj8+9KpMLQdb:+NxqJLXjJl5PMK8sMXF6/KpKQdb"
+    },
+    {
+      "md5": "699e33b729e2425061642809b1ed2fc8",
+      "path": "access_points-0.4.59/setup.py",
+      "sha1": "9ef68dbebe5f01419b1952b6a70039dfb815d1f0",
+      "sha256": "7cf37c8cf41d6110793b24d810a8861c79359b2b66764c46685c965e208028d6",
+      "ssdeep": "48:/nb+FKk4Dn7Xk8AX92+W+JrbFaIR+IMIwIazzclzwQz13+Q:z+Fv4D7088923waIR+IMIwIazzclzT1T"
+    },
+    {
+      "md5": "12066b62dc19ee71cfad5085c1bc56e0",
+      "path": "access_points-0.4.59/PKG-INFO",
+      "sha1": "bb634231319997147dbb7c70a94b7f6d6737bac9",
+      "sha256": "cb3332dc9f6743b12e39851d9e440ac58f28992817af93b494c036d4b53f17d2",
+      "ssdeep": "24:DfKz+NxqhXj2SP2kTQJQ8lMQIROQIjIQI4QIyHZftWZft2ZftDZftYZftRlu94Ar:DC9XZlQ7aQIROQIUQI4QIWaaDYBuF13l"
+    },
+    {
+      "md5": "2bb44620ad252ad1a1dabaf16b0aaf3f",
+      "path": "access_points-0.4.59/access_points.egg-info/entry_points.txt",
+      "sha1": "feb9eef07e0f1847a3759bedd2cb9af987e2a45b",
+      "sha256": "079843d3a8d97c40aca00b47edf3a1906b05ab8d354a41971c78d55b3110d896",
+      "ssdeep": "3:1ERAv6vR6L3n:1epQL3"
+    },
+    {
+      "md5": "68b329da9893e34099c7d8ad5cb9c940",
+      "path": "access_points-0.4.59/access_points.egg-info/not-zip-safe",
+      "sha1": "adc83b19e793491b1c6ea0fd8b46cd9f32e592fc",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "ssdeep": "3:v:v"
+    },
+    {
+      "md5": "4e90b71cbc7fb7feb6da51e6c7eecfc8",
+      "path": "access_points-0.4.59/access_points.egg-info/SOURCES.txt",
+      "sha1": "020e15aa8490d6bc0c8f8c022db15500659fbdab",
+      "sha256": "0e45499c626a9f304fef306c3c571cacbdcced604e02abcc7e005c4f23b85ab3",
+      "ssdeep": "6:nE0QfhTdTxYGzWxoWuRT4WMEZJf4WZV2Jf4WDWKwWvcik6cklc:nE0QfhTdTxYGdZ8J4RikPklc"
+    },
+    {
+      "md5": "68b329da9893e34099c7d8ad5cb9c940",
+      "path": "access_points-0.4.59/access_points.egg-info/dependency_links.txt",
+      "sha1": "adc83b19e793491b1c6ea0fd8b46cd9f32e592fc",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "ssdeep": "3:v:v"
+    },
+    {
+      "md5": "990d46490950a423601b1f35f7a727e9",
+      "path": "access_points-0.4.59/access_points.egg-info/top_level.txt",
+      "sha1": "2fe8615088ce7c520ddf0b6c76be3caa83ee2d9c",
+      "sha256": "8ee57e2754621471f793547e3998f970fe9f8fb45c5ce5af4b54521753b2e475",
+      "ssdeep": "3:vGzuuJ:+pJ"
+    },
+    {
+      "md5": "0968307b1de3698908d016943c484244",
+      "path": "access_points-0.4.59/access_points.egg-info/PKG-INFO",
+      "sha1": "5caf2c804c3676286970a1220b81b6b638245e4b",
+      "sha256": "3f115ed7335c1827cea347b022ebe10cb135223f5d0db0996e48beab4b6790f7",
+      "ssdeep": "24:DBKz+NxqhXj2SP2kTQJQ8lMQIROQIjIQI4QIyHZftWZft2ZftDZftYZftRlu94Ar:DU9XZlQ7aQIROQIUQI4QIWaaDYBuF13l"
+    },
+    {
+      "md5": "d41d8cd98f00b204e9800998ecf8427e",
+      "path": "access_points-0.4.59/data/__init__.py",
+      "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ssdeep": "3::"
+    },
+    {
+      "md5": "d41d8cd98f00b204e9800998ecf8427e",
+      "path": "access_points-0.4.59/tests/__init__.py",
+      "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ssdeep": "3::"
+    },
+    {
+      "md5": "cd7799c38f442b162f163a4874ef39e8",
+      "path": "access_points-0.4.59/tests/all_test.py",
+      "sha1": "3075139aafd6fc0c1815d95fa9aa75dd209384f4",
+      "sha256": "ad3378961fde641564a719703deb8d1b45837806b67602284aadf3e0667001ab",
+      "ssdeep": "96:IfyQYrjHxMTkLJNo1hqNVerAEYJAJ/O9aJuFo4g1w1D2P1s1v1R+1n1D1fv1M1gB:IfyFxSsJNo1wHCxgo3UpY"
+    },
+    {
+      "md5": "09b9f63cfb272906488df32423f33d80",
+      "path": "access_points-0.4.59/access_points/__init__.py",
+      "sha1": "93b1d22d4d99aed405c24c637305b77ed9281e0b",
+      "sha256": "1b6959cc3c21f185617994b21a135bb3c99b1a2c4a2412800d5c253c5524afdd",
+      "ssdeep": "192:8eH3K7YQQPgmf+PhKRQOD0fuTxR9iX80dej1IoIAHIIWIndxM:HH5QQPT+PhKdUuTRKhejCD9IVdy"
+    },
+    {
+      "md5": "d9a68aa93e70b47fb6991cfaaaa7ba3a",
+      "path": "access_points-0.4.59/access_points/__init___flymake.py",
+      "sha1": "bc3b38670543f5ca297024e23c96d966aa41665a",
+      "sha256": "9262a620e73def246a9a8801f6c6a252942b6d3945bb428cc278b22d4482ed8b",
+      "ssdeep": "192:7eH3K7YQQPgmf+PhKRQOD0fuTxR9iX80dej1IoIAHIIWIndxM:yH5QQPT+PhKdUuTRKhejCD9IVdy"
+    },
+    {
+      "artifact": true,
+      "md5": "48e8169cbeb2b3f48110a00ad3037838",
+      "path": "access_points-0.4.59.tar.gz",
+      "sha1": "1ea4a2ce1356cfbd096124fe493ece8ad9bc0cc2",
+      "sha256": "c2da070d641187ccee93141a9e73aafcc20fd2f21053afe1802a4168722574bc",
+      "ssdeep": "96:UKMC8QZPLPKHzwih+6t5dI+eVR6NOQhJ2rOGI2oXfAVyrx09BAJs789ZIaACWpff:UKJ8gLOtNTER6NOQhJ2tcJseJs7K2jCw"
+    }
+  ],
+  "schema": {
+    "name": "digests",
+    "version": "1-0-0"
+  },
+  "status": "success",
+  "summary": []
+}
