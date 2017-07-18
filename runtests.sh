@@ -9,7 +9,7 @@ trap gc EXIT SIGINT
 
 # Enter local-setup/ directory
 # Run local instances for: dynamodb, gremlin-websocket, gremlin-http
-function start_gremlin_http{
+function start_gremlin_http {
     pushd local-setup/
     echo "Invoke Docker Compose Start Gremlin HTTP and WebSocket services"
     sudo docker-compose -f docker-compose.yaml up --force-recreate -d gremlin-http
