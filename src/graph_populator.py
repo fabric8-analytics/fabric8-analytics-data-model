@@ -111,7 +111,9 @@ class GraphPopulator(object):
         gh_issues_last_year_closed = str(gh_details.get('updated_issues', {}).get('year', {}).get('closed', -1))
         gh_issues_last_month_closed = str(gh_details.get('updated_issues', {}).get('month', {}).get('closed', -1))
         gh_forks = str(gh_details.get('forks_count', -1))
-        gh_stargazers = str(gh_details.get('details', {}).get('stargazers_count', -1))
+        gh_stargazers = str(gh_details.get('stargazers_count', -1))
+        gh_open_issues_count = str(gh_details.get('open_issues_count', -1))
+        gh_subscribers_count = str(gh_details.get('subscribers_count', -1))
 
         # Create the query string
         str_package = "pkg = g.V().has('ecosystem','" + ecosystem + "').has('name','" + pkg_name + "').tryNext()" \
@@ -127,6 +129,8 @@ class GraphPopulator(object):
                       "pkg.property('gh_issues_last_month_closed', " + gh_issues_last_month_closed + ");" \
                       "pkg.property('gh_forks', " + gh_forks + ");" \
                       "pkg.property('gh_stargazers', " + gh_stargazers + ");" \
+                      "pkg.property('gh_open_issues_count', " + gh_open_issues_count + ");" \
+                      "pkg.property('gh_subscribers_count', " + gh_subscribers_count + ");" \
                       "pkg.property('latest_version', '" + latest_version + "');" \
                       "pkg.property('package_relative_used', '" + pkg_usage + "');" \
                       "pkg.property('package_dependents_count', " + pkg_deps_count + ");" \
@@ -147,8 +151,7 @@ class GraphPopulator(object):
         ecosystem = input_json.get('ecosystem')
         version = input_json.get('version')
         # creation of query string
-        str_gremlin = cls.construct_package_query(input_json) + \
-                      cls.construct_version_query(input_json)
+        str_gremlin = cls.construct_package_query(input_json) + cls.construct_version_query(input_json)
 
         # Add edge from Package to Version
         str_gremlin += "edge_c = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
