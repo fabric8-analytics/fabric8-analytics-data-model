@@ -7,6 +7,7 @@ import requests
 from datetime import datetime
 from data_source.s3_data_source import S3DataSource
 
+logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 

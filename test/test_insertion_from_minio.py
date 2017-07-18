@@ -6,6 +6,7 @@ from minio.error import ResponseError, BucketAlreadyOwnedByYou, BucketAlreadyExi
 from data_importer import import_epv_from_s3_http
 from graph_manager import BayesianGraph
 
+logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 # Check whether schema is created or not
