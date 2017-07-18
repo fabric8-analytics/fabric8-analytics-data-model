@@ -12,14 +12,14 @@ trap gc EXIT SIGINT
 function start_gremlin_http_websocket {
     pushd local-setup/
     echo "Invoke Docker Compose Start Gremlin HTTP and WebSocket services"
-    sudo docker-compose -f docker-compose.yaml up --force-recreate -d gremlin-websocket gremlin-http
+    sudo docker-compose -f docker-compose.yaml up --force-recreate -d gremlin-http
     popd
 }
 
 
 echo JAVA_OPTIONS value: $JAVA_OPTIONS
 
-start_gremlin_http_websocket
+start_gremlin_http
 
 export LOGFILE_PATH="all-tests.log"
 rm -f "$LOGFILE_PATH"
