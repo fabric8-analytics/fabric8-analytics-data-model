@@ -31,6 +31,16 @@
             gh_stargazers = mgmt.makePropertyKey('gh_stargazers').dataType(Integer.class).make();
         }
 
+        gh_open_issues_count = mgmt.getPropertyKey('gh_open_issues_count');
+        if(gh_open_issues_count == null) {
+            gh_open_issues_count = mgmt.makePropertyKey('gh_open_issues_count').dataType(Integer.class).make();
+        }
+
+        gh_subscribers_count = mgmt.getPropertyKey('gh_subscribers_count');
+        if(gh_subscribers_count == null) {
+            gh_subscribers_count = mgmt.makePropertyKey('gh_subscribers_count').dataType(Integer.class).make();
+        }
+
         gh_forks = mgmt.getPropertyKey('gh_forks');
         if(gh_forks == null) {
             gh_forks = mgmt.makePropertyKey('gh_forks').dataType(Integer.class).make();
@@ -455,6 +465,8 @@
                 //'package_dependents_count',
                 //'latest_version',
                 //'gh_stargazers',
+                //'gh_open_issues_count',
+                //'gh_subscribers_count',
                 'pname',
                 'pecosystem',
                 'version',
