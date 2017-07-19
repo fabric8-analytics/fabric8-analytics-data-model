@@ -13,7 +13,8 @@ Keep proper configuration values handy ( preferably in `.env` file for docker co
 ```
 AWS_S3_ACCESS_KEY_ID=some_key
 AWS_S3_SECRET_ACCESS_KEY=some_secret
-AWS_BUCKET=bucket_name
+AWS_EPV_BUCKET=epv_bucket_name
+AWS_PKG_BUCKET=pkg_bucket_name
 DYNAMODB_PREFIX=prefix_allocated_to_you
 DYNAMODB_CLIENT_CREDENTIALS_CLASS_NAME=com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 AWS_ACCESS_KEY_ID=<dynamodb-access-key-id>
@@ -26,7 +27,7 @@ AWS_SECRET_ACCESS_KEY=<dynamodb-secret-access-key>
 cd local-setup
 docker-compose up
 ```
-Now you can run the tests or the REST API on another terminal
+Now you can run the tests or the REST API
 
 ### How to run run REST API:
 
@@ -56,11 +57,6 @@ You can POST the following list as body of the request with `Content-Type: appli
 ]
 ```
 
-The websocket based endpoint to populate the graph is `/api/v1/import_epv_from_s3`
-This endpoint creates the entire graph.
-It uses the same input format as described for the HTTP endpoint.
-
-
 ### How to run the tests?
 
 NOTE: Make sure to perform test on a fresh instance of graph. i.e `g.V().count == 0`
@@ -73,37 +69,8 @@ cp src/config.py.template src/config.py
 PYTHONPATH=`pwd`/src py.test test/ -s
 ```
 
-### How to run importer script?
+### How to run importer script? Still a WIP to import from local-file-system
 
-We can import data into graph from a directory where such JSON files are present. To prepare for such setup, we can first load data from S3 into a local directory.
-
-Example commands that can be used are:
-
-```
-$ sudo dnf install -y awscli
-$ aws configure
-AWS Access Key ID [None]: ENTER ACCESS KEY HERE
-AWS Secret Access Key [None]: ENTER SECRET KEY HERE
-Default region name [None]: us-east-1
-Default output format [None]: 
-$ aws configure set s3.signature_version s3v4
-$ cd ../
-$ mkdir s3-data
-$ aws s3 cp --recursive "s3://bayesian-bayesian-core-data/" s3-data/
-$ cd -
-```
-
-If a directory with JSON files is located at `../s3-data/` we can invoke the importer script as below:
-
-```
-PYTHONPATH=`pwd`/src python src/data_importer.py -s DIR -d ../s3-data/
-```
-
-Or via configured S3 location
-
-```
-PYTHONPATH=`pwd`/src python src/data_importer.py -s S3
-```
 
 To run on OpenShift see **Data Importer** section below in this document.
 
@@ -119,35 +86,16 @@ sudo docker-compose -f docker-compose-server.yml up
 #### Using OpenShift
 
 
- * WebSocket endpoint
-
-```
-oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=0 -v CHANNELIZER=ws | oc create -f -
-```
-
- * HTTP endpoint
-
 ```
 oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=1 -v CHANNELIZER=http | oc create -f -
 ```
 
-### Building container images
-
-All the artifacts required to build the container images are stored in a [publicly hosted repository](https://github.com/containscafeine/data-model). These are the artifacts which have been used to deploy the application on the remote OpenShift instance.
-
-Also, the above mentioned repository is being tracked by the CentOS Container Pipeline which, each time a commit is pushed to the tracked repository, automatically builds a newer container image and pushes to registry.centos.org (read more [here](https://github.com/CentOS/container-index)), which is then deployed on the remote OpenShift instance.
-
-To locally build the container images, one way would be to use the following command:
-
-`docker-compose -f <path to docker compose file> build <service name, optional>`
 
 ### Deploying the application
 
 #### Server
 
-There are 2 Gremlin servers defined in `docker-compose-server.yml`
 - `gremlin-http` deploys with the HTTP channelizer
-- `gremlin-websocket` deploys with the WebSocket channelizer
 
 To deploy these locally, set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables in your local environment or store the same in the .env file in the same directory as `docker-compose-server.yml`
 
@@ -174,43 +122,7 @@ Now, to deploy:
 
         To deploy with the HTTP channelizer, add `-v REST_VALUE=1` to the above command.
 
-	For instance, to deploy with both WebSocket and HTTP channelizers, the OpenShift commands will look something like -
-
-          - WebSocket channelizer:
-
-            `oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=0 -v CHANNELIZER=ws | oc create -f -`
-
-          - HTTP channelizer:
-
-            `oc process -f gremlin-server-openshift-template.yaml -v DYNAMODB_PREFIX=<dynamodb_prefix> -v REST_VALUE=1 -v CHANNELIZER=http | oc create -f -`
-
-    Get the endpoint from `oc get services` or `oc get routes` if you have a router configured.
-
-#### Client
-
-There are 2 Gremlin clients defined in `docker-compose-client.yml`:
-- `client-ipython` starts an iPython shell, using which you can connect to the server.
-
-- `client-console` starts the gremlin console.
-
-    It requires `$GREMLIN_HOST` and `$GREMLIN_PORT` environment variables to be set in your local environment or store the same in the .env file in the same directory as `docker-compose-client.yml`
-
-    These variables point to the remote Gremlin server running with the WebSocket channelizer.
-
-Now, to deploy on:
-
-- Docker Compose, run -
-
-    `docker-compose -f docker-compose-client.yml up -d <service name, optional>`
-
-    `docker attach <container name>` to get access to the console/shell
-
-- OpenShift, run -
-
-    `kompose -f docker-compose-client.yml --provider openshift up`
-
-    `oc attach -it <pod name>`
-
+	Get the endpoint from `oc get services` or `oc get routes` if you have a router configured.
 
 ### Data Importer
 
