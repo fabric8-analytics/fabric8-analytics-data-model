@@ -9,17 +9,17 @@ trap gc EXIT SIGINT
 
 # Enter local-setup/ directory
 # Run local instances for: dynamodb, gremlin-websocket, gremlin-http
-function start_gremlin_http_websocket {
+function start_gremlin_http {
     pushd local-setup/
     echo "Invoke Docker Compose Start Gremlin HTTP and WebSocket services"
-    sudo docker-compose -f docker-compose.yaml up --force-recreate -d gremlin-websocket gremlin-http
+    sudo docker-compose -f docker-compose.yaml up --force-recreate -d 
     popd
 }
 
 
 echo JAVA_OPTIONS value: $JAVA_OPTIONS
 
-start_gremlin_http_websocket
+start_gremlin_http
 
 export LOGFILE_PATH="all-tests.log"
 rm -f "$LOGFILE_PATH"
@@ -49,10 +49,6 @@ python src/sanitycheck.py || exit -1
 # py.test --profile-svg -s test/
 
 py.test -s test/
-
-# Print all the logs for inspection
-
-cat $LOGFILE_PATH
 
 rm -rf env-test/
 

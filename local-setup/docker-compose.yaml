@@ -25,50 +25,16 @@ services:
         - dynamodb
       mem_limit: 2G
 
-
-    gremlin-websocket:
-      image: registry.centos.org/datamodel/gremlin:concaf
-      volumes:
-        - ./scripts:/scripts:z
-        - ./metrics:/opt/dynamodb/dynamodb-titan-storage-backend/server/dynamodb-titan100-storage-backend-1.0.0-hadoop1/metrics
-      entrypoint: /scripts/new-entrypoint.sh
-      environment:
-        - DEBUG_GRAPH_METRICS=1
-        - INIT_DELAY=20
+    minio-s3:
+      image: minio/minio
+      command:
+        - server
+        - --address
+        - ":33000"
+        - /export
+      network_mode: bridge
       ports:
-        - "8182:8182"
-      depends_on:
-        - dynamodb
-      mem_limit: 2G
-
-    # graph:
-    #   image: ohamada/graphite-grafana
-    #   ports:
-    #     - "80:80"
-    #     - "8080:8080"
-    #     - "2003:2003"
-    #     - "2004:2004"
-    #     - "7002:7002"
-    #   environment:
-    #     - PGHOST=postgres
-    #     - PGUSER=pgadmin
-    #     - PGPASSWORD=pgadmin
-    #   volumes:
-    #     - ./graphite-grafana/graphite:/var/lib/graphite/whisper
-    #   links:
-    #     - db:postgres
-    #   depends_on:
-    #     - db
-
-    # db:
-    #   image: postgres:9.5
-    #   ports:
-    #     - "5432:5432"
-    #   expose:
-    #     - 5432
-    #   environment:
-    #     - POSTGRES_USER=pgadmin
-    #     - POSTGRES_PASSWORD=pgadmin
-    #     - PGDATA=/var/lib/postgresql/data/pgdata
-    #   volumes:
-    #     - ./graphite-grafana/pgdata:/var/lib/postgresql/data/pgdata:rw
+        - "33000:33000"
+      environment:
+        MINIO_ACCESS_KEY: GNV3SAHAHA3DOT99GQII
+        MINIO_SECRET_KEY: ZmvMwngonaDK5ymlCd6ptaalDdJsCn3aSSxASPaZ

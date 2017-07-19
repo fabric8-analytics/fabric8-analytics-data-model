@@ -10,28 +10,22 @@ LOGFILE_PATH = os.environ.get("LOGFILE_PATH", "/tmp/error.log")
 #   Gremlin server on openshift: "http://gremlin-data-model.che.ci.centos.org"
 #
 # GREMLIN_SERVER_URL_REST = "http://gremlin-data-model.che.ci.centos.org"
-# GREMLIN_SERVER_URL_WEBSOCKET = "ws://gremlin-websocket-data-model.che.ci.centos.org"
 
 _gremlin_securely = "true" == os.environ.get("GREMLIN_USE_SECURE_CONNECTION", "false").lower()
 GREMLIN_SERVER_URL_REST = "{proto}://{host}:{port}".format(proto="https" if _gremlin_securely else "http",
                                                            host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
                                                            port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8181"))
-GREMLIN_SERVER_URL_WEBSOCKET = "{proto}://{host}:{port}".format(proto="wss" if _gremlin_securely else "ws",
-                                                                host=os.environ.get("BAYESIAN_GREMLIN_WS_SERVICE_HOST", "localhost"),
-                                                                port=os.environ.get("BAYESIAN_GREMLIN_WS_SERVICE_PORT", "8182"))
-POSTGRES_SERVER = os.environ.get("POSTGRES_SERVER","")
 
 # To load data from S3
 AWS_S3_ACCESS_KEY_ID = os.environ.get("AWS_S3_ACCESS_KEY_ID", "")
 AWS_S3_SECRET_ACCESS_KEY = os.environ.get("AWS_S3_SECRET_ACCESS_KEY", "")
 AWS_EPV_BUCKET = os.environ.get("AWS_EPV_BUCKET", "")
 AWS_PKG_BUCKET = os.environ.get("AWS_PKG_BUCKET", "")
-POSTGRESQL_USER = os.environ.get("POSTGRESQL_USER", "")
-POSTGRESQL_PASSWORD = os.environ.get("POSTGRESQL_PASSWORD", "")
-POSTGRESQL_DATABASE = os.environ.get("POSTGRESQL_DATABASE", "")
-POSTGRESQL_HOST = os.environ.get("BAYESIAN_PGBOUNCER_SERVICE_HOST", "")
-POSTGRESQL_PORT = os.environ.get("BAYESIAN_PGBOUNCER_SERVICE_PORT", "")
 
+# Local Minio
+LOCAL_MINIO_ENDPOINT = os.environ.get("LOCAL_MINIO_ENDPOINT","localhost:33000")
+MINIO_ACCESS_KEY = "GNV3SAHAHA3DOT99GQII"
+MINIO_SECRET_KEY = "ZmvMwngonaDK5ymlCd6ptaalDdJsCn3aSSxASPaZ"
 # if this variable is set, we are running AWS S3 locally ( via Minio )
 AWS_S3_IS_LOCAL = "AWS_S3_IS_LOCAL" in os.environ
 

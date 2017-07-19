@@ -1,0 +1,15 @@
+{
+  "_audit": {
+    "ended_at": "2017-07-17T09:57:50.406086",
+    "started_at": "2017-07-17T09:57:39.105584",
+    "version": "v1"
+  },
+  "_release": "pypi:access_points:0.4.59",
+  "details": [],
+  "schema": {
+    "name": "security_issues",
+    "version": "3-0-0"
+  },
+  "status": "success",
+  "summary": []
+}
