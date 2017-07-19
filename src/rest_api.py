@@ -21,7 +21,6 @@ CORS(app)
 # Check whether schema is created or not
 # populate schema if not already done
 try:
-
     status, json_result = BayesianGraph.populate_schema()
     if status:
         app.logger.info("Ready to serve requests")

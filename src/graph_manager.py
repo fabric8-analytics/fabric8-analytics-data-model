@@ -15,14 +15,6 @@ logger = logging.getLogger(__name__)
 
 # singleton object which will have reference to Graph object
 class BayesianGraph(object):
-    _instances = {'graph': None}
-
-    @classmethod
-    def instance(cls):
-        if cls._instances['graph'] is None:
-            cls._instances['graph'] = g
-        return cls._instances['graph']
-
 
     @classmethod
     def execute(cls, str_gremlin_dsl):
