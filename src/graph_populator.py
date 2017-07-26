@@ -14,15 +14,25 @@ class GraphPopulator(object):
         version = input_json.get('version')
         ver_deps_count = str(input_json.get('dependents_count', -1))
         description = input_json.get('analyses', {}).get('metadata', {}).get('details', [{}])[0].get('description', '')
-        str_version = "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
-                      ".has('version','" + version + "').properties('licenses','cve_ids').drop().iterate();" \
-                      "ver = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
-                      ".has('version','" + version + "').tryNext().orElseGet{graph.addVertex('pecosystem','" \
-                      + ecosystem + "', 'pname','" + pkg_name + "', 'version','" + version + "', " \
-                      "'vertex_label', 'Version')};" \
-                      "ver.property('dependents_count'," + ver_deps_count + ");" \
-                      "ver.property('description','" + re.sub('[^A-Za-z0-9_ ]', '', description or '').lower() + "');" \
-                      "ver.property('last_updated'," + str(time.time()) + ");"
+        drop_props = []
+        str_version = ""
+        # Check if license and cve are success. Then we refresh the property
+        if 'success' == input_json.get('analyses', {}).get('source_licenses', {}).get('status'):
+            drop_props.append('licenses')
+        if 'success' == input_json.get('analyses', {}).get('security_issues', {}).get('status'):
+            drop_props.append('cve_ids')
+        if len(drop_props) > 0:
+            str_version = "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
+                          ".has('version','" + version + "').properties('" + "','".join(drop_props) + "')." \
+                          "drop().iterate();" \
+
+        str_version += "ver = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
+                       ".has('version','" + version + "').tryNext().orElseGet{graph.addVertex('pecosystem','" \
+                       + ecosystem + "', 'pname','" + pkg_name + "', 'version','" + version + "', " \
+                       "'vertex_label', 'Version')};" \
+                       "ver.property('dependents_count'," + ver_deps_count + ");" \
+                       "ver.property('description','" + re.sub('[^A-Za-z0-9_ ]', '', description or '').lower() + "');" \
+                       "ver.property('last_updated'," + str(time.time()) + ");"
 
         # Get Code Metrics Details
         if 'code_metrics' in input_json.get('analyses', {}):
@@ -127,9 +137,13 @@ class GraphPopulator(object):
                                              .get('releases', {}).get('latest', {}).get('published_at')
 
             if libio_latest_release is not None:
-                str_package += "pkg.property('libio_latest_release', '" + \
-                               str(time.mktime(datetime.strptime("2017-05-14T16:28:30Z",
-                                                                 '%Y-%m-%dT%H:%M:%SZ').timetuple()))+"');"
+                try:
+                    str_package += "pkg.property('libio_latest_release', '" + \
+                                   str(time.mktime(datetime.strptime("2017-05-14T16:28:30Z",
+                                                                     '%Y-%m-%dT%H:%M:%SZ').timetuple()))+"');"
+                except:
+                    # We pass if we do not get timestamp information in required format
+                    pass
 
             for key, val in input_json.get('analyses').get('libraries_io').get('details', {}) \
                                       .get('dependent_repositories', {}).get('top', {}).items():
