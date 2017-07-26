@@ -83,7 +83,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
                 # Check Package related information and add it to package object
                 if len(contents.get('package')) > 0:
                     pkg_obj = _other_key_info(data_source, contents.get('package'), config.AWS_PKG_BUCKET)
-                    obj.update(pkg_obj)
+                    obj['analyses'].update(pkg_obj['analyses'])
 
                 # Create Gremlin Query
                 str_gremlin = GraphPopulator.create_query_string(obj)
