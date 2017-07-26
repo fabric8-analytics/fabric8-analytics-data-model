@@ -108,7 +108,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
                 report['message'] = msg
                 report['epv'] = epv_key
 
-    report['epv'] = epv
+    report['epv'] = epv_key
     report['count_imported_EPVs'] = count_imported_EPVs
     report['last_imported_EPV'] = last_imported_EPV
     report['max_finished_at'] = max_finished_at
