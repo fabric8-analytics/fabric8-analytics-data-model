@@ -124,13 +124,11 @@ def _log_report_msg(import_type, report):
         Total number of EPVs imported: {}
         The last successfully imported EPV: {}
         Max value of 'finished_at' among all imported EPVs: {}
-        EPV: {}
     """
     msg = msg.format(import_type, report.get('message'),
                      report.get('count_imported_EPVs'),
                      report.get('last_imported_EPV'),
-                     report.get('max_finished_at'),
-                     report.get('epv'))
+                     report.get('max_finished_at'))
 
     if report.get('status') is 'Success':
         logger.debug(msg)
@@ -149,7 +147,7 @@ def import_epv_http(data_source, list_epv):
             pkg_list_keys = []
             # Get EPV level keys
             ver_key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/" + epv.get('version')
-            ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET, prefix=ver_key_prefix))
+            ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET, prefix=ver_key_prefix + "/"))
             # Get Package level keys
             pkg_key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/"
             pkg_list_keys.extend(data_source.list_files(bucket_name=config.AWS_PKG_BUCKET, prefix=pkg_key_prefix))

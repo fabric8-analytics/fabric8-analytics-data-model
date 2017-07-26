@@ -50,9 +50,10 @@ class S3DataSource(AbstractDataSource):
         #   we can use 'Marker' = graph_meta.last_imported_s3_key
         if prefix is None:
             objects = bucket.objects.all()
-            list_filenames = [x.key for x in objects]
+            list_filenames = [x.key for x in objects if x.key.endswith('.json')]
         else:
             for obj in bucket.objects.filter(Prefix=prefix):
-                list_filenames.append(obj.key)
+                if obj.key.endswith('.json'):
+                    list_filenames.append(obj.key)
         
         return list_filenames
