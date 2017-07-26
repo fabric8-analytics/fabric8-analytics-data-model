@@ -45,7 +45,7 @@ def liveness():
 @app.route('/api/v1/ingest_to_graph', methods=['POST'])
 def ingest_to_graph():
     input_json = request.get_json()
-    app.logger.info("Ingesting the given list of EPVs")
+    app.logger.info("Ingesting the given list of EPVs - " + json.dumps(input_json))
 
     expected_keys = set(['ecosystem', 'name', 'version'])
     for epv in input_json:
