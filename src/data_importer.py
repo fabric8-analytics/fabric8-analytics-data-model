@@ -106,6 +106,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
                 msg = _get_exception_msg("The import failed", e)
                 report['status'] = 'Failure'
                 report['message'] = msg
+                report['epv'] = epv_key
 
     report['epv'] = epv
     report['count_imported_EPVs'] = count_imported_EPVs
