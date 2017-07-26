@@ -124,11 +124,13 @@ def _log_report_msg(import_type, report):
         Total number of EPVs imported: {}
         The last successfully imported EPV: {}
         Max value of 'finished_at' among all imported EPVs: {}
+        EPV: {}
     """
     msg = msg.format(import_type, report.get('message'),
                      report.get('count_imported_EPVs'),
                      report.get('last_imported_EPV'),
-                     report.get('max_finished_at'))
+                     report.get('max_finished_at'),
+                     report.get('epv'))
 
     if report.get('status') is 'Success':
         logger.debug(msg)
