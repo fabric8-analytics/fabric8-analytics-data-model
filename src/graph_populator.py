@@ -13,7 +13,9 @@ class GraphPopulator(object):
         ecosystem = input_json.get('ecosystem')
         version = input_json.get('version')
         ver_deps_count = str(input_json.get('dependents_count', -1))
-        description = input_json.get('analyses', {}).get('metadata', {}).get('details', [{}])[0].get('description', '')
+        description = ''
+        if len(input_json.get('analyses', {}).get('metadata', {}).get('details')) > 0:
+            description = input_json.get('analyses').get('metadata').get('details')[0].get('description', '')
         drop_props = []
         str_version = ""
         # Check if license and cve are success. Then we refresh the property
@@ -31,7 +33,7 @@ class GraphPopulator(object):
                        + ecosystem + "', 'pname','" + pkg_name + "', 'version','" + version + "', " \
                        "'vertex_label', 'Version')};" \
                        "ver.property('dependents_count'," + ver_deps_count + ");" \
-                       "ver.property('description','" + re.sub('[^A-Za-z0-9_ ]', '', description or '').lower() + "');" \
+                       "ver.property('description','" + re.sub('[^A-Za-z0-9_\\\/\'":. ]', '', description or '') + "');" \
                        "ver.property('last_updated'," + str(time.time()) + ");"
 
         # Get Code Metrics Details
