@@ -17,11 +17,11 @@ class GraphPopulator(object):
         try:
             if len(input_json.get('analyses', {}).get('metadata', {}).get('details')) > 0:
                 description = input_json.get('analyses').get('metadata').get('details')[0].get('description', '')
+                description = description.replace("'", "\\'")
         except:
             # we pass and move forward without description
             pass
 
-        description = description.replace("'", "\\'")
         drop_props = []
         str_version = ""
         # Check if license and cve are success. Then we refresh the property
