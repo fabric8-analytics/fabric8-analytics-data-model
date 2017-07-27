@@ -50,13 +50,13 @@ class GraphPopulator(object):
                 if lang.get('metrics', {}).get('functions', {}).get('average_cyclomatic_complexity'):
                     count += 1
                     tot_complexity += lang['metrics']['functions']['average_cyclomatic_complexity']
-                cm_avg_cyclomatic_complexity = str(tot_complexity / count) if count > 0 else '-1'
-                cm_loc = str(input_json.get('analyses').get('code_metrics').get('summary', {}).get('total_lines', -1))
-                cm_num_files = str(input_json.get('analyses').get('code_metrics').get('summary', {})
-                                   .get('total_files', -1))
-                str_version += "ver.property('cm_num_files'," + cm_num_files + ");" \
-                               "ver.property('cm_avg_cyclomatic_complexity'," + cm_avg_cyclomatic_complexity + ");" \
-                               "ver.property('cm_loc'," + str(cm_loc) + ");"
+            cm_avg_cyclomatic_complexity = str(tot_complexity / count) if count > 0 else '-1'
+            cm_loc = str(input_json.get('analyses').get('code_metrics').get('summary', {}).get('total_lines', -1))
+            cm_num_files = str(input_json.get('analyses').get('code_metrics').get('summary', {})
+                               .get('total_files', -1))
+            str_version += "ver.property('cm_num_files'," + cm_num_files + ");" \
+                           "ver.property('cm_avg_cyclomatic_complexity'," + cm_avg_cyclomatic_complexity + ");" \
+                           "ver.property('cm_loc'," + str(cm_loc) + ");"
 
         # Get downstream details
         shipped_as_downstream = 'false'
