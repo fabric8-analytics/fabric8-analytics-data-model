@@ -63,6 +63,29 @@ def ingest_to_graph():
     else:
         return flask.jsonify(response)
 
+@app.route('/api/v1/selective_ingest', methods=['POST'])
+def selective_ingest():
+    input_json = request.get_json()
+
+    if input_json.get('package_list') is None or len(input_json.get('package_list')) == 0:
+        return flask.jsonify(message='No Packages provided. Nothing to be ingested'), 400
+
+    expected_keys = set(['ecosystem', 'name'])
+    for epv in input_json.get('package_list'):
+        if not expected_keys.issubset(set(epv.keys())):
+            response = {'message': 'Invalid keys found in input: ' + ','.join(epv.keys())}
+            return flask.jsonify(response), 400
+
+    report = data_importer.import_epv_from_s3_http(list_epv=input_json.get('package_list'),
+                                                   select_doc=input_json.get('select_ingest', None))
+    response = {'message': report.get('message'),
+                'epv': input_json,
+                'count_imported_EPVs': report.get('count_imported_EPVs')}
+
+    if report.get('status') is not 'Success':
+        return flask.jsonify(response), 500
+    else:
+        return flask.jsonify(response)
 
 if __name__ == "__main__":
     app.run()
