@@ -12,7 +12,6 @@ class GraphPopulator(object):
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
         version = input_json.get('version')
-        ver_deps_count = str(input_json.get('dependents_count', -1))
         description = ''
         try:
             if len(input_json.get('analyses', {}).get('metadata', {}).get('details')) > 0:
@@ -24,7 +23,7 @@ class GraphPopulator(object):
 
         drop_props = []
         str_version = ""
-        # Check if license and cve are success. Then we refresh the property
+        # Check if license and cve analyses succeeded. Then we refresh the property
         if 'success' == input_json.get('analyses', {}).get('source_licenses', {}).get('status'):
             drop_props.append('licenses')
         if 'success' == input_json.get('analyses', {}).get('security_issues', {}).get('status'):
@@ -38,10 +37,10 @@ class GraphPopulator(object):
                        ".has('version','" + version + "').tryNext().orElseGet{graph.addVertex('pecosystem','" \
                        + ecosystem + "', 'pname','" + pkg_name + "', 'version','" + version + "', " \
                        "'vertex_label', 'Version')};" \
-                       "ver.property('dependents_count'," + ver_deps_count + ");" \
-                       "ver.property('description','" + re.sub('[^A-Za-z0-9_\\\/\'":. ]', '', description or '') + "');" \
                        "ver.property('last_updated'," + str(time.time()) + ");"
-
+        # Add Description if not blank
+        if description != '':
+            str_version += "ver.property('description','" + re.sub('[^A-Za-z0-9_\\\/\'":. ]', '', description) + "');"
         # Get Code Metrics Details
         if 'code_metrics' in input_json.get('analyses', {}):
             count = 0
@@ -92,11 +91,7 @@ class GraphPopulator(object):
         # Get Metadata Details
         if 'metadata' in input_json.get('analyses', {}):
             latest_version = input_json.get('latest_version') or ''
-            pkg_deps_count = str(input_json.get('package_info', {}).get('dependents_count', -1))
-            pkg_usage = input_json.get('package_info', {}).get('relative_usage', 'NA')
             str_package += "pkg.property('latest_version', '" + latest_version + "');" \
-                           "pkg.property('package_relative_used', '" + pkg_usage + "');" \
-                           "pkg.property('package_dependents_count', " + pkg_deps_count + ");" \
                            "pkg.property('last_updated', " + str(time.time()) + ");"
 
         # Get Github Details
@@ -171,11 +166,12 @@ class GraphPopulator(object):
         ecosystem = input_json.get('ecosystem')
         version = input_json.get('version')
         # creation of query string
-        str_gremlin = cls.construct_package_query(input_json) + cls.construct_version_query(input_json)
-
-        # Add edge from Package to Version
-        str_gremlin += "edge_c = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
-                       ".has('version','" + version + "').in('has_version').tryNext()" \
-                       ".orElseGet{pkg.addEdge('has_version', ver)};"
+        str_gremlin = cls.construct_package_query(input_json)
+        if version is not None and version != '':
+            str_gremlin += cls.construct_version_query(input_json)
+            # Add edge from Package to Version
+            str_gremlin += "edge_c = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')" \
+                           ".has('version','" + version + "').in('has_version').tryNext()" \
+                           ".orElseGet{pkg.addEdge('has_version', ver)};"
         print(str_gremlin)
         return str_gremlin
