@@ -82,7 +82,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
                             obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
                 epv.append(obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
                 payload = {'gremlin': str_gremlin}
-                response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload))
+                response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload), timeout=30)
                 resp = response.json()
 
                 if resp['status']['code'] == 200:
@@ -137,11 +137,12 @@ def import_epv_http(data_source, list_epv, select_doc=None):
                 pkg_key_prefix = ver_key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/"
                 pkg_list_keys.extend(data_source.list_files(bucket_name=config.AWS_PKG_BUCKET, prefix=pkg_key_prefix))
 
-            if 'version' in epv:
+            if 'version' in epv and epv.get('version') is not None:
                 # Get EPV level keys
                 ver_key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/" + epv.get('version')
                 ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET, prefix=ver_key_prefix + "/"))
-
+            else:
+                epv['version'] = ''
             if select_doc is not None and len(select_doc) > 0:
                 select_ver_doc = [ver_key_prefix + '/' + x + '.json' for x in select_doc]
                 select_pkg_doc = [pkg_key_prefix + x + '.json' for x in select_doc]

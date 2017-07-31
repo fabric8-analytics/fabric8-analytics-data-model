@@ -138,11 +138,13 @@ class GraphPopulator(object):
                                              .get('releases', {}).get('count', -1)
             libio_latest_release = input_json.get('analyses').get('libraries_io').get('details', {}) \
                                              .get('releases', {}).get('latest', {}).get('published_at')
+            libio_latest_version = input_json.get('analyses').get('libraries_io').get('details', {}) \
+                                             .get('releases', {}).get('latest', {}).get('version', '')
 
             if libio_latest_release is not None:
                 try:
                     str_package += "pkg.property('libio_latest_release', '" + \
-                                   str(time.mktime(datetime.strptime("2017-05-14T16:28:30Z",
+                                   str(time.mktime(datetime.strptime(libio_latest_release,
                                                                      '%Y-%m-%dT%H:%M:%SZ').timetuple()))+"');"
                 except:
                     # We pass if we do not get timestamp information in required format
@@ -154,7 +156,21 @@ class GraphPopulator(object):
 
             str_package += "pkg.property('libio_dependents_projects', '" + libio_dependents_projects + "');" \
                            "pkg.property('libio_dependents_repos', '" + libio_dependents_repos + "');" \
-                           "pkg.property('libio_total_releases', '" + libio_total_releases + "');"
+                           "pkg.property('libio_total_releases', '" + libio_total_releases + "');" \
+                           "pkg.property('libio_latest_version', '" + libio_latest_version + "');"
+
+            # Update EPV Github Release Date based on libraries_io data
+            if libio_latest_release:
+                str_package += "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')." \
+                               "has('version','" + libio_latest_version + "')." \
+                               "property('gh_release_date'," + str(time.mktime(datetime.strptime(libio_latest_release,
+                                                                   '%Y-%m-%dT%H:%M:%SZ').timetuple())) + ");"
+            for version, release in input_json.get('analyses').get('libraries_io').get('details', {}) \
+                                              .get('releases', {}).get('latest', {}).get('recent', {}).items():
+                str_package += "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + "')." \
+                               "has('version','" + version + "')." \
+                               "property('gh_release_date'," + str(time.mktime(datetime.strptime(release,
+                                                                   '%Y-%m-%dT%H:%M:%SZ').timetuple())) + ");"
 
         return str_package
 
