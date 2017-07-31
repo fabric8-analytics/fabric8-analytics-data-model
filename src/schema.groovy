@@ -398,6 +398,16 @@
             libio_first_release = mgmt.makePropertyKey('libio_first_release').dataType(Double.class).make();
         }
 
+        gh_release_date = mgmt.getPropertyKey('gh_release_date');
+        if(gh_release_date == null){
+            gh_release_date = mgmt.makePropertyKey('gh_release_date').dataType(Double.class).make();
+        }
+
+        libio_latest_version = mgmt.getPropertyKey('libio_latest_version');
+        if(libio_latest_version == null) {
+            libio_latest_version = mgmt.makePropertyKey('libio_latest_version').dataType(String.class).make();
+        }
+
         libio_watchers = mgmt.getPropertyKey('libio_watchers');
         if(libio_watchers == null){
             libio_watchers = mgmt.makePropertyKey('libio_watchers').dataType(Double.class).make();
@@ -509,15 +519,17 @@
                 'tokens',
                 'topics',
                 'categories',
-                //libio_dependents_projects,
-                //libio_dependents_repos,
-                //libio_total_releases,
-                //libio_latest_release,
+                //'libio_dependents_projects',
+                //'libio_dependents_repos',
+                //'libio_total_releases',
+                //'libio_latest_release',
                 //'libio_watchers',
                 //'libio_contributors',
-                //libio_first_release,
-                //libio_usedby,
-                //user_id,
+                //'libio_first_release',
+                'gh_release_date',
+                //'libio_latest_version',
+                //'libio_usedby',
+                //'user_id',
                 //'company',
                 'recent_requests',
                 //'osio_usage_count'
