@@ -39,7 +39,7 @@ class GraphPopulator(object):
                        "'vertex_label', 'Version')};" \
                        "ver.property('last_updated'," + str(time.time()) + ");"
         # Add Description if not blank
-        if description != '':
+        if description and description != '':
             str_version += "ver.property('description','" + re.sub('[^A-Za-z0-9_\\\/\'":. ]', '', description) + "');"
         # Get Code Metrics Details
         if 'code_metrics' in input_json.get('analyses', {}):
