@@ -63,6 +63,7 @@ def ingest_to_graph():
     else:
         return flask.jsonify(response)
 
+
 @app.route('/api/v1/selective_ingest', methods=['POST'])
 def selective_ingest():
     input_json = request.get_json()
