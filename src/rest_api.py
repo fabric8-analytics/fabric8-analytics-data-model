@@ -77,11 +77,15 @@ def selective_ingest():
             response = {'message': 'Invalid keys found in input: ' + ','.join(epv.keys())}
             return flask.jsonify(response), 400
 
+    app.logger.info("Selective Ingestion with payload - " + json.dumps(input_json))
+
     report = data_importer.import_epv_from_s3_http(list_epv=input_json.get('package_list'),
                                                    select_doc=input_json.get('select_ingest', None))
     response = {'message': report.get('message'),
                 'epv': input_json,
                 'count_imported_EPVs': report.get('count_imported_EPVs')}
+
+    app.logger.info(response)
 
     if report.get('status') is not 'Success':
         return flask.jsonify(response), 500
