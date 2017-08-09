@@ -80,12 +80,13 @@ class GraphPopulator(object):
         if 'metadata' in input_json.get('analyses', {}):
             details = input_json.get('analyses').get('metadata', {}).get('details', [])
             if details and details[0]:
-                declared_license = details[0].get('declared_license')
                 declared_licenses = []
-                if isinstance(declared_license, list):
-                    declared_licenses = declared_license
-                else:
-                    declared_licenses.append(declared_license)
+                if 'declared_licenses' in details[0]:
+                    # list of license names
+                    declared_licenses = details[0]['declared_licenses']
+                elif 'declared_license' in details[0]:
+                    # string with comma separated license names
+                    declared_licenses = details[0]['declared_license'].split(',')
 
                 str_version += " ".join(map(lambda x: "ver.property('declared_licenses', '" + x + "');", declared_licenses))
                 # Create License Node and edge from EPV
