@@ -39,7 +39,7 @@ class GraphPopulator(object):
                        "'vertex_label', 'Version')};" \
                        "ver.property('last_updated'," + str(time.time()) + ");"
         # Add Description if not blank
-        if description and description != '':
+        if description:
             str_version += "ver.property('description','" + re.sub('[^A-Za-z0-9_\\\/\'":. ]', '', description) + "');"
         # Get Code Metrics Details
         if 'code_metrics' in input_json.get('analyses', {}):
@@ -76,6 +76,26 @@ class GraphPopulator(object):
                 cves.append(cve.get('id') + ":" + str(cve.get('cvss', {}).get('score')))
             str_version += " ".join(map(lambda x: "ver.property('cve_ids', '" + x + "');", cves))
 
+        # Get Metadata Details
+        if 'metadata' in input_json.get('analyses', {}):
+            details = input_json.get('analyses').get('metadata', {}).get('details', [])
+            if details and details[0]:
+                declared_license = details[0].get('declared_license')
+                declared_licenses = []
+                if isinstance(declared_license, list):
+                    declared_licenses = declared_license
+                else:
+                    declared_licenses.append(declared_license)
+
+                str_version += " ".join(map(lambda x: "ver.property('declared_licenses', '" + x + "');", declared_licenses))
+                # Create License Node and edge from EPV
+                for lic in declared_licenses:
+                    str_version += "lic = g.V().has('lname','" + lic + "').tryNext()." \
+                                   "orElseGet{graph.addVertex('vertex_label', 'License', 'lname', '" + lic + "', " \
+                                   "'last_updated'," + str(time.time()) + ")};" \
+                                   "g.V(ver).out('has_declared_license').has('lname', '" + lic + "').tryNext()." \
+                                   "orElseGet{ver.addEdge('has_declared_license', lic)};"
+
         return str_version
 
     @classmethod
@@ -88,11 +108,9 @@ class GraphPopulator(object):
                       ".orElseGet{graph.addVertex('ecosystem', '" + ecosystem + "', 'name', '" + pkg_name + "', " \
                       "'vertex_label', 'Package')};"
 
-        # Get Metadata Details
-        if 'metadata' in input_json.get('analyses', {}):
-            latest_version = input_json.get('latest_version') or ''
-            str_package += "pkg.property('latest_version', '" + latest_version + "');" \
-                           "pkg.property('last_updated', " + str(time.time()) + ");"
+        latest_version = input_json.get('latest_version') or ''
+        str_package += "pkg.property('latest_version', '" + latest_version + "');" \
+                       "pkg.property('last_updated', " + str(time.time()) + ");"
 
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):

@@ -97,6 +97,16 @@
             licenses = mgmt.makePropertyKey('licenses').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
+        declared_licenses = mgmt.getPropertyKey('declared_licenses');
+        if(declared_licenses == null) {
+            declared_licenses = mgmt.makePropertyKey('declared_licenses').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        libio_licenses = mgmt.getPropertyKey('libio_licenses');
+        if(libio_licenses == null) {
+            libio_licenses = mgmt.makePropertyKey('libio_licenses').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
         cve_ids = mgmt.getPropertyKey('cve_ids');
         if(cve_ids == null) {
             cve_ids = mgmt.makePropertyKey('cve_ids').dataType(String.class).cardinality(Cardinality.SET).make();
@@ -229,6 +239,11 @@
         licensed_under = mgmt.getEdgeLabel('licensed_under');
         if(licensed_under == null) {
             licensed_under = mgmt.makeEdgeLabel('licensed_under').make();
+        }
+
+        has_declared_license = mgmt.getEdgeLabel('has_declared_license');
+        if(has_declared_license == null) {
+            has_declared_license = mgmt.makeEdgeLabel('has_declared_license').make();
         }
 
         authored_by = mgmt.getEdgeLabel('authored_by');
@@ -483,6 +498,8 @@
                 //'description',
                 'shipped_as_downstream',
                 //'licenses',
+                'libio_licenses',
+                'declared_licenses',
                 //'cve_ids',
                 //'cm_loc',
                 //'cm_num_files',
