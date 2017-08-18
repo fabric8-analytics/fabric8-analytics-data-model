@@ -25,7 +25,8 @@ def _other_key_info(data_source, other_keys, bucket_name=None):
     for this_key in other_keys:
         value = data_source.read_json_file(this_key, bucket_name)
         this_key = this_key.split("/")[-1]
-        obj["analyses"][this_key[:-len('.json')]] = value
+        if 'success' == value.get('status', ''):
+            obj["analyses"][this_key[:-len('.json')]] = value
     return obj
 
 
@@ -77,17 +78,18 @@ def _import_keys_from_s3_http(data_source, epv_list):
                 # Create Gremlin Query
                 str_gremlin = GraphPopulator.create_query_string(obj)
 
-                # Fire Gremlin HTTP query now
-                logger.info("Ingestion initialized for EPV - " +
-                            obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
-                epv.append(obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
-                payload = {'gremlin': str_gremlin}
-                response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload), timeout=30)
-                resp = response.json()
+                if str_gremlin:
+                    # Fire Gremlin HTTP query now
+                    logger.info("Ingestion initialized for EPV - " +
+                                obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
+                    epv.append(obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
+                    payload = {'gremlin': str_gremlin}
+                    response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload), timeout=30)
+                    resp = response.json()
 
-                if resp['status']['code'] == 200:
-                    count_imported_EPVs += 1
-                    last_imported_EPV = obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version')
+                    if resp['status']['code'] == 200:
+                        count_imported_EPVs += 1
+                        last_imported_EPV = obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version')
 
             except Exception as e:
                 msg = _get_exception_msg("The import failed", e)
@@ -97,6 +99,8 @@ def _import_keys_from_s3_http(data_source, epv_list):
 
     report['epv'] = epv_list
     report['count_imported_EPVs'] = count_imported_EPVs
+    if count_imported_EPVs == 0:
+        report['message'] = 'Nothing to be synced to Graph!'
     report['last_imported_EPV'] = last_imported_EPV
 
     return report
