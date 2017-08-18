@@ -81,10 +81,10 @@ class GraphPopulator(object):
             details = input_json.get('analyses').get('metadata', {}).get('details', [])
             if details and details[0]:
                 declared_licenses = []
-                if 'declared_licenses' in details[0]:
+                if 'declared_licenses' in details[0] and details[0]['declared_licenses']:
                     # list of license names
                     declared_licenses = details[0]['declared_licenses']
-                elif 'declared_license' in details[0]:
+                elif 'declared_license' in details[0] and details[0]['declared_license']:
                     # string with comma separated license names
                     declared_licenses = details[0]['declared_license'].split(',')
 
