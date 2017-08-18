@@ -99,7 +99,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
 
     report['epv'] = epv_list
     report['count_imported_EPVs'] = count_imported_EPVs
-    if count_imported_EPVs == 0:
+    if count_imported_EPVs == 0 and report['status'] == 'Success':
         report['message'] = 'Nothing to be synced to Graph!'
     report['last_imported_EPV'] = last_imported_EPV
 
