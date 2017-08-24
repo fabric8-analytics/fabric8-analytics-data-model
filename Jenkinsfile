@@ -28,7 +28,7 @@ node('gremlin') {
 
     if (env.BRANCH_NAME == 'master') {
         stage('Push Images') {
-            docker.withRegistry('https://registry.devshift.net/') {
+            docker.withRegistry('https://push.registry.devshift.net/', 'devshift-registry') {
                 image.push('latest')
                 image.push(commitId)
             }
