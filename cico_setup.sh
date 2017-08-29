@@ -12,7 +12,7 @@ load_jenkins_vars() {
 
 prep() {
     yum -y update
-    yum -y install docker git which epel-release python-virtualenv
+    yum -y install docker git which epel-release python-virtualenv postgresql
     yum -y install python-pip
     pip install docker-compose
     systemctl start docker
