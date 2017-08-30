@@ -31,6 +31,7 @@ echo "Create Virtualenv for Python deps ..."
 virtualenv --python /usr/bin/python2.7 env-test
 source env-test/bin/activate
 
+pip install -U pip
 pip install -r requirements.txt
 
 # Install profiling module
