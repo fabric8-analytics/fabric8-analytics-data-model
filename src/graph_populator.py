@@ -210,17 +210,18 @@ class GraphPopulator(object):
         # creation of query string
         str_gremlin = ""
         str_package, prp_package = cls.construct_package_query(input_json)
+        if prp_package:
+            str_gremlin = str_package + prp_package
 
         if version is not None and version != '':
             str_gremlin_version = cls.construct_version_query(input_json)
             # Add edge from Package to Version
             if str_gremlin_version:
-                str_gremlin = str_package + prp_package + str_gremlin_version
-                str_gremlin += "edge_c = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + \
-                               "').has('version','" + version + "').in('has_version').tryNext()" \
-                               ".orElseGet{pkg.addEdge('has_version', ver)};"
-            elif prp_package:
-                str_gremlin = str_package + prp_package
+                str_gremlin += str_gremlin_version
+                if prp_package:
+                    str_gremlin += "edge_c = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + pkg_name + \
+                                   "').has('version','" + version + "').in('has_version').tryNext()" \
+                                   ".orElseGet{pkg.addEdge('has_version', ver)};"
 
         print(str_gremlin)
         return str_gremlin
