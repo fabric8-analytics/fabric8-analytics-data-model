@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .cache/
 env*/
+venv/
 config.py
 error.log
 env.txt
