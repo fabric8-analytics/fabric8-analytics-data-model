@@ -35,10 +35,9 @@ class BayesianGraph(object):
     @classmethod
     def return_json_response_data(cls, json_result):
         is_created = False
-        if "result" in json_result and "data" in json_result["result"]:
-            script_output = json_result["result"]["data"]
-            if type(script_output) is list and len(script_output) > 0:
-                is_created = script_output[0] is True
+        script_output = json_result.get("result", {}).get("data", [])
+        if isinstance(script_output, list) and len(script_output) > 0:
+            is_created = script_output[0]
         return is_created
 
     @classmethod
