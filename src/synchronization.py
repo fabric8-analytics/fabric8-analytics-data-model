@@ -33,7 +33,8 @@
 #             # sync has never been performed before
 #             return datetime.utcfromtimestamp(0)
 #
-#         self.logger.info("Last sync vertex found, last sync performed : %s" % result[0]['last_time_performed'])
+#         self.logger.info("Last sync vertex found, last sync performed : %s" %
+#                          result[0]['last_time_performed'])
 #         # we have to convert string back to datetime object
 #         return datetime.strptime(result[0]['last_analysis_performed'], '%Y-%m-%d %H:%M:%S.%f')
 #
@@ -62,7 +63,8 @@
 #         populator = GraphPopulator()
 #         try:
 #             query = self.rdb.query(Analysis).join(Version).join(Package). \
-#                 join(Ecosystem).order_by(Analysis.finished_at.asc()).filter(Analysis.finished_at >= last_time)
+#                 join(Ecosystem).order_by(Analysis.finished_at.asc()).filter(
+#                     Analysis.finished_at >= last_time)
 #             item = None
 #             for item in query:
 #                 d = item.to_dict()

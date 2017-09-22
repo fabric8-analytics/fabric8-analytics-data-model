@@ -61,7 +61,8 @@ def _import_keys_from_s3_http(data_source, epv_list):
                     first_key = contents['ver_key_prefix'] + '.json'
                     first_obj = _first_key_info(data_source, first_key, config.AWS_EPV_BUCKET)
                     obj.update(first_obj)
-                    ver_obj = _other_key_info(data_source, contents.get('ver_list_keys'), config.AWS_EPV_BUCKET)
+                    ver_obj = _other_key_info(data_source, contents.get('ver_list_keys'),
+                                              config.AWS_EPV_BUCKET)
                     if 'analyses' in obj:
                         obj.get('analyses', {}).update(ver_obj['analyses'])
                     else:
@@ -69,7 +70,8 @@ def _import_keys_from_s3_http(data_source, epv_list):
 
                 # Check Package related information and add it to package object
                 if len(contents.get('pkg_list_keys')) > 0:
-                    pkg_obj = _other_key_info(data_source, contents.get('pkg_list_keys'), config.AWS_PKG_BUCKET)
+                    pkg_obj = _other_key_info(data_source, contents.get('pkg_list_keys'),
+                                              config.AWS_PKG_BUCKET)
                     if 'analyses' in obj:
                         obj.get('analyses', {}).update(pkg_obj['analyses'])
                     else:
@@ -81,15 +83,19 @@ def _import_keys_from_s3_http(data_source, epv_list):
                 if str_gremlin:
                     # Fire Gremlin HTTP query now
                     logger.info("Ingestion initialized for EPV - " +
-                                obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
-                    epv.append(obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version'))
+                                obj.get('ecosystem') + ":" + obj.get('package') + ":" +
+                                obj.get('version'))
+                    epv.append(obj.get('ecosystem') + ":" + obj.get('package') + ":" +
+                               obj.get('version'))
                     payload = {'gremlin': str_gremlin}
-                    response = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload), timeout=30)
+                    response = requests.post(config.GREMLIN_SERVER_URL_REST,
+                                             data=json.dumps(payload), timeout=30)
                     resp = response.json()
 
                     if resp['status']['code'] == 200:
                         count_imported_EPVs += 1
-                        last_imported_EPV = obj.get('ecosystem') + ":" + obj.get('package') + ":" + obj.get('version')
+                        last_imported_EPV = (obj.get('ecosystem') + ":" + obj.get('package') +
+                                             ":" + obj.get('version'))
 
             except Exception as e:
                 msg = _get_exception_msg("The import failed", e)
@@ -138,13 +144,17 @@ def import_epv_http(data_source, list_epv, select_doc=None):
                 continue
             else:
                 # Get Package level keys
-                pkg_key_prefix = ver_key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/"
-                pkg_list_keys.extend(data_source.list_files(bucket_name=config.AWS_PKG_BUCKET, prefix=pkg_key_prefix))
+                pkg_key_prefix = ver_key_prefix = (epv.get('ecosystem') + "/" + epv.get('name') +
+                                                   "/")
+                pkg_list_keys.extend(data_source.list_files(bucket_name=config.AWS_PKG_BUCKET,
+                                                            prefix=pkg_key_prefix))
 
             if 'version' in epv and epv.get('version') is not None:
                 # Get EPV level keys
-                ver_key_prefix = epv.get('ecosystem') + "/" + epv.get('name') + "/" + epv.get('version')
-                ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET, prefix=ver_key_prefix + "/"))
+                ver_key_prefix = (epv.get('ecosystem') + "/" + epv.get('name') + "/" +
+                                  epv.get('version'))
+                ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET,
+                                                            prefix=ver_key_prefix + "/"))
             else:
                 epv['version'] = ''
             if select_doc is not None and len(select_doc) > 0:
@@ -179,8 +189,10 @@ def import_epv_http(data_source, list_epv, select_doc=None):
 
 def import_epv_from_s3_http(list_epv, select_doc=None):
     # if aws-keys are not provided we assume it is local
-    access_key = config.MINIO_ACCESS_KEY if config.AWS_S3_ACCESS_KEY_ID == "" else config.AWS_S3_ACCESS_KEY_ID
-    secret_key = config.MINIO_SECRET_KEY if config.AWS_S3_SECRET_ACCESS_KEY == "" else config.AWS_S3_SECRET_ACCESS_KEY
+    access_key = config.MINIO_ACCESS_KEY if config.AWS_S3_ACCESS_KEY_ID == "" \
+        else config.AWS_S3_ACCESS_KEY_ID
+    secret_key = config.MINIO_SECRET_KEY if config.AWS_S3_SECRET_ACCESS_KEY == "" \
+        else config.AWS_S3_SECRET_ACCESS_KEY
     config.AWS_S3_IS_LOCAL = True if config.AWS_S3_ACCESS_KEY_ID == "" else False
 
     return import_epv_http(S3DataSource(src_bucket_name=config.AWS_EPV_BUCKET,

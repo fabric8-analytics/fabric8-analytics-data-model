@@ -26,7 +26,8 @@ class BayesianGraph(object):
 
         logger.debug("BayesianGraph::execute(): %s", response)
         if response.status_code != 200:
-            logger.debug("ERROR %d(%s): %s" % (response.status_code, response.reason, json_response.get("message")))
+            logger.debug("ERROR %d(%s): %s" % (response.status_code, response.reason,
+                                               json_response.get("message")))
             return False, json_response
         else:
             return True, json_response
@@ -81,6 +82,3 @@ class BayesianGraph(object):
         with open(schema_file_path, 'r') as f:
             str_gremlin_dsl = f.read()
         return cls.execute(str_gremlin_dsl)
-
-
-

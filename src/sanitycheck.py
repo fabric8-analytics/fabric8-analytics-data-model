@@ -26,12 +26,13 @@ def test_http_connection():
 def time_remaining(start_time, current_time, max_delay=MAX_DELAY):
     return max_delay - (current_time - start_time)
 
+
 def main():
     waittime = 5
 
     start_time = time.time()
 
-    logger.info ("Connecting to HTTP...")
+    logger.info("Connecting to HTTP...")
     while time_remaining(start_time, time.time()) > 0:
         try:
             test_http_connection()
