@@ -15,7 +15,7 @@ class S3DataSource(AbstractDataSource):
             self.session = boto3.session.Session(aws_access_key_id=access_key,
                                                  aws_secret_access_key=secret_key,
                                                  region_name=self._DEFAULT_REGION_NAME)
-            endpoint_url = endpoint_url = "http://" + config.LOCAL_MINIO_ENDPOINT
+            endpoint_url = "http://" + config.LOCAL_MINIO_ENDPOINT
             self.s3_resource = self.session.resource('s3', config=botocore.client.Config(
                                                          signature_version='s3v4'),
                                                      use_ssl=False,

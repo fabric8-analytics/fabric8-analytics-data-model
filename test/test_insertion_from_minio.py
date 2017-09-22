@@ -63,8 +63,8 @@ def test_create_minio_bucket():
     except ResponseError as err:
         logger.error(err)
 
-    assert minioClient.bucket_exists(config.AWS_PKG_BUCKET) is True
-    assert minioClient.bucket_exists(config.AWS_EPV_BUCKET) is True
+    assert minioClient.bucket_exists(config.AWS_PKG_BUCKET)
+    assert minioClient.bucket_exists(config.AWS_EPV_BUCKET)
 
 
 def test_insertion():
