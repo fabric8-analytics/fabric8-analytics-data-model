@@ -13,13 +13,17 @@ logger = logging.getLogger(__name__)
 # populate schema if not already done
 try:
     status, json_result = BayesianGraph.populate_schema()
-    if status:
-        logger.info("Graph Schema Created")
-    else:
-        logger.error(json_result)
-        raise RuntimeError("Failed to setup graph schema")
-except Exception:
-    raise RuntimeError("Failed to initialize graph schema")
+except Exception as exc:
+    # Py2 compatibility: switch to "from exc" once we're on Py3
+    new_exc = RuntimeError("Failed to initialize graph schema")
+    new_exc.__cause__ = exc
+    raise new_exc
+
+if status:
+    logger.info("Graph Schema Created")
+else:
+    logger.error(json_result)
+    raise RuntimeError("Failed to setup graph schema")
 
 
 def test_create_minio_bucket():
