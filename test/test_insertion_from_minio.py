@@ -21,6 +21,7 @@ try:
 except:
     raise RuntimeError("Failed to initialize graph schema")
 
+
 def test_create_minio_bucket():
     # Create Necessary Config Parameters
     config.AWS_PKG_BUCKET = "test-bayesian-core-package-data"
@@ -45,11 +46,14 @@ def test_create_minio_bucket():
                                 'test/data/S3-data/pypi/access_points/github_details.json')
         minioClient.fput_object(config.AWS_PKG_BUCKET, 'pypi/access_points/libraries_io.json',
                                 'test/data/S3-data/pypi/access_points/libraries_io.json')
-        minioClient.fput_object(config.AWS_EPV_BUCKET, 'pypi/access_points/0.4.59/code_metrics.json',
+        minioClient.fput_object(config.AWS_EPV_BUCKET,
+                                'pypi/access_points/0.4.59/code_metrics.json',
                                 'test/data/S3-data/pypi/access_points/0.4.59/code_metrics.json')
-        minioClient.fput_object(config.AWS_EPV_BUCKET, 'pypi/access_points/0.4.59/security_issues.json',
+        minioClient.fput_object(config.AWS_EPV_BUCKET,
+                                'pypi/access_points/0.4.59/security_issues.json',
                                 'test/data/S3-data/pypi/access_points/0.4.59/security_issues.json')
-        minioClient.fput_object(config.AWS_EPV_BUCKET, 'pypi/access_points/0.4.59/source_licenses.json',
+        minioClient.fput_object(config.AWS_EPV_BUCKET,
+                                'pypi/access_points/0.4.59/source_licenses.json',
                                 'test/data/S3-data/pypi/access_points/0.4.59/source_licenses.json')
         minioClient.fput_object(config.AWS_EPV_BUCKET, 'pypi/access_points/0.4.59/metadata.json',
                                 'test/data/S3-data/pypi/access_points/0.4.59/metadata.json')
@@ -59,8 +63,9 @@ def test_create_minio_bucket():
     except ResponseError as err:
         logger.error(err)
 
-    assert(minioClient.bucket_exists(config.AWS_PKG_BUCKET) == True)
-    assert(minioClient.bucket_exists(config.AWS_EPV_BUCKET) == True)
+    assert minioClient.bucket_exists(config.AWS_PKG_BUCKET)
+    assert minioClient.bucket_exists(config.AWS_EPV_BUCKET)
+
 
 def test_insertion():
 
@@ -74,10 +79,9 @@ def test_insertion():
     try:
         report = import_epv_from_s3_http(list_epv)
         logger.info(report)
-        assert(report['status'] == "Success")
-        assert(report["epv"] == ["pypi:access_points:0.4.59"])
-        assert(report["count_imported_EPVs"] == 1)
+        assert report['status'] == "Success"
+        assert report["epv"] == ["pypi:access_points:0.4.59"]
+        assert report["count_imported_EPVs"] == 1
     except:
         tb = traceback.format_exc()
         logger.error("Traceback for latest failure in import call: %s" % tb)
-

@@ -4,6 +4,7 @@ import boto3
 import json
 import config
 
+
 class S3DataSource(AbstractDataSource):
     _DEFAULT_REGION_NAME = 'us-east-1'
 
@@ -11,13 +12,19 @@ class S3DataSource(AbstractDataSource):
         self.is_local = config.AWS_S3_IS_LOCAL
 
         if self.is_local:
-            self.session = boto3.session.Session(aws_access_key_id=access_key, aws_secret_access_key=secret_key,
+            self.session = boto3.session.Session(aws_access_key_id=access_key,
+                                                 aws_secret_access_key=secret_key,
                                                  region_name=self._DEFAULT_REGION_NAME)
-            self.s3_resource = self.session.resource('s3', config=botocore.client.Config(signature_version='s3v4'),
-                                                     use_ssl=False, endpoint_url="http://"+config.LOCAL_MINIO_ENDPOINT)
+            endpoint_url = "http://" + config.LOCAL_MINIO_ENDPOINT
+            self.s3_resource = self.session.resource('s3', config=botocore.client.Config(
+                                                         signature_version='s3v4'),
+                                                     use_ssl=False,
+                                                     endpoint_url=endpoint_url)
         else:
-            self.session = boto3.session.Session(aws_access_key_id=access_key, aws_secret_access_key=secret_key)
-            self.s3_resource = self.session.resource('s3', config=botocore.client.Config(signature_version='s3v4'))
+            self.session = boto3.session.Session(aws_access_key_id=access_key,
+                                                 aws_secret_access_key=secret_key)
+            self.s3_resource = self.session.resource('s3', config=botocore.client.Config(
+                signature_version='s3v4'))
 
         self.bucket_name = src_bucket_name
 
@@ -55,5 +62,5 @@ class S3DataSource(AbstractDataSource):
             for obj in bucket.objects.filter(Prefix=prefix):
                 if obj.key.endswith('.json'):
                     list_filenames.append(obj.key)
-        
+
         return list_filenames
