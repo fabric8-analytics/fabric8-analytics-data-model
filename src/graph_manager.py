@@ -51,10 +51,7 @@ class BayesianGraph(object):
         i != null
         """
         status, json_result = cls.execute(str_gremlin_dsl)
-        if not status:
-            return False
-        else:
-            return cls.return_json_response_data(json_result)
+        return cls.return_json_response_data(json_result) if status else False
 
     @classmethod
     def is_schema_defined(cls):
@@ -69,10 +66,7 @@ class BayesianGraph(object):
         k != null
         """
         status, json_result = cls.execute(str_gremlin_dsl)
-        if not status:
-            return False
-        else:
-            return cls.return_json_response_data(json_result)
+        return cls.return_json_response_data(json_result) if status else False
 
     @classmethod
     def populate_schema(cls):

@@ -38,9 +38,7 @@ def test_create_minio_bucket():
     try:
         minioClient.make_bucket(config.AWS_EPV_BUCKET, location="us-east-1")
         minioClient.make_bucket(config.AWS_PKG_BUCKET, location="us-east-1")
-    except BucketAlreadyOwnedByYou as err:
-        pass
-    except BucketAlreadyExists as err:
+    except (BucketAlreadyOwnedByYou, BucketAlreadyExists):
         pass
     except ResponseError as err:
         logger.error(err)
