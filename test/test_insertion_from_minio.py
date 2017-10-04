@@ -18,7 +18,7 @@ try:
     else:
         logger.error(json_result)
         raise RuntimeError("Failed to setup graph schema")
-except:
+except Exception:
     raise RuntimeError("Failed to initialize graph schema")
 
 
@@ -82,6 +82,6 @@ def test_insertion():
         assert report['status'] == "Success"
         assert report["epv"] == ["pypi:access_points:0.4.59"]
         assert report["count_imported_EPVs"] == 1
-    except:
+    except Exception:
         tb = traceback.format_exc()
         logger.error("Traceback for latest failure in import call: %s" % tb)
