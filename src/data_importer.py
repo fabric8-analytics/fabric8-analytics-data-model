@@ -136,7 +136,6 @@ def import_epv_http(data_source, list_epv, select_doc=None):
         # Collect relevant files from data-source and group them by package-version.
         list_keys = []
         for epv in list_epv:
-            dict_keys = {}
             ver_list_keys = []
             pkg_list_keys = []
 
@@ -163,6 +162,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
                 ver_list_keys = list(set(ver_list_keys).intersection(set(select_ver_doc)))
                 pkg_list_keys = list(set(pkg_list_keys).intersection(set(select_pkg_doc)))
 
+            dict_keys = {}
             dict_keys[pkg_key_prefix] = {
                 'ver_list_keys': ver_list_keys,
                 'ver_key_prefix': ver_key_prefix,
@@ -193,7 +193,6 @@ def import_epv_from_s3_http(list_epv, select_doc=None):
         else config.AWS_S3_ACCESS_KEY_ID
     secret_key = config.MINIO_SECRET_KEY if config.AWS_S3_SECRET_ACCESS_KEY == "" \
         else config.AWS_S3_SECRET_ACCESS_KEY
-    config.AWS_S3_IS_LOCAL = True if config.AWS_S3_ACCESS_KEY_ID == "" else False
 
     return import_epv_http(S3DataSource(src_bucket_name=config.AWS_EPV_BUCKET,
                                         access_key=access_key,
