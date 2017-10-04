@@ -18,7 +18,7 @@ class GraphPopulator(object):
                 description = input_json.get('analyses').get('metadata').get('details')[0].get(
                     'description', '')
                 description = description.replace("'", "\\'")
-        except:
+        except Exception:
             # we pass and move forward without description
             pass
 
@@ -211,7 +211,7 @@ class GraphPopulator(object):
                                    str(time.mktime(datetime.strptime(libio_latest_release,
                                                                      '%b %d, %Y').timetuple())) + \
                                    "');"
-                except:
+                except Exception:
                     # We pass if we do not get timestamp information in required format
                     pass
 
@@ -247,7 +247,7 @@ class GraphPopulator(object):
                                    "property('gh_release_date'," + \
                                    str(time.mktime(datetime.strptime(release,
                                                    '%b %d, %Y').timetuple())) + ");"
-            except:
+            except Exception:
                 # We pass if we do not get timestamp information in required format
                 pass
 
