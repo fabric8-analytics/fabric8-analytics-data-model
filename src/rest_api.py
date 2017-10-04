@@ -27,7 +27,7 @@ try:
     else:
         app.logger.error(json_result)
         raise RuntimeError("Failed to setup graph schema")
-except:
+except Exception:
     raise RuntimeError("Failed to initialized graph schema")
 
 
