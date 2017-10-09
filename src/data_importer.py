@@ -162,16 +162,14 @@ def import_epv_http(data_source, list_epv, select_doc=None):
                 ver_list_keys = list(set(ver_list_keys).intersection(set(select_ver_doc)))
                 pkg_list_keys = list(set(pkg_list_keys).intersection(set(select_pkg_doc)))
 
-            dict_keys = {}
-            dict_keys[pkg_key_prefix] = {
+            dict_keys = {pkg_key_prefix: {
                 'ver_list_keys': ver_list_keys,
                 'ver_key_prefix': ver_key_prefix,
                 'pkg_list_keys': pkg_list_keys,
                 'pkg_key_prefix': pkg_key_prefix,
                 'package': epv.get('name'),
                 'version': epv.get('version', ''),
-                'ecosystem': epv.get('ecosystem')
-            }
+                'ecosystem': epv.get('ecosystem')}}
 
             list_keys.append(dict_keys)
 
