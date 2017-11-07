@@ -26,7 +26,7 @@ class BayesianGraph(object):
 
         logger.debug("BayesianGraph::execute(): %s", response)
         if response.status_code != 200:
-            logger.debug("ERROR %d(%s): %s" % (response.status_code, response.reason,
+            logger.error("ERROR %d(%s): %s" % (response.status_code, response.reason,
                                                json_response.get("message")))
             return False, json_response
         else:

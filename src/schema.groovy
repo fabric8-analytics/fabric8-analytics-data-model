@@ -266,6 +266,13 @@
             has_code_metrics = mgmt.makeEdgeLabel('has_code_metrics').make();
         }
 
+        has_tagged = mgmt.getEdgeLabel('has_tagged');
+        if(has_tagged == null) {
+            has_tagged = mgmt.makeEdgeLabel('has_tagged').make();
+        }
+
+        // # for github
+
         gh_issues_opened_last_year = mgmt.getPropertyKey('gh_issues_opened_last_year');
         if(gh_issues_opened_last_year == null) {
             gh_issues_opened_last_year = mgmt.makePropertyKey('gh_issues_opened_last_year').dataType(Integer.class).make();
@@ -373,10 +380,14 @@
             vulnerability_updated_date = mgmt.makePropertyKey('vulnerability_updated_date').dataType(String.class).make();
         }
 
+        // for component search
+
         tokens = mgmt.getPropertyKey('tokens');
         if(tokens == null) {
             tokens = mgmt.makePropertyKey('tokens').dataType(String.class).cardinality(Cardinality.SET).make();
         }
+
+        // for intents
 
         topics = mgmt.getPropertyKey('topics');
         if(topics == null) {
@@ -387,6 +398,8 @@
         if(categories == null) {
             categories = mgmt.makePropertyKey('categories').dataType(String.class).cardinality(Cardinality.SET).make();
         }
+
+        // for libraries.io data
 
         libio_dependents_projects = mgmt.getPropertyKey('libio_dependents_projects');
         if(libio_dependents_projects == null){
@@ -438,6 +451,8 @@
             libio_usedby = mgmt.makePropertyKey('libio_usedby').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
+        // user related properties
+
         userid = mgmt.getPropertyKey('userid');
         if(userid == null) {
             userid = mgmt.makePropertyKey('userid').dataType(String.class).make();
@@ -457,6 +472,29 @@
         if(osio_usage_count == null) {
             osio_usage_count = mgmt.makePropertyKey('osio_usage_count').dataType(Integer.class).make();
         }
+
+        // Manual tags related properties
+
+        tags = mgmt.getPropertyKey('tags');
+        if(tags == null) {
+            tags = mgmt.makePropertyKey('tags').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        user_tags = mgmt.getPropertyKey('user_tags');
+        if(user_tags == null) {
+            user_tags = mgmt.makePropertyKey('user_tags').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        tags_count = mgmt.getPropertyKey('tags_count');
+        if(tags_count == null) {
+            tags_count = mgmt.makePropertyKey('tags_count').dataType(Integer.class).make();
+        }
+
+        manual_tagging_required = mgmt.getPropertyKey('manual_tagging_required');
+        if(manual_tagging_required == null) {
+            manual_tagging_required = mgmt.makePropertyKey('manual_tagging_required').dataType(Boolean.class).make();
+        }
+
 
         // # for indexes
         if(null == mgmt.getGraphIndex('CVEidIndex')) {
@@ -481,6 +519,14 @@
 
         if(null == mgmt.getGraphIndex('CompanyIndex')) {
             mgmt.buildIndex('CompanyIndex', Vertex.class).addKey(company).buildCompositeIndex();
+        }
+
+        if(null == mgmt.getGraphIndex('TagEcosystemIndex')) {
+            mgmt.buildIndex('TagEcosystemIndex', Vertex.class).addKey(manual_tagging_required).addKey(ecosystem).buildCompositeIndex();
+        }
+
+        if(null == mgmt.getGraphIndex('TagEcosystemCountIndex')) {
+            mgmt.buildIndex('TagEcosystemCountIndex', Vertex.class).addKey(manual_tagging_required).addKey(ecosystem).buildCompositeIndex();
         }
 
         List<String> allKeys = [
@@ -549,7 +595,11 @@
                 //'user_id',
                 //'company',
                 'recent_requests',
-                //'osio_usage_count'
+                //'osio_usage_count',
+                'manual_tagging_required',
+                'tags',
+                'user_tags',
+                'tags_count'
         ]
 
         allKeys.each { k ->
