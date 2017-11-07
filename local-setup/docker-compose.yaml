@@ -12,7 +12,7 @@ services:
       restart: always
 
     gremlin-http:
-      image: registry.centos.org/datamodel/gremlin:concaf
+      image: registry.devshift.net/bayesian/gremlin 
       volumes:
         - ./scripts:/scripts:z
       entrypoint: /scripts/new-entrypoint.sh
