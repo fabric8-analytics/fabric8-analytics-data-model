@@ -525,10 +525,6 @@
             mgmt.buildIndex('TagEcosystemIndex', Vertex.class).addKey(manual_tagging_required).addKey(ecosystem).buildCompositeIndex();
         }
 
-        if(null == mgmt.getGraphIndex('TagEcosystemCountIndex')) {
-            mgmt.buildIndex('TagEcosystemCountIndex', Vertex.class).addKey(manual_tagging_required).addKey(ecosystem).buildCompositeIndex();
-        }
-
         List<String> allKeys = [
                 'ecosystem',
                 'name',
