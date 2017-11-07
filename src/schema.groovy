@@ -26,6 +26,8 @@
             latest_version = mgmt.makePropertyKey('latest_version').dataType(String.class).make();
         }
 
+        // package github details
+
         gh_stargazers = mgmt.getPropertyKey('gh_stargazers');
         if(gh_stargazers == null) {
             gh_stargazers = mgmt.makePropertyKey('gh_stargazers').dataType(Integer.class).make();
@@ -39,6 +41,11 @@
         gh_subscribers_count = mgmt.getPropertyKey('gh_subscribers_count');
         if(gh_subscribers_count == null) {
             gh_subscribers_count = mgmt.makePropertyKey('gh_subscribers_count').dataType(Integer.class).make();
+        }
+
+        gh_contributors_count = mgmt.getPropertyKey('gh_contributors_count');
+        if(gh_contributors_count == null) {
+            gh_contributors_count = mgmt.makePropertyKey('gh_contributors_count').dataType(Integer.class).make();
         }
 
         gh_forks = mgmt.getPropertyKey('gh_forks');
@@ -92,6 +99,8 @@
             shipped_as_downstream = mgmt.makePropertyKey('shipped_as_downstream').dataType(Boolean.class).make();
         }
 
+        // for licenses
+
         licenses = mgmt.getPropertyKey('licenses');
         if(licenses == null) {
             licenses = mgmt.makePropertyKey('licenses').dataType(String.class).cardinality(Cardinality.SET).make();
@@ -107,6 +116,8 @@
             libio_licenses = mgmt.makePropertyKey('libio_licenses').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
+        // for CVEs
+
         cve_ids = mgmt.getPropertyKey('cve_ids');
         if(cve_ids == null) {
             cve_ids = mgmt.makePropertyKey('cve_ids').dataType(String.class).cardinality(Cardinality.SET).make();
@@ -116,6 +127,8 @@
         if(cvss_scores == null) {
             cvss_scores =  mgmt.makePropertyKey('cvss_scores').dataType(Float.class).cardinality(Cardinality.SET).make();
         }
+
+        // for code metrics
 
         cm_loc = mgmt.getPropertyKey('cm_loc');
         if(cm_loc == null) {
@@ -131,6 +144,8 @@
         if(cm_avg_cyclomatic_complexity == null) {
             cm_avg_cyclomatic_complexity = mgmt.makePropertyKey('cm_avg_cyclomatic_complexity').dataType(Float.class).make();
         }
+
+        // downstream usage
 
         relative_used = mgmt.getPropertyKey('relative_used');
         if(relative_used == null) {
@@ -534,6 +549,7 @@
                 //'gh_stargazers',
                 //'gh_open_issues_count',
                 //'gh_subscribers_count',
+                //'gh_contributors_count',
                 'pname',
                 'pecosystem',
                 'version',
