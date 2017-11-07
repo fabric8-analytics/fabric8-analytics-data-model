@@ -160,6 +160,7 @@ class GraphPopulator(object):
             gh_stargazers = str(gh_details.get('stargazers_count', -1))
             gh_open_issues_count = str(gh_details.get('open_issues_count', -1))
             gh_subscribers_count = str(gh_details.get('subscribers_count', -1))
+            gh_contributors_count = str(gh_details.get('contributors_count', -1))
 
             prp_package += "pkg.property('gh_prs_last_year_opened', " + \
                            gh_prs_last_year_opened + ");" \
@@ -180,7 +181,8 @@ class GraphPopulator(object):
                            "pkg.property('gh_forks', " + gh_forks + ");" \
                            "pkg.property('gh_stargazers', " + gh_stargazers + ");" \
                            "pkg.property('gh_open_issues_count', " + gh_open_issues_count + ");" \
-                           "pkg.property('gh_subscribers_count', " + gh_subscribers_count + ");"
+                           "pkg.property('gh_subscribers_count', " + gh_subscribers_count + ");" \
+                           "pkg.property('gh_contributors_count', " + gh_contributors_count + ");"
 
         # Add tokens for a package
         for tkn in pkg_name_tokens:
