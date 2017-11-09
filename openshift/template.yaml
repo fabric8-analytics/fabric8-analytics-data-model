@@ -111,7 +111,7 @@ objects:
     test: false
     triggers:
     - type: ConfigChange
-    replicas: ${REPLICAS}
+    replicas: ${{REPLICAS}}
 
 parameters:
 - description: Port number that data importer service will listen to
