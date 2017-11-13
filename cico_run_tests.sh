@@ -9,3 +9,4 @@ build_image
 
 ./runtests.sh
 
+push_image
