@@ -29,13 +29,6 @@ class GraphPopulator(object):
             drop_props.append('licenses')
         if 'success' == input_json.get('analyses', {}).get('security_issues', {}).get('status'):
             drop_props.append('cve_ids')
-        if len(drop_props) > 0:
-            # TODO use str.format() instead of concatenation by +
-            drop_prop += "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + \
-                         pkg_name + "')" \
-                         ".has('version','" + version + "').properties('" + \
-                         "','".join(drop_props) + "')." \
-                         "drop().iterate();" \
 
         # TODO use str.format() instead of concatenation by +
         str_version += "ver = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + \
@@ -103,6 +96,9 @@ class GraphPopulator(object):
                     # string with comma separated license names
                     declared_licenses = details[0]['declared_license'].split(',')
 
+                # Clear declared licenses field before refreshing
+                drop_props.append('declared_licenses')
+
                 prp_version += " ".join(map(lambda x: "ver.property('declared_licenses', '" + x +
                                         "');", declared_licenses))
                 # Create License Node and edge from EPV
@@ -116,6 +112,12 @@ class GraphPopulator(object):
                                    "').tryNext()." \
                                    "orElseGet{ver.addEdge('has_declared_license', lic)};"
 
+        if len(drop_props) > 0:
+            # TODO use str.format() instead of concatenation by +
+            drop_prop += "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + \
+                         pkg_name + "').has('version','" + version + "').properties('" + \
+                         "','".join(drop_props) + "').drop().iterate();"
+
         str_version = drop_prop + str_version + prp_version if prp_version else ''
 
         return str_version
@@ -125,7 +127,10 @@ class GraphPopulator(object):
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
         pkg_name_tokens = re.split('\W+', pkg_name)
+        print(pkg_name_tokens)
         prp_package = ""
+        drop_prop = ""
+        drop_props = []
         str_package = "pkg = g.V().has('ecosystem','" + ecosystem + "').has('name','" + \
                       pkg_name + "').tryNext()" \
                       ".orElseGet{graph.addVertex('ecosystem', '" + ecosystem + "', 'name', '" + \
@@ -185,6 +190,8 @@ class GraphPopulator(object):
                            "pkg.property('gh_contributors_count', " + gh_contributors_count + ");"
 
         # Add tokens for a package
+        if pkg_name_tokens:
+            drop_props.append('tokens')
         for tkn in pkg_name_tokens:
             if tkn:
                 str_package += "pkg.property('tokens', '" + tkn + "');"
@@ -216,6 +223,10 @@ class GraphPopulator(object):
                 except Exception:
                     # We pass if we do not get timestamp information in required format
                     pass
+
+            if input_json.get('analyses').get('libraries_io').get('details', {})\
+                    .get('dependent_repositories', {}).get('top', {}):
+                drop_props.append('libio_usedby')
 
             for key, val in input_json.get('analyses').get('libraries_io').get('details', {}) \
                                       .get('dependent_repositories', {}).get('top', {}).items():
@@ -253,7 +264,14 @@ class GraphPopulator(object):
                 # We pass if we do not get timestamp information in required format
                 pass
 
-        return str_package, prp_package
+        # Refresh the properties whereever applicable
+        if len(drop_props) > 0:
+            # TODO use str.format() instead of concatenation by +
+            drop_prop += "g.V().has('ecosystem','" + ecosystem + "').has('name','" + \
+                         pkg_name + "').properties('" + \
+                         "','".join(drop_props) + "').drop().iterate();"
+
+        return drop_prop + str_package, prp_package
 
     @classmethod
     def create_query_string(cls, input_json):
