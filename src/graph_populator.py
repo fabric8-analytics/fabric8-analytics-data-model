@@ -127,7 +127,6 @@ class GraphPopulator(object):
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
         pkg_name_tokens = re.split('\W+', pkg_name)
-        print(pkg_name_tokens)
         prp_package = ""
         drop_prop = ""
         drop_props = []
