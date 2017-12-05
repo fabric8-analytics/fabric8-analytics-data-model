@@ -30,7 +30,6 @@ class GraphPopulator(object):
         if 'success' == input_json.get('analyses', {}).get('security_issues', {}).get('status'):
             drop_props.append('cve_ids')
 
-        # TODO use str.format() instead of concatenation by +
         str_version += "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', '{pkg_name}')." \
                        "has('version', '{version}').tryNext().orElseGet{{" \
                        "graph.addVertex('pecosystem','{ecosystem}', 'pname','{pkg_name}', " \
@@ -61,7 +60,6 @@ class GraphPopulator(object):
                          .get('total_lines', -1))
             cm_num_files = str(input_json.get('analyses').get('code_metrics').get('summary', {})
                                .get('total_files', -1))
-            # TODO use str.format() instead of concatenation by +
             prp_version += "ver.property('cm_num_files',{cm_num_files});" \
                            "ver.property('cm_avg_cyclomatic_complexity', " + \
                            "{cm_avg_cyclomatic_complexity});" \
@@ -111,7 +109,6 @@ class GraphPopulator(object):
                                          (dl) for dl in declared_licenses])
                 # Create License Node and edge from EPV
                 for lic in declared_licenses:
-                    # TODO use str.format() instead of concatenation by +
                     prp_version += "lic = g.V().has('lname', '{lic}').tryNext().orElseGet{{" \
                                    "graph.addVertex('vertex_label', 'License', 'lname', '{lic}', " \
                                    "'last_updated',{last_updated})}}; g.V(ver).out(" \
@@ -121,7 +118,6 @@ class GraphPopulator(object):
                                    )
 
         if len(drop_props) > 0:
-            # TODO use str.format() instead of concatenation by +
             drop_prop += "g.V().has('pecosystem','{ecosystem}').has('pname','{pkg_name}')." \
                          "has('version','{version}').properties('{p}').drop().iterate();".format(
                             ecosystem=ecosystem, pkg_name=pkg_name, version=version,
@@ -265,7 +261,6 @@ class GraphPopulator(object):
             # Update EPV Github Release Date based on libraries_io data
             try:
                 if libio_latest_release:
-                    # TODO use str.format() instead of concatenation by +
                     prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
                                    "'{pkg_name}')." \
                                    "has('version','{libio_latest_version}')." \
@@ -278,7 +273,6 @@ class GraphPopulator(object):
                 for version, release in input_json.get('analyses').get('libraries_io') \
                                                   .get('details', {}).get('releases', {}) \
                                                   .get('latest', {}).get('recent', {}).items():
-                    # TODO use str.format() instead of concatenation by +
                     prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
                                    "'{pkg_name}').has('version','{version}')." \
                                    "property('gh_release_date',{gh_rel});".format(
@@ -292,7 +286,6 @@ class GraphPopulator(object):
 
         # Refresh the properties whereever applicable
         if len(drop_props) > 0:
-            # TODO use str.format() instead of concatenation by +
             drop_prop += "g.V().has('ecosystem','{ecosystem}').has('name'," \
                          "'{pkg_name}').properties('{p}').drop().iterate();".format(
                             ecosystem=ecosystem, pkg_name=pkg_name, p="','".join(drop_props)
