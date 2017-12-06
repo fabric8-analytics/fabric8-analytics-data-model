@@ -30,17 +30,20 @@ class GraphPopulator(object):
         if 'success' == input_json.get('analyses', {}).get('security_issues', {}).get('status'):
             drop_props.append('cve_ids')
 
-        # TODO use str.format() instead of concatenation by +
-        str_version += "ver = g.V().has('pecosystem','" + ecosystem + "').has('pname','" + \
-                       pkg_name + "').has('version','" + version + \
-                       "').tryNext().orElseGet{graph.addVertex('pecosystem','" \
-                       + ecosystem + "', 'pname','" + pkg_name + "', 'version','" + \
-                       version + "', 'vertex_label', 'Version')};" \
-                       "ver.property('last_updated'," + str(time.time()) + ");"
+        str_version += "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', '{pkg_name}')." \
+                       "has('version', '{version}').tryNext().orElseGet{{" \
+                       "graph.addVertex('pecosystem','{ecosystem}', 'pname','{pkg_name}', " \
+                       "'version', '{version}', 'vertex_label', 'Version')}};" \
+                       "ver.property('last_updated',{last_updated});".format(
+                            ecosystem=ecosystem, pkg_name=pkg_name, version=version,
+                            last_updated=str(time.time())
+                       )
+
         # Add Description if not blank
         if description:
-            prp_version += "ver.property('description','" + re.sub('[^A-Za-z0-9_\\\/\'":. ]', '',
-                                                                   description) + "');"
+            prp_version += "ver.property('description','{description}');".format(
+                description=re.sub('[^A-Za-z0-9_\\\/\'":. ]', '', description)
+            )
         # Get Code Metrics Details
         if 'code_metrics' in input_json.get('analyses', {}):
             count = 0
@@ -57,32 +60,35 @@ class GraphPopulator(object):
                          .get('total_lines', -1))
             cm_num_files = str(input_json.get('analyses').get('code_metrics').get('summary', {})
                                .get('total_files', -1))
-            # TODO use str.format() instead of concatenation by +
-            prp_version += "ver.property('cm_num_files'," + cm_num_files + ");" \
-                           "ver.property('cm_avg_cyclomatic_complexity'," + \
-                           cm_avg_cyclomatic_complexity + ");" \
-                           "ver.property('cm_loc'," + str(cm_loc) + ");"
+            prp_version += "ver.property('cm_num_files',{cm_num_files});" \
+                           "ver.property('cm_avg_cyclomatic_complexity', " + \
+                           "{cm_avg_cyclomatic_complexity});" \
+                           "ver.property('cm_loc',{cm_loc});".format(
+                               cm_num_files=cm_num_files, cm_loc=str(cm_loc),
+                               cm_avg_cyclomatic_complexity=cm_avg_cyclomatic_complexity
+                           )
 
         # Get downstream details
 
         if len(input_json.get('analyses', {}).get('redhat_downstream', {})
                .get('summary', {}).get('all_rhsm_product_names', [])) > 0:
             shipped_as_downstream = 'true'
-            prp_version += "ver.property('shipped_as_downstream'," + shipped_as_downstream + ");"
+            prp_version += "ver.property('shipped_as_downstream',{shipped_as_downstream});".format(
+                shipped_as_downstream=shipped_as_downstream
+            )
 
         # Add license details
         if 'source_licenses' in input_json.get('analyses', {}):
             licenses = input_json.get('analyses').get('source_licenses').get('summary', {}) \
                                      .get('sure_licenses', [])
-            prp_version += " ".join(map(lambda x: "ver.property('licenses', '" + x + "');",
-                                        licenses))
+            prp_version += " ".join(["ver.property('licenses', '{}');".format(l) for l in licenses])
 
         # Add CVE property if it exists
         if 'security_issues' in input_json.get('analyses', {}):
             cves = []
             for cve in input_json.get('analyses', {}).get('security_issues', {}).get('details', []):
                 cves.append(cve.get('id') + ":" + str(cve.get('cvss', {}).get('score')))
-            prp_version += " ".join(map(lambda x: "ver.property('cve_ids', '" + x + "');", cves))
+            prp_version += " ".join(["ver.property('cve_ids', '{}');".format(c) for c in cves])
 
         # Get Metadata Details
         if 'metadata' in input_json.get('analyses', {}):
@@ -99,24 +105,24 @@ class GraphPopulator(object):
                 # Clear declared licenses field before refreshing
                 drop_props.append('declared_licenses')
 
-                prp_version += " ".join(map(lambda x: "ver.property('declared_licenses', '" + x +
-                                        "');", declared_licenses))
+                prp_version += " ".join(["ver.property('declared_licenses', '{}');".format
+                                         (dl) for dl in declared_licenses])
                 # Create License Node and edge from EPV
                 for lic in declared_licenses:
-                    # TODO use str.format() instead of concatenation by +
-                    prp_version += "lic = g.V().has('lname','" + lic + "').tryNext()." \
-                                   "orElseGet{graph.addVertex('vertex_label', " \
-                                   "'License', 'lname', '" + lic + "', " \
-                                   "'last_updated'," + str(time.time()) + ")};" \
-                                   "g.V(ver).out('has_declared_license').has('lname', '" + lic + \
-                                   "').tryNext()." \
-                                   "orElseGet{ver.addEdge('has_declared_license', lic)};"
+                    prp_version += "lic = g.V().has('lname', '{lic}').tryNext().orElseGet{{" \
+                                   "graph.addVertex('vertex_label', 'License', 'lname', '{lic}', " \
+                                   "'last_updated',{last_updated})}}; g.V(ver).out(" \
+                                   "'has_declared_license').has('lname', '{lic}').tryNext()." \
+                                   "orElseGet{{ver.addEdge('has_declared_license', lic)}};".format(
+                                       lic=lic, last_updated=str(time.time())
+                                   )
 
         if len(drop_props) > 0:
-            # TODO use str.format() instead of concatenation by +
-            drop_prop += "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + \
-                         pkg_name + "').has('version','" + version + "').properties('" + \
-                         "','".join(drop_props) + "').drop().iterate();"
+            drop_prop += "g.V().has('pecosystem','{ecosystem}').has('pname','{pkg_name}')." \
+                         "has('version','{version}').properties('{p}').drop().iterate();".format(
+                            ecosystem=ecosystem, pkg_name=pkg_name, version=version,
+                            p="','".join(drop_props)
+                         )
 
         str_version = drop_prop + str_version + prp_version if prp_version else ''
 
@@ -130,16 +136,16 @@ class GraphPopulator(object):
         prp_package = ""
         drop_prop = ""
         drop_props = []
-        str_package = "pkg = g.V().has('ecosystem','" + ecosystem + "').has('name','" + \
-                      pkg_name + "').tryNext()" \
-                      ".orElseGet{graph.addVertex('ecosystem', '" + ecosystem + "', 'name', '" + \
-                      pkg_name + "', " \
-                      "'vertex_label', 'Package')};" \
-                      "pkg.property('last_updated', " + str(time.time()) + ");"
+        str_package = "pkg = g.V().has('ecosystem','{ecosystem}').has('name', '{pkg_name}')." \
+                      "tryNext().orElseGet{{graph.addVertex('ecosystem', '{ecosystem}', 'name', " \
+                      "'{pkg_name}', 'vertex_label', 'Package')}};" \
+                      "pkg.property('last_updated', {last_updated});".format(
+                        ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time())
+                      )
 
         latest_version = input_json.get('latest_version') or ''
         if latest_version:
-            prp_package += "pkg.property('latest_version', '" + latest_version + "');"
+            prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
 
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):
@@ -166,34 +172,42 @@ class GraphPopulator(object):
             gh_subscribers_count = str(gh_details.get('subscribers_count', -1))
             gh_contributors_count = str(gh_details.get('contributors_count', -1))
 
-            prp_package += "pkg.property('gh_prs_last_year_opened', " + \
-                           gh_prs_last_year_opened + ");" \
-                           "pkg.property('gh_prs_last_month_opened', " + \
-                           gh_prs_last_month_opened + ");" \
-                           "pkg.property('gh_prs_last_year_closed', " + \
-                           gh_prs_last_year_closed + ");" \
-                           "pkg.property('gh_prs_last_month_closed', " + \
-                           gh_prs_last_month_closed + ");" \
-                           "pkg.property('gh_issues_last_year_opened', " + \
-                           gh_issues_last_year_opened + ");" \
-                           "pkg.property('gh_issues_last_month_opened', " + \
-                           gh_issues_last_month_opened + ");" \
-                           "pkg.property('gh_issues_last_year_closed', " + \
-                           gh_issues_last_year_closed + ");" \
-                           "pkg.property('gh_issues_last_month_closed', " + \
-                           gh_issues_last_month_closed + ");" \
-                           "pkg.property('gh_forks', " + gh_forks + ");" \
-                           "pkg.property('gh_stargazers', " + gh_stargazers + ");" \
-                           "pkg.property('gh_open_issues_count', " + gh_open_issues_count + ");" \
-                           "pkg.property('gh_subscribers_count', " + gh_subscribers_count + ");" \
-                           "pkg.property('gh_contributors_count', " + gh_contributors_count + ");"
+            prp_package += "pkg.property('gh_prs_last_year_opened', {gh_prs_last_year_opened});" \
+                           "pkg.property('gh_prs_last_month_opened', {gh_prs_last_month_opened});" \
+                           "pkg.property('gh_prs_last_year_closed', {gh_prs_last_year_closed});" \
+                           "pkg.property('gh_prs_last_month_closed', {gh_prs_last_month_closed});" \
+                           "pkg.property('gh_issues_last_year_opened', " \
+                           "{gh_issues_last_year_opened});" \
+                           "pkg.property('gh_issues_last_month_opened', " \
+                           "{gh_issues_last_month_opened});" \
+                           "pkg.property('gh_issues_last_year_closed', " \
+                           "{gh_issues_last_year_closed});" \
+                           "pkg.property('gh_issues_last_month_closed', " \
+                           "{gh_issues_last_month_closed});" \
+                           "pkg.property('gh_forks', {gh_forks});" \
+                           "pkg.property('gh_stargazers', {gh_stargazers});" \
+                           "pkg.property('gh_open_issues_count', {gh_open_issues_count});" \
+                           "pkg.property('gh_subscribers_count', {gh_subscribers_count});" \
+                           "pkg.property('gh_contributors_count', {gh_contributors_count});".format(
+                                gh_prs_last_year_opened=gh_prs_last_year_opened,
+                                gh_prs_last_month_opened=gh_prs_last_month_opened,
+                                gh_prs_last_year_closed=gh_prs_last_year_closed,
+                                gh_prs_last_month_closed=gh_prs_last_month_closed,
+                                gh_issues_last_year_opened=gh_issues_last_year_opened,
+                                gh_issues_last_month_opened=gh_issues_last_month_opened,
+                                gh_issues_last_year_closed=gh_issues_last_year_closed,
+                                gh_issues_last_month_closed=gh_issues_last_month_closed,
+                                gh_forks=gh_forks, gh_stargazers=gh_stargazers,
+                                gh_open_issues_count=gh_open_issues_count,
+                                gh_subscribers_count=gh_subscribers_count,
+                                gh_contributors_count=gh_contributors_count
+                           )
 
         # Add tokens for a package
         if pkg_name_tokens:
             drop_props.append('tokens')
-        for tkn in pkg_name_tokens:
-            if tkn:
-                str_package += "pkg.property('tokens', '" + tkn + "');"
+            str_package += " ".join(["pkg.property('tokens', '{}');".format(t)
+                                     for t in pkg_name_tokens if t])
 
         # Get Libraries.io data
         if 'libraries_io' in input_json.get('analyses', {}):
@@ -215,10 +229,10 @@ class GraphPopulator(object):
 
             if libio_latest_release is not None:
                 try:
-                    prp_package += "pkg.property('libio_latest_release', '" + \
-                                   str(time.mktime(datetime.strptime(libio_latest_release,
-                                                                     '%b %d, %Y').timetuple())) + \
-                                   "');"
+                    prp_package += "pkg.property('libio_latest_release', '{}');".format(
+                        str(time.mktime(datetime.strptime(libio_latest_release,
+                                                          '%b %d, %Y').timetuple()))
+                    )
                 except Exception:
                     # We pass if we do not get timestamp information in required format
                     pass
@@ -229,46 +243,53 @@ class GraphPopulator(object):
 
             for key, val in input_json.get('analyses').get('libraries_io').get('details', {}) \
                                       .get('dependent_repositories', {}).get('top', {}).items():
-                prp_package += "pkg.property('libio_usedby', '" + key + ":" + val + "');"
+                prp_package += "pkg.property('libio_usedby', '{key}:{val}');".format(
+                    key=key, val=val
+                )
 
-            prp_package += "pkg.property('libio_dependents_projects', '" + \
-                           libio_dependents_projects + "');" \
-                           "pkg.property('libio_dependents_repos', '" + libio_dependents_repos + \
-                           "');" \
-                           "pkg.property('libio_total_releases', '" + libio_total_releases + \
-                           "');" \
-                           "pkg.property('libio_latest_version', '" + libio_latest_version + "');"
+            prp_package += "pkg.property('libio_dependents_projects', " \
+                           "'{libio_dependents_projects}');" \
+                           "pkg.property('libio_dependents_repos', '{libio_dependents_repos}');" \
+                           "pkg.property('libio_total_releases', '{libio_total_releases}');" \
+                           "pkg.property('libio_latest_version', '{libio_latest_version}');".format(
+                                libio_dependents_projects=libio_dependents_projects,
+                                libio_dependents_repos=libio_dependents_repos,
+                                libio_total_releases=libio_total_releases,
+                                libio_latest_version=libio_latest_version
+                           )
 
             # Update EPV Github Release Date based on libraries_io data
             try:
                 if libio_latest_release:
-                    # TODO use str.format() instead of concatenation by +
-                    prp_package += "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + \
-                                   pkg_name + "')." \
-                                   "has('version','" + libio_latest_version + "')." \
-                                   "property('gh_release_date'," + \
-                                   str(time.mktime(datetime.strptime(libio_latest_release,
-                                                   '%b %d, %Y').timetuple())) + ");"
+                    prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
+                                   "'{pkg_name}')." \
+                                   "has('version','{libio_latest_version}')." \
+                                   "property('gh_release_date', {gh_rel});".format(
+                                        pkg_name=pkg_name, ecosystem=ecosystem,
+                                        libio_latest_version=libio_latest_version,
+                                        gh_rel=str(time.mktime(datetime.strptime(
+                                            libio_latest_release, '%b %d, %Y').timetuple()))
+                                   )
                 for version, release in input_json.get('analyses').get('libraries_io') \
                                                   .get('details', {}).get('releases', {}) \
                                                   .get('latest', {}).get('recent', {}).items():
-                    # TODO use str.format() instead of concatenation by +
-                    prp_package += "g.V().has('pecosystem','" + ecosystem + "').has('pname','" + \
-                                   pkg_name + "')." \
-                                   "has('version','" + version + "')." \
-                                   "property('gh_release_date'," + \
-                                   str(time.mktime(datetime.strptime(release,
-                                                   '%b %d, %Y').timetuple())) + ");"
+                    prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
+                                   "'{pkg_name}').has('version','{version}')." \
+                                   "property('gh_release_date',{gh_rel});".format(
+                                        ecosystem=ecosystem, pkg_name=pkg_name, version=version,
+                                        gh_rel=str(time.mktime(datetime.strptime(release,
+                                                   '%b %d, %Y').timetuple()))
+                                   )
             except Exception:
                 # We pass if we do not get timestamp information in required format
                 pass
 
         # Refresh the properties whereever applicable
         if len(drop_props) > 0:
-            # TODO use str.format() instead of concatenation by +
-            drop_prop += "g.V().has('ecosystem','" + ecosystem + "').has('name','" + \
-                         pkg_name + "').properties('" + \
-                         "','".join(drop_props) + "').drop().iterate();"
+            drop_prop += "g.V().has('ecosystem','{ecosystem}').has('name'," \
+                         "'{pkg_name}').properties('{p}').drop().iterate();".format(
+                            ecosystem=ecosystem, pkg_name=pkg_name, p="','".join(drop_props)
+                         )
 
         return drop_prop + str_package, prp_package
 
@@ -291,11 +312,12 @@ class GraphPopulator(object):
             if str_gremlin_version:
                 str_gremlin += str_gremlin_version
                 if prp_package:
-                    str_gremlin += "edge_c = g.V().has('pecosystem','" + ecosystem + \
-                                   "').has('pname','" + pkg_name + \
-                                   "').has('version','" + version + \
-                                   "').in('has_version').tryNext()" \
-                                   ".orElseGet{pkg.addEdge('has_version', ver)};"
+                    str_gremlin += "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
+                                   "'{pkg_name}').has('version','{version}').in(" \
+                                   "'has_version').tryNext()" \
+                                   ".orElseGet{{pkg.addEdge('has_version', ver)}};".format(
+                                        ecosystem=ecosystem, pkg_name=pkg_name, version=version
+                                   )
 
         print(str_gremlin)
         return str_gremlin
