@@ -141,7 +141,7 @@ class GraphPopulator(object):
                       "'{pkg_name}', 'vertex_label', 'Package')}};" \
                       "pkg.property('last_updated', {last_updated});".format(
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time())
-        )
+                      )
 
         latest_version = input_json.get('latest_version') or ''
         if latest_version:
@@ -229,9 +229,9 @@ class GraphPopulator(object):
 
             if libio_latest_release is not None:
                 try:
-                    prp_package += "pkg.property('libio_latest_release', '{l}');".format(
-                        l=str(time.mktime(datetime.strptime(libio_latest_release,
-                                                            '%b %d, %Y').timetuple()))
+                    prp_package += "pkg.property('libio_latest_release', '{}');".format(
+                        str(time.mktime(datetime.strptime(libio_latest_release,
+                                                          '%b %d, %Y').timetuple()))
                     )
                 except Exception:
                     # We pass if we do not get timestamp information in required format
