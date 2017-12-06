@@ -207,7 +207,7 @@ class GraphPopulator(object):
         if pkg_name_tokens:
             drop_props.append('tokens')
             str_package += " ".join(["pkg.property('tokens', '{}');".format(t)
-                                     for t in pkg_name_tokens])
+                                     for t in pkg_name_tokens if t])
 
         # Get Libraries.io data
         if 'libraries_io' in input_json.get('analyses', {}):
