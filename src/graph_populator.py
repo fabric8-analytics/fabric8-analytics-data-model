@@ -2,7 +2,6 @@ import logging
 import re
 import time
 from datetime import datetime
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -328,7 +327,6 @@ class GraphPopulator(object):
                                ".orElseGet{{pkg.addEdge('has_version', ver)}};".format(
                                     ecosystem=ecosystem, pkg_name=pkg_name, version=version
                                )
-
 
         print(str_gremlin)
         return str_gremlin
