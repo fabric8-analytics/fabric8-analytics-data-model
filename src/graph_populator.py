@@ -2,6 +2,7 @@ import logging
 import re
 import time
 from datetime import datetime
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -58,13 +59,14 @@ class GraphPopulator(object):
             cm_avg_cyclomatic_complexity = str(tot_complexity / count) if count > 0 else '-1'
             cm_loc = str(input_json.get('analyses').get('code_metrics').get('summary', {})
                          .get('total_lines', -1))
+
             cm_num_files = str(input_json.get('analyses').get('code_metrics').get('summary', {})
                                .get('total_files', -1))
             prp_version += "ver.property('cm_num_files',{cm_num_files});" \
-                           "ver.property('cm_avg_cyclomatic_complexity', " + \
+                           "ver.property('cm_avg_cyclomatic_complexity', " \
                            "{cm_avg_cyclomatic_complexity});" \
                            "ver.property('cm_loc',{cm_loc});".format(
-                               cm_num_files=cm_num_files, cm_loc=str(cm_loc),
+                               cm_num_files=cm_num_files, cm_loc=cm_loc,
                                cm_avg_cyclomatic_complexity=cm_avg_cyclomatic_complexity
                            )
 
@@ -311,13 +313,22 @@ class GraphPopulator(object):
             # Add edge from Package to Version
             if str_gremlin_version:
                 str_gremlin += str_gremlin_version
-                if prp_package:
-                    str_gremlin += "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
-                                   "'{pkg_name}').has('version','{version}').in(" \
-                                   "'has_version').tryNext()" \
-                                   ".orElseGet{{pkg.addEdge('has_version', ver)}};".format(
-                                        ecosystem=ecosystem, pkg_name=pkg_name, version=version
+                if not prp_package:
+                    str_gremlin += "pkg = g.V().has('ecosystem','{ecosystem}')." \
+                                   "has('name', '{pkg_name}').tryNext().orElseGet{{" \
+                                   "graph.addVertex('ecosystem', '{ecosystem}', 'name', " \
+                                   "'{pkg_name}', 'vertex_label', 'Package')}};" \
+                                   "pkg.property('last_updated', {last_updated});".format(
+                                        ecosystem=ecosystem, pkg_name=pkg_name,
+                                        last_updated=str(time.time())
                                    )
+                str_gremlin += "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
+                               "'{pkg_name}').has('version','{version}').in(" \
+                               "'has_version').tryNext()" \
+                               ".orElseGet{{pkg.addEdge('has_version', ver)}};".format(
+                                    ecosystem=ecosystem, pkg_name=pkg_name, version=version
+                               )
+
 
         print(str_gremlin)
         return str_gremlin
