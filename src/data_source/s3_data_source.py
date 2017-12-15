@@ -1,3 +1,5 @@
+"""Data source that returns data read from the AWS S3 database."""
+
 from abstract_data_source import AbstractDataSource
 import botocore
 import boto3
@@ -6,9 +8,12 @@ import config
 
 
 class S3DataSource(AbstractDataSource):
+    """Data source that returns data read from the AWS S3 database."""
+
     _DEFAULT_REGION_NAME = 'us-east-1'
 
     def __init__(self, src_bucket_name, access_key, secret_key):
+        """Initialize the connection to the AWS S3 database."""
         self.is_local = config.AWS_S3_IS_LOCAL
 
         if self.is_local:
@@ -29,11 +34,11 @@ class S3DataSource(AbstractDataSource):
         self.bucket_name = src_bucket_name
 
     def get_source_name(self):
+        """Get the name of this data source."""
         return "S3"
 
     def read_json_file(self, filename, bucket_name=None):
-        """Read JSON file from the data source"""
-
+        """Read JSON file from the data source."""
         if bucket_name is None:
             bucket_name = self.bucket_name
 
@@ -42,8 +47,7 @@ class S3DataSource(AbstractDataSource):
         return json.loads(utf_data)
 
     def list_files(self, prefix=None, bucket_name=None):
-        """List all the files in the source directory"""
-
+        """List all the files in the source directory."""
         list_filenames = []
         if bucket_name is None:
             bucket_name = self.bucket_name

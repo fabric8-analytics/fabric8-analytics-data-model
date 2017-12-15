@@ -1,3 +1,5 @@
+"""Sanity check of the graph DB REST API."""
+
 from graph_manager import BayesianGraph
 import traceback
 import time
@@ -11,6 +13,7 @@ MAX_DELAY = 20 * 60  # 5 minutes
 
 
 def test_http_connection():
+    """Test the connection to a graph DB and the result send from the DB."""
     result = BayesianGraph.execute("g.V().count()")
     code, data = result
     logger.info(result)
@@ -24,10 +27,12 @@ def test_http_connection():
 
 
 def time_remaining(start_time, current_time, max_delay=MAX_DELAY):
+    """Compute the remaining time."""
     return max_delay - (current_time - start_time)
 
 
 def main():
+    """Start the sanity check of the graph DB REST API."""
     waittime = 5
 
     start_time = time.time()

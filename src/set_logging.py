@@ -1,3 +1,5 @@
+"""Logger and its handler configuration."""
+
 import logging
 import config
 

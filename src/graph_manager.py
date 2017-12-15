@@ -13,8 +13,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# singleton object which will have reference to Graph object
 class BayesianGraph(object):
+    """Template for a singleton object which will have reference to Graph object."""
 
     @classmethod
     def execute(cls, str_gremlin_dsl):
