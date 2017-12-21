@@ -1,3 +1,9 @@
+"""The tests for Minio put/get operations.
+
+Test that the ecosystem/package/version information could be stored and retrieved from
+the Minio storage.
+"""
+
 import logging
 import config
 import traceback
@@ -27,6 +33,7 @@ else:
 
 
 def test_create_minio_bucket():
+    """Test if buckets can be put into the Minio storage."""
     # Create Necessary Config Parameters
     config.AWS_PKG_BUCKET = "test-bayesian-core-package-data"
     config.AWS_EPV_BUCKET = "test-bayesian-core-data"
@@ -70,7 +77,7 @@ def test_create_minio_bucket():
 
 
 def test_insertion():
-
+    """Test if the stored e/p/v data can be retrieved back."""
     list_epv = [
         {
             "version": "0.4.59",

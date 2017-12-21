@@ -1,3 +1,5 @@
+"""Template for a singleton object which will have reference to Graph object."""
+
 import config
 import json
 import requests
@@ -18,6 +20,7 @@ class BayesianGraph(object):
 
     @classmethod
     def execute(cls, str_gremlin_dsl):
+        """Execute the query prepared for the graph database."""
         logger.debug("BayesianGraph::execute() Gremlin DSL:  %s", str_gremlin_dsl)
         payload = {'gremlin': str_gremlin_dsl}
         response = requests.post(config.GREMLIN_SERVER_URL_REST,
@@ -34,6 +37,7 @@ class BayesianGraph(object):
 
     @classmethod
     def return_json_response_data(cls, json_result):
+        """Return the data taken from the graph DB response (other attributes are ignored)."""
         is_created = False
         script_output = json_result.get("result", {}).get("data", [])
         if isinstance(script_output, list) and len(script_output) > 0:
@@ -42,6 +46,7 @@ class BayesianGraph(object):
 
     @classmethod
     def is_index_created(cls):
+        """Check whether the index is created in the graph database."""
         str_gremlin_dsl = """
         // obtain references reference to graph management instance
         mgmt = graph.openManagement();
@@ -54,6 +59,7 @@ class BayesianGraph(object):
 
     @classmethod
     def is_schema_defined(cls):
+        """Check whether the schema is defined in the graph database."""
         str_gremlin_dsl = """
         // obtain references reference to graph management instance
         mgmt = graph.openManagement();
@@ -69,6 +75,7 @@ class BayesianGraph(object):
 
     @classmethod
     def populate_schema(cls):
+        """Populate the schema stored in the Groovy script."""
         current_file_path = os.path.dirname(os.path.realpath(__file__))
         schema_file_path = os.path.join(current_file_path, 'schema.groovy')
         str_gremlin_dsl = ''''''

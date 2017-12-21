@@ -1,3 +1,5 @@
+"""Class containing classmethods used to construct queries to the graph database."""
+
 import logging
 import re
 import time
@@ -7,8 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 class GraphPopulator(object):
+    """Class containing classmethods used to construct queries to the graph database."""
+
     @classmethod
     def construct_version_query(cls, input_json):
+        """Construct the query to retrieve detailed information of given version of a package."""
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
         version = input_json.get('version')
@@ -131,6 +136,7 @@ class GraphPopulator(object):
 
     @classmethod
     def construct_package_query(cls, input_json):
+        """Construct the query to retrieve detailed information of given package."""
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
         pkg_name_tokens = re.split('\W+', pkg_name)
@@ -296,9 +302,13 @@ class GraphPopulator(object):
 
     @classmethod
     def create_query_string(cls, input_json):
+        """Create query to get information about the package or package+version ."""
+        # TODO add check of JSON against the schema
 
         # NPM packages with dependencies, versions i.e. Package version
+        # TODO add check for existence of this attribute
         pkg_name = input_json.get('package')
+        # TODO add check for existence of this attribute
         ecosystem = input_json.get('ecosystem')
         version = input_json.get('version')
         # creation of query string
