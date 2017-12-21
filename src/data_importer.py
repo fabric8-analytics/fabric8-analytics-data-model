@@ -134,7 +134,7 @@ def _log_report_msg(import_type, report):
 
 
 def import_epv_http(data_source, list_epv, select_doc=None):
-    """Import the ecostystem+package+version triple from the S3 database using the selected data source."""
+    """Import the ecostystem+package+version triple from S3 database using selected data source."""
     try:
         # Collect relevant files from data-source and group them by package-version.
         list_keys = []
