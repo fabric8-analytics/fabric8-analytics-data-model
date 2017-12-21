@@ -1,3 +1,5 @@
+"""Module with functions to fetch data from the S3 data source."""
+
 from graph_populator import GraphPopulator
 import logging
 import config
@@ -132,6 +134,7 @@ def _log_report_msg(import_type, report):
 
 
 def import_epv_http(data_source, list_epv, select_doc=None):
+    """Import the ecostystem+package+version triple from the S3 database using the selected data source."""
     try:
         # Collect relevant files from data-source and group them by package-version.
         list_keys = []
@@ -186,6 +189,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
 
 
 def import_epv_from_s3_http(list_epv, select_doc=None):
+    """Import the ecostystem+package+version triple from the S3 database via HTTP protocol."""
     # if aws-keys are not provided we assume it is local
     access_key = config.MINIO_ACCESS_KEY if config.AWS_S3_ACCESS_KEY_ID == "" \
         else config.AWS_S3_ACCESS_KEY_ID

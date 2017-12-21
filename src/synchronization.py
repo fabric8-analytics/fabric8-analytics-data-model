@@ -1,3 +1,7 @@
+"""This module has been commented out from the beginning."""
+
+# TODO: create an issue whether this script should be deleted or reincarnated again
+
 # from graph_manager import BayesianGraph
 # import config
 #

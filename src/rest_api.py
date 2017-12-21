@@ -1,3 +1,5 @@
+"""Declaration of the custom REST API to graph DB."""
+
 import flask
 from flask import Flask, request, redirect, make_response
 from flask_cors import CORS
@@ -33,17 +35,20 @@ except Exception:
 
 @app.route('/api/v1/readiness')
 def readiness():
+    """Generate response for the GET request to /api/v1/readiness."""
     return flask.jsonify({}), 200
 
 
 @app.route('/api/v1/liveness')
 def liveness():
+    """Generate response for the GET request to /api/v1/liveness."""
     # TODO Check graph database connection
     return flask.jsonify({}), 200
 
 
 @app.route('/api/v1/ingest_to_graph', methods=['POST'])
 def ingest_to_graph():
+    """Import e/p/v data and generate response for the POST request to /api/v1/ingest_to_graph."""
     input_json = request.get_json()
     app.logger.info("Ingesting the given list of EPVs - " + json.dumps(input_json))
 
@@ -58,6 +63,7 @@ def ingest_to_graph():
                 'epv': input_json,
                 'count_imported_EPVs': report.get('count_imported_EPVs')}
     print(response)
+    # TODO the previous code can raise a runtime exception, does not we need to handle that?
     if report.get('status') is not 'Success':
         return flask.jsonify(response), 500
     else:
@@ -66,6 +72,7 @@ def ingest_to_graph():
 
 @app.route('/api/v1/selective_ingest', methods=['POST'])
 def selective_ingest():
+    """Import e/p/v data and generate response for the POST request to /api/v1/selective."""
     input_json = request.get_json()
 
     if input_json.get('package_list') is None or len(input_json.get('package_list')) == 0:
@@ -87,6 +94,7 @@ def selective_ingest():
 
     app.logger.info(response)
 
+    # TODO the previous code can raise a runtime exception, does not we need to handle that?
     if report.get('status') is not 'Success':
         return flask.jsonify(response), 500
     else:
