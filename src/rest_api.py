@@ -46,6 +46,37 @@ def liveness():
     return flask.jsonify({}), 200
 
 
+@app.route('/api/v1/pending')
+def pending():
+    """Generate response for the GET request to /api/v1/pending."""
+
+    pending_list = data_importer.GraphSync().find_pending_list()
+
+    return flask.jsonify(pending_list), 200
+
+
+@app.route('/api/v1/sync_all')
+def sync_all():
+    """Generate response for the GET request to /api/v1/sync_all."""
+
+    pending_list = data_importer.GraphSync().find_pending_list()
+    input_json = pending_list
+
+    try:
+        report = data_importer.import_epv_from_s3_http(list_epv=input_json)
+        response = {'message': report.get('message'),
+                    'epv': input_json,
+                    'count_imported_EPVs': report.get('count_imported_EPVs')}
+        print(response)
+        if report.get('status') is not 'Success':
+            return flask.jsonify(response), 500
+        else:
+            return flask.jsonify(response)
+    except RuntimeError:
+        response = {'message': 'RuntimeError encountered', 'epv': input_json}
+        return flask.jsonify(response), 500
+
+
 @app.route('/api/v1/ingest_to_graph', methods=['POST'])
 def ingest_to_graph():
     """Import e/p/v data and generate response for the POST request to /api/v1/ingest_to_graph."""

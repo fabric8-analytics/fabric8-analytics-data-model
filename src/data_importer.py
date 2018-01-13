@@ -9,6 +9,10 @@ import requests
 from datetime import datetime
 from data_source.s3_data_source import S3DataSource
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
+
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
@@ -98,6 +102,15 @@ def _import_keys_from_s3_http(data_source, epv_list):
                         count_imported_EPVs += 1
                         last_imported_EPV = (obj.get('ecosystem') + ":" + obj.get('package') +
                                              ":" + obj.get('version'))
+
+                        # update first key with graph synced tag
+                        logger.info("Mark as synced in RDS %s" % last_imported_EPV)
+                        GraphSync().update_epv_in_rds(
+                            obj.get('ecosystem'),
+                            obj.get('package'),
+                            obj.get('version')
+                        )
+
 
             except Exception as e:
                 msg = _get_exception_msg("The import failed", e)
@@ -200,3 +213,50 @@ def import_epv_from_s3_http(list_epv, select_doc=None):
                                         access_key=access_key,
                                         secret_key=secret_key),
                            list_epv, select_doc)
+
+
+class GraphSync(object):
+    def __init__(self):
+        # connect to RDS
+        engine = create_engine(config.PGSQL_ENDPOINT_URL)
+        session = sessionmaker(bind=engine)
+        self.rdb = session()
+
+    def find_pending_list(self):
+        # alter table versions add column synced2graph boolean not null default false;
+
+        pending_list = []
+        try:
+            items = self.rdb.execute("""
+                SELECT e.name AS ename, p.name AS pname, v.identifier AS versionid
+                FROM versions v
+                     JOIN packages p ON v.package_id = p.id
+                     JOIN ecosystems e ON p.ecosystem_id = e.id
+                WHERE v.synced2graph = FALSE
+                """)
+            for e, p, v in items:
+                pending_list.append({"ecosystem": e, "name": p, "version": v})
+        except NoResultFound:
+            logger("No pending EPVs found for graph sync")
+
+        return pending_list
+
+    def update_epv_in_rds(self, ecosystem, package, version):
+
+
+        query = """
+            UPDATE versions
+            SET synced2graph = TRUE
+            WHERE versions.id IN (
+              SELECT v.id AS versionid
+              FROM versions v
+                JOIN packages p ON v.package_id = p.id
+                JOIN ecosystems e ON p.ecosystem_id = e.id
+              WHERE e.name = :ecosystem AND p.name = :package AND v.identifier = :version
+            )
+        """
+
+        params = {"ecosystem": ecosystem, "package": package, "version": version}
+        print("query: %s, params: %s" % (query, params))
+        self.rdb.execute(query, params)
+        self.rdb.commit()
