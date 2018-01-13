@@ -105,12 +105,11 @@ def _import_keys_from_s3_http(data_source, epv_list):
 
                         # update first key with graph synced tag
                         logger.info("Mark as synced in RDS %s" % last_imported_EPV)
-                        GraphSync().update_epv_in_rds(
+                        PostgresHandler().update_epv_in_rds(
                             obj.get('ecosystem'),
                             obj.get('package'),
                             obj.get('version')
                         )
-
 
             except Exception as e:
                 msg = _get_exception_msg("The import failed", e)
@@ -215,25 +214,29 @@ def import_epv_from_s3_http(list_epv, select_doc=None):
                            list_epv, select_doc)
 
 
-class GraphSync(object):
+class PostgresHandler(object):
+    """PostgresHandler for interacting with Postgres data store."""
+
     def __init__(self):
+        """Initialize Handler with session to Postgres Database."""
         # connect to RDS
         engine = create_engine(config.PGSQL_ENDPOINT_URL)
         session = sessionmaker(bind=engine)
         self.rdb = session()
 
-    def find_pending_list(self):
-        # alter table versions add column synced2graph boolean not null default false;
-
-        pending_list = []
-        try:
-            items = self.rdb.execute("""
+    def fetch_pending_epvs(self):
+        """Enlist all the EPVs which are not yet synced to Graph."""
+        query = """
                 SELECT e.name AS ename, p.name AS pname, v.identifier AS versionid
                 FROM versions v
                      JOIN packages p ON v.package_id = p.id
                      JOIN ecosystems e ON p.ecosystem_id = e.id
                 WHERE v.synced2graph = FALSE
-                """)
+                """
+
+        pending_list = []
+        try:
+            items = self.rdb.execute(query)
             for e, p, v in items:
                 pending_list.append({"ecosystem": e, "name": p, "version": v})
         except NoResultFound:
@@ -242,8 +245,7 @@ class GraphSync(object):
         return pending_list
 
     def update_epv_in_rds(self, ecosystem, package, version):
-
-
+        """Mark the given EPV as synced to Graph."""
         query = """
             UPDATE versions
             SET synced2graph = TRUE
@@ -252,11 +254,10 @@ class GraphSync(object):
               FROM versions v
                 JOIN packages p ON v.package_id = p.id
                 JOIN ecosystems e ON p.ecosystem_id = e.id
-              WHERE e.name = :ecosystem AND p.name = :package AND v.identifier = :version
-            )
-        """
+              WHERE e.name = :ecosystem AND p.name = :package AND v.identifier = :version)
+            """
 
         params = {"ecosystem": ecosystem, "package": package, "version": version}
-        print("query: %s, params: %s" % (query, params))
+        # print("query: %s, params: %s" % (query, params))
         self.rdb.execute(query, params)
         self.rdb.commit()

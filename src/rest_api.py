@@ -49,8 +49,7 @@ def liveness():
 @app.route('/api/v1/pending')
 def pending():
     """Generate response for the GET request to /api/v1/pending."""
-
-    pending_list = data_importer.GraphSync().find_pending_list()
+    pending_list = data_importer.PostgresHandler().fetch_pending_epvs()
 
     return flask.jsonify(pending_list), 200
 
@@ -58,8 +57,7 @@ def pending():
 @app.route('/api/v1/sync_all')
 def sync_all():
     """Generate response for the GET request to /api/v1/sync_all."""
-
-    pending_list = data_importer.GraphSync().find_pending_list()
+    pending_list = data_importer.PostgresHandler().fetch_pending_epvs()
     input_json = pending_list
 
     try:
