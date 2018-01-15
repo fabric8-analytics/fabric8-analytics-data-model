@@ -226,7 +226,6 @@ class PostgresHandler(object):
 
     def fetch_pending_epvs(self, ecosystem=None, package=None, version=None):
         """Enlist all the EPVs which are not yet synced to Graph."""
-
         def strip_or_empty(x):
             return '' if x is None else x.strip()
 
