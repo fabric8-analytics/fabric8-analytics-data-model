@@ -224,19 +224,31 @@ class PostgresHandler(object):
         session = sessionmaker(bind=engine)
         self.rdb = session()
 
-    def fetch_pending_epvs(self):
+    def fetch_pending_epvs(self, ecosystem=None, package=None, version=None):
         """Enlist all the EPVs which are not yet synced to Graph."""
+
+        def strip_or_empty(x):
+            return '' if x is None else x.strip()
+
+        ecosystem = strip_or_empty(ecosystem)
+        package = strip_or_empty(package)
+        version = strip_or_empty(version)
+
         query = """
                 SELECT e.name AS ename, p.name AS pname, v.identifier AS versionid
                 FROM versions v
                      JOIN packages p ON v.package_id = p.id
                      JOIN ecosystems e ON p.ecosystem_id = e.id
                 WHERE v.synced2graph = FALSE
+                  AND (e.name = :ecosystem OR :ecosystem = '')
+                  AND (p.name = :package OR :package = '')
+                  AND (v.identifier = :version OR :version = '');
                 """
 
         pending_list = []
         try:
-            items = self.rdb.execute(query)
+            params = {"ecosystem": ecosystem, "package": package, "version": version}
+            items = self.rdb.execute(query, params)
             for e, p, v in items:
                 pending_list.append({"ecosystem": e, "name": p, "version": v})
         except NoResultFound:

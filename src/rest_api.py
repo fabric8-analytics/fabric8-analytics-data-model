@@ -49,7 +49,13 @@ def liveness():
 @app.route('/api/v1/pending')
 def pending():
     """Generate response for the GET request to /api/v1/pending."""
-    pending_list = data_importer.PostgresHandler().fetch_pending_epvs()
+    ecosystem_name  = request.args.get('ecosystem', None)
+    package_name  = request.args.get('package', None)
+    version_id  = request.args.get('version', None)
+    pending_list = data_importer.PostgresHandler().fetch_pending_epvs(
+        ecosystem=ecosystem_name,
+        package=package_name,
+        version=version_id)
 
     return flask.jsonify(pending_list), 200
 
@@ -57,7 +63,15 @@ def pending():
 @app.route('/api/v1/sync_all')
 def sync_all():
     """Generate response for the GET request to /api/v1/sync_all."""
-    pending_list = data_importer.PostgresHandler().fetch_pending_epvs()
+    ecosystem_name  = request.args.get('ecosystem', None)
+    package_name  = request.args.get('package', None)
+    version_id  = request.args.get('version', None)
+
+    pending_list = data_importer.PostgresHandler().fetch_pending_epvs(
+        ecosystem=ecosystem_name,
+        package=package_name,
+        version=version_id)
+
     input_json = pending_list
 
     try:
