@@ -48,7 +48,7 @@ def liveness():
 
 @app.route('/api/v1/pending')
 def pending():
-    """Generate response for the GET request to /api/v1/pending."""
+    """Get request to enlist all the EPVs which are not yet synced to Graph."""
     ecosystem_name = request.args.get('ecosystem', None)
     package_name = request.args.get('package', None)
     version_id = request.args.get('version', None)
@@ -72,20 +72,18 @@ def sync_all():
         package=package_name,
         version=version_id)
 
-    input_json = pending_list
-
     try:
-        report = data_importer.import_epv_from_s3_http(list_epv=input_json)
+        report = data_importer.import_epv_from_s3_http(list_epv=pending_list)
         response = {'message': report.get('message'),
-                    'epv': input_json,
+                    'epv': pending_list,
                     'count_imported_EPVs': report.get('count_imported_EPVs')}
-        print(response)
+
         if report.get('status') is not 'Success':
             return flask.jsonify(response), 500
         else:
             return flask.jsonify(response)
     except RuntimeError:
-        response = {'message': 'RuntimeError encountered', 'epv': input_json}
+        response = {'message': 'RuntimeError encountered', 'epv': pending_list}
         return flask.jsonify(response), 500
 
 

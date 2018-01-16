@@ -105,7 +105,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
 
                         # update first key with graph synced tag
                         logger.info("Mark as synced in RDS %s" % last_imported_EPV)
-                        PostgresHandler().update_epv_in_rds(
+                        PostgresHandler().mark_epv_synced(
                             obj.get('ecosystem'),
                             obj.get('package'),
                             obj.get('version')
@@ -255,7 +255,7 @@ class PostgresHandler(object):
 
         return pending_list
 
-    def update_epv_in_rds(self, ecosystem, package, version):
+    def mark_epv_synced(self, ecosystem, package, version):
         """Mark the given EPV as synced to Graph."""
         query = """
             UPDATE versions
