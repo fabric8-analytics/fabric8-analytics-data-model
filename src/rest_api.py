@@ -46,6 +46,47 @@ def liveness():
     return flask.jsonify({}), 200
 
 
+@app.route('/api/v1/pending')
+def pending():
+    """Get request to enlist all the EPVs which are not yet synced to Graph."""
+    ecosystem_name = request.args.get('ecosystem', None)
+    package_name = request.args.get('package', None)
+    version_id = request.args.get('version', None)
+    pending_list = data_importer.PostgresHandler().fetch_pending_epvs(
+        ecosystem=ecosystem_name,
+        package=package_name,
+        version=version_id)
+
+    return flask.jsonify(pending_list), 200
+
+
+@app.route('/api/v1/sync_all')
+def sync_all():
+    """Generate response for the GET request to /api/v1/sync_all."""
+    ecosystem_name = request.args.get('ecosystem', None)
+    package_name = request.args.get('package', None)
+    version_id = request.args.get('version', None)
+
+    pending_list = data_importer.PostgresHandler().fetch_pending_epvs(
+        ecosystem=ecosystem_name,
+        package=package_name,
+        version=version_id)
+
+    try:
+        report = data_importer.import_epv_from_s3_http(list_epv=pending_list)
+        response = {'message': report.get('message'),
+                    'epv': pending_list,
+                    'count_imported_EPVs': report.get('count_imported_EPVs')}
+
+        if report.get('status') is not 'Success':
+            return flask.jsonify(response), 500
+        else:
+            return flask.jsonify(response)
+    except RuntimeError:
+        response = {'message': 'RuntimeError encountered', 'epv': pending_list}
+        return flask.jsonify(response), 500
+
+
 @app.route('/api/v1/ingest_to_graph', methods=['POST'])
 def ingest_to_graph():
     """Import e/p/v data and generate response for the POST request to /api/v1/ingest_to_graph."""

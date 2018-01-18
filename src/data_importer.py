@@ -9,6 +9,10 @@ import requests
 from datetime import datetime
 from data_source.s3_data_source import S3DataSource
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
+
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 
@@ -98,6 +102,14 @@ def _import_keys_from_s3_http(data_source, epv_list):
                         count_imported_EPVs += 1
                         last_imported_EPV = (obj.get('ecosystem') + ":" + obj.get('package') +
                                              ":" + obj.get('version'))
+
+                        # update first key with graph synced tag
+                        logger.info("Mark as synced in RDS %s" % last_imported_EPV)
+                        PostgresHandler().mark_epv_synced(
+                            obj.get('ecosystem'),
+                            obj.get('package'),
+                            obj.get('version')
+                        )
 
             except Exception as e:
                 msg = _get_exception_msg("The import failed", e)
@@ -200,3 +212,63 @@ def import_epv_from_s3_http(list_epv, select_doc=None):
                                         access_key=access_key,
                                         secret_key=secret_key),
                            list_epv, select_doc)
+
+
+class PostgresHandler(object):
+    """PostgresHandler for interacting with Postgres data store."""
+
+    def __init__(self):
+        """Initialize Handler with session to Postgres Database."""
+        # connect to RDS
+        engine = create_engine(config.PGSQL_ENDPOINT_URL)
+        session = sessionmaker(bind=engine)
+        self.rdb = session()
+
+    def fetch_pending_epvs(self, ecosystem=None, package=None, version=None):
+        """Enlist all the EPVs which are not yet synced to Graph."""
+        def strip_or_empty(x):
+            return '' if x is None else x.strip()
+
+        ecosystem = strip_or_empty(ecosystem)
+        package = strip_or_empty(package)
+        version = strip_or_empty(version)
+
+        query = """
+                SELECT e.name AS ename, p.name AS pname, v.identifier AS versionid
+                FROM versions v
+                     JOIN packages p ON v.package_id = p.id
+                     JOIN ecosystems e ON p.ecosystem_id = e.id
+                WHERE v.synced2graph = FALSE
+                  AND (e.name = :ecosystem OR :ecosystem = '')
+                  AND (p.name = :package OR :package = '')
+                  AND (v.identifier = :version OR :version = '');
+                """
+
+        pending_list = []
+        try:
+            params = {"ecosystem": ecosystem, "package": package, "version": version}
+            items = self.rdb.execute(query, params)
+            for e, p, v in items:
+                pending_list.append({"ecosystem": e, "name": p, "version": v})
+        except NoResultFound:
+            logger("No pending EPVs found for graph sync")
+
+        return pending_list
+
+    def mark_epv_synced(self, ecosystem, package, version):
+        """Mark the given EPV as synced to Graph."""
+        query = """
+            UPDATE versions
+            SET synced2graph = TRUE
+            WHERE versions.id IN (
+              SELECT v.id AS versionid
+              FROM versions v
+                JOIN packages p ON v.package_id = p.id
+                JOIN ecosystems e ON p.ecosystem_id = e.id
+              WHERE e.name = :ecosystem AND p.name = :package AND v.identifier = :version)
+            """
+
+        params = {"ecosystem": ecosystem, "package": package, "version": version}
+        # print("query: %s, params: %s" % (query, params))
+        self.rdb.execute(query, params)
+        self.rdb.commit()
