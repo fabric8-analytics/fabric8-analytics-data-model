@@ -106,7 +106,15 @@ class GraphPopulator(object):
                     declared_licenses = details[0]['declared_licenses']
                 elif details[0].get('declared_license'):
                     # string with comma separated license names
-                    declared_licenses = details[0]['declared_license'].split(',')
+                    # declared_licenses = details[0]['declared_license'].split(',')
+                    declared_licenses = details[0].get('declared_license').split(', ')
+                    final_declared_licenses = list()
+                    for i in xrange(0, len(declared_licenses)):
+                        if declared_licenses[i].startswith("Version"):
+                            final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + declared_licenses[i]
+                        else:
+                            final_declared_licenses.append(declared_licenses[i])
+                    declared_licenses = final_declared_licenses
 
                 # Clear declared licenses field before refreshing
                 drop_props.append('declared_licenses')
