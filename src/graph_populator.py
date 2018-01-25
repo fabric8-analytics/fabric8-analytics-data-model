@@ -111,7 +111,8 @@ class GraphPopulator(object):
                     final_declared_licenses = list()
                     for i in xrange(0, len(declared_licenses)):
                         if declared_licenses[i].startswith("Version"):
-                            final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + declared_licenses[i]
+                            final_declared_licenses[-1] = final_declared_licenses[-1] + ", "\
+                                                          + declared_licenses[i]
                         else:
                             final_declared_licenses.append(declared_licenses[i])
                     declared_licenses = final_declared_licenses
