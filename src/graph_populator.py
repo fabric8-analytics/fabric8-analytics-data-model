@@ -222,14 +222,14 @@ class GraphPopulator(object):
             libio_dependents_projects = details.get('dependents', {}).get('count', -1)
             libio_dependents_repos = details.get('dependent_repositories', {}).get('count', -1)
             libio_total_releases = details.get('releases', {}).get('count', -1)
-            libio_latest_release = details.get('releases', {}).get('latest', {}).get('published_at',
-                                                                                     '')
+            libio_latest_published_at = details.get('releases', {})\
+                .get('latest', {}).get('published_at', '')
             libio_latest_version = details.get('releases', {}).get('latest', {}).get('version', '')
 
-            if libio_latest_release is not None:
+            if libio_latest_published_at is not None:
                 try:
                     prp_package += "pkg.property('libio_latest_release', '{}');".format(
-                        str(time.mktime(datetime.strptime(libio_latest_release,
+                        str(time.mktime(datetime.strptime(libio_latest_published_at,
                                                           '%b %d, %Y').timetuple()))
                     )
                 except Exception:
@@ -257,7 +257,7 @@ class GraphPopulator(object):
 
             # Update EPV Github Release Date based on libraries_io data
             try:
-                if libio_latest_release:
+                if libio_latest_published_at:
                     prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
                                    "'{pkg_name}')." \
                                    "has('version','{libio_latest_version}')." \
@@ -265,7 +265,7 @@ class GraphPopulator(object):
                                         pkg_name=pkg_name, ecosystem=ecosystem,
                                         libio_latest_version=libio_latest_version,
                                         gh_rel=str(time.mktime(datetime.strptime(
-                                            libio_latest_release, '%b %d, %Y').timetuple()))
+                                            libio_latest_published_at, '%b %d, %Y').timetuple()))
                                    )
                 for version, release in details.get('releases', {}) \
                                                .get('latest', {}).get('recent', {}).items():
