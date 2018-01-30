@@ -106,16 +106,16 @@ class GraphPopulator(object):
                     declared_licenses = details[0]['declared_licenses']
                 elif details[0].get('declared_license'):
                     # string with comma separated license names
-                    # fix for: https://github.com/fabric8-analytics/fabric8-analytics-data-model/issues/71
+                    # see: github.com/fabric8-analytics/fabric8-analytics-data-model/issues/71
                     # TODO: Factor out this license normalization elsewhere into a module ?
                     """
                     Split multiline license string by newlines and trim whitespaces around each
-                    
+
                     Apache License, Version 2.0 and
                     Common Development And Distribution License (CDDL) Version 1.0
-                    
+
                     above string becomes
-                    
+
                     ['Apache License, Version 2.0 and',
                     'Common Development And Distribution License (CDDL) Version 1.0']
                     """
