@@ -4,6 +4,7 @@ import logging
 import re
 import time
 from datetime import datetime
+from dateutil.parser import parse as parse_datetime
 
 logger = logging.getLogger(__name__)
 
@@ -218,31 +219,35 @@ class GraphPopulator(object):
 
         # Get Libraries.io data
         if 'libraries_io' in input_json.get('analyses', {}):
+            v2 = input_json['analyses']['libraries_io'].get('schema', {}).get('version', '0-0-0')\
+                 >= '2-0-0'
             details = input_json['analyses']['libraries_io'].get('details', {})
             libio_dependents_projects = details.get('dependents', {}).get('count', -1)
             libio_dependents_repos = details.get('dependent_repositories', {}).get('count', -1)
-            libio_total_releases = details.get('releases', {}).get('count', -1)
-            libio_latest_published_at = details.get('releases', {})\
-                .get('latest', {}).get('published_at', '')
-            libio_latest_version = details.get('releases', {}).get('latest', {}).get('version', '')
+            releases = details.get('releases', {})
+            libio_total_releases = releases.get('count', -1)
+            if v2:
+                libio_latest = releases.get('recent', [{}])[-1]  # last is latest
+                libio_latest_published_at = libio_latest.get('published_at', '')
+                libio_latest_version = libio_latest.get('version', '')
+            else:
+                libio_latest_published_at = releases.get('latest', {}).get('published_at', '')
+                libio_latest_version = releases.get('latest', {}).get('version', '')
 
-            if libio_latest_published_at is not None:
+            if libio_latest_published_at:
                 try:
                     prp_package += "pkg.property('libio_latest_release', '{}');".format(
-                        str(time.mktime(datetime.strptime(libio_latest_published_at,
-                                                          '%b %d, %Y').timetuple()))
+                        str(time.mktime(parse_datetime(libio_latest_published_at).timetuple()))
                     )
                 except Exception:
                     # We pass if we do not get timestamp information in required format
                     pass
 
-            if details.get('dependent_repositories', {}).get('top', {}):
+            if details.get('dependent_repositories', {}).get('top'):
                 drop_props.append('libio_usedby')
-
-            for key, val in details.get('dependent_repositories', {}).get('top', {}).items():
-                prp_package += "pkg.property('libio_usedby', '{key}:{val}');".format(
-                    key=key, val=val
-                )
+                for key, val in details.get('dependent_repositories', {}).get('top', {}).items():
+                    prp_package += "pkg.property('libio_usedby', '{key}:{val}');".format(
+                                                                key=key, val=val)
 
             prp_package += "pkg.property('libio_dependents_projects', " \
                            "'{libio_dependents_projects}');" \
@@ -257,25 +262,34 @@ class GraphPopulator(object):
 
             # Update EPV Github Release Date based on libraries_io data
             try:
-                if libio_latest_published_at:
-                    prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
-                                   "'{pkg_name}')." \
-                                   "has('version','{libio_latest_version}')." \
-                                   "property('gh_release_date', {gh_rel});".format(
-                                        pkg_name=pkg_name, ecosystem=ecosystem,
-                                        libio_latest_version=libio_latest_version,
-                                        gh_rel=str(time.mktime(datetime.strptime(
-                                            libio_latest_published_at, '%b %d, %Y').timetuple()))
-                                   )
-                for version, release in details.get('releases', {}) \
-                                               .get('latest', {}).get('recent', {}).items():
-                    prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
-                                   "'{pkg_name}').has('version','{version}')." \
-                                   "property('gh_release_date',{gh_rel});".format(
-                                        ecosystem=ecosystem, pkg_name=pkg_name, version=version,
-                                        gh_rel=str(time.mktime(datetime.strptime(release,
-                                                   '%b %d, %Y').timetuple()))
-                                   )
+                if v2:
+                    # 'recent' is list of {'number':n, 'published_at':p} including the latest
+                    for release in releases.get('recent', []):
+                        timestamp = time.mktime(parse_datetime(
+                            release.get('published_at', '').timetuple()))
+                        prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
+                                       "'{pkg_name}').has('version','{version}')." \
+                                       "property('gh_release_date',{gh_rel});".format(
+                                        ecosystem=ecosystem, pkg_name=pkg_name,
+                                        version=release.get('number', ''),
+                                        gh_rel=str(timestamp))
+                else:
+                    if libio_latest_published_at:
+                        prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
+                                       "'{pkg_name}')." \
+                                       "has('version','{libio_latest_version}')." \
+                                       "property('gh_release_date', {gh_rel});".format(
+                                            pkg_name=pkg_name, ecosystem=ecosystem,
+                                            libio_latest_version=libio_latest_version,
+                                            gh_rel=str(time.mktime(parse_datetime(
+                                                libio_latest_published_at).timetuple())))
+                    for version, release in releases.get('latest', {}).get('recent', {}).items():
+                        prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
+                                       "'{pkg_name}').has('version','{version}')." \
+                                       "property('gh_release_date',{gh_rel});".format(
+                                            ecosystem=ecosystem, pkg_name=pkg_name, version=version,
+                                            gh_rel=str(time.mktime(parse_datetime(
+                                                release).timetuple())))
             except Exception:
                 # We pass if we do not get timestamp information in required format
                 pass
