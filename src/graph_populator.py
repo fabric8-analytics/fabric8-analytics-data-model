@@ -218,21 +218,13 @@ class GraphPopulator(object):
 
         # Get Libraries.io data
         if 'libraries_io' in input_json.get('analyses', {}):
-            libio_dependents_projects = input_json.get('analyses').get('libraries_io') \
-                                                  .get('details', {}) \
-                                                  .get('dependents', {}).get('count', -1)
-            libio_dependents_repos = input_json.get('analyses').get('libraries_io') \
-                                               .get('details', {}) \
-                                               .get('dependent_repositories', {}).get('count', -1)
-            libio_total_releases = input_json.get('analyses').get('libraries_io') \
-                                             .get('details', {}) \
-                                             .get('releases', {}).get('count', -1)
-            libio_latest_release = input_json.get('analyses').get('libraries_io') \
-                                             .get('details', {}).get('releases', {}) \
-                                             .get('latest', {}).get('published_at')
-            libio_latest_version = input_json.get('analyses').get('libraries_io') \
-                                             .get('details', {}).get('releases', {}) \
-                                             .get('latest', {}).get('version', '')
+            details = input_json['analyses']['libraries_io'].get('details', {})
+            libio_dependents_projects = details.get('dependents', {}).get('count', -1)
+            libio_dependents_repos = details.get('dependent_repositories', {}).get('count', -1)
+            libio_total_releases = details.get('releases', {}).get('count', -1)
+            libio_latest_release = details.get('releases', {}).get('latest', {}).get('published_at',
+                                                                                     '')
+            libio_latest_version = details.get('releases', {}).get('latest', {}).get('version', '')
 
             if libio_latest_release is not None:
                 try:
@@ -244,12 +236,10 @@ class GraphPopulator(object):
                     # We pass if we do not get timestamp information in required format
                     pass
 
-            if input_json.get('analyses').get('libraries_io').get('details', {})\
-                    .get('dependent_repositories', {}).get('top', {}):
+            if details.get('dependent_repositories', {}).get('top', {}):
                 drop_props.append('libio_usedby')
 
-            for key, val in input_json.get('analyses').get('libraries_io').get('details', {}) \
-                                      .get('dependent_repositories', {}).get('top', {}).items():
+            for key, val in details.get('dependent_repositories', {}).get('top', {}).items():
                 prp_package += "pkg.property('libio_usedby', '{key}:{val}');".format(
                     key=key, val=val
                 )
@@ -277,9 +267,8 @@ class GraphPopulator(object):
                                         gh_rel=str(time.mktime(datetime.strptime(
                                             libio_latest_release, '%b %d, %Y').timetuple()))
                                    )
-                for version, release in input_json.get('analyses').get('libraries_io') \
-                                                  .get('details', {}).get('releases', {}) \
-                                                  .get('latest', {}).get('recent', {}).items():
+                for version, release in details.get('releases', {}) \
+                                               .get('latest', {}).get('recent', {}).items():
                     prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
                                    "'{pkg_name}').has('version','{version}')." \
                                    "property('gh_release_date',{gh_rel});".format(
