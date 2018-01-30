@@ -101,20 +101,20 @@ class GraphPopulator(object):
             details = input_json.get('analyses').get('metadata', {}).get('details', [])
             if details and details[0]:
                 declared_licenses = []
-                if details[0].get('declared_licenses'):
+                dl = details[0].get('declared_licenses')
+                if dl and isinstance(dl, list):
                     # list of license names
-                    declared_licenses = details[0]['declared_licenses']
-                elif details[0].get('declared_license'):
+                    declared_licenses = dl
+                elif dl and isinstance(dl, str):
                     # string with comma separated license names
-                    # declared_licenses = details[0]['declared_license'].split(',')
-                    declared_licenses = details[0].get('declared_license').split(', ')
+                    declared_licenses = dl.replace(", ", ",").lower().split(",")
                     final_declared_licenses = list()
-                    for i in xrange(0, len(declared_licenses)):
-                        if declared_licenses[i].startswith("Version"):
+                    for declared_license in declared_licenses:
+                        if declared_license.startswith("version"):
                             final_declared_licenses[-1] = final_declared_licenses[-1] + ", "\
-                                                          + declared_licenses[i]
+                                                          + declared_license
                         else:
-                            final_declared_licenses.append(declared_licenses[i])
+                            final_declared_licenses.append(declared_licenses)
                     declared_licenses = final_declared_licenses
 
                 # Clear declared licenses field before refreshing
