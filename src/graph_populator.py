@@ -116,7 +116,7 @@ class GraphPopulator(object):
                 if details[0].get('declared_licenses'):
                     # list of license names
                     declared_licenses = details[0]['declared_licenses']
-                elif details[0].get('declared_licenses'):
+                elif details[0].get('declared_license'):
                     # string with comma separated license names
                     # see: github.com/fabric8-analytics/fabric8-analytics-data-model/issues/71
                     # TODO: Factor out this license normalization elsewhere into a module ?
