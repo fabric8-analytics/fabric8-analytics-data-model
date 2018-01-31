@@ -107,14 +107,15 @@ class GraphPopulator(object):
                     declared_licenses = dl
                 elif dl and isinstance(dl, str):
                     # string with comma separated license names
-                    declared_licenses = dl.replace(", ", ",").lower().split(",")
+                    declared_licenses = dl.replace(", ", ",").split(",")
                     final_declared_licenses = list()
                     for declared_license in declared_licenses:
-                        if declared_license.startswith("version"):
+                        if declared_license.startswith("version") or declared_license.\
+                                startswith("Version"):
                             final_declared_licenses[-1] = final_declared_licenses[-1] + ", "\
                                                           + declared_license
                         else:
-                            final_declared_licenses.append(declared_licenses)
+                            final_declared_licenses.append(declared_license)
                     declared_licenses = final_declared_licenses
 
                 # Clear declared licenses field before refreshing
