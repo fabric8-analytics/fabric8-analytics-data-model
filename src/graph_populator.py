@@ -106,7 +106,34 @@ class GraphPopulator(object):
                     declared_licenses = details[0]['declared_licenses']
                 elif details[0].get('declared_license'):
                     # string with comma separated license names
-                    declared_licenses = details[0]['declared_license'].split(',')
+                    # see: github.com/fabric8-analytics/fabric8-analytics-data-model/issues/71
+                    # TODO: Factor out this license normalization elsewhere into a module ?
+                    """
+                    Split multiline license string by newlines and trim whitespaces around each
+
+                    -----
+                    Apache License, Version 2.0 and
+                    Common Development And Distribution License (CDDL) Version 1.0
+                    -----
+
+                    above string becomes
+
+                    ['Apache License, Version 2.0 and',
+                    'Common Development And Distribution License (CDDL) Version 1.0']
+
+                    """
+                    declared_str = details[0]['declared_license']
+
+                    if "and\n" in declared_str:  # case described above
+                        declared_licenses = [x.strip() for x in declared_str.split("and\n")]
+                    elif "\n" in declared_str:  # avoid newlines, they break gremlin queries
+                        # trim each line and then join by a space
+                        no_newlines = " ".join([x.strip() for x in declared_str.split("\n")])
+                        # split by comma
+                        declared_licenses = [x.strip() for x in no_newlines.split(",")]
+                    else:  # default behavior
+                        # split by comma
+                        declared_licenses = [x.strip() for x in declared_str.split(",")]
 
                 # Clear declared licenses field before refreshing
                 drop_props.append('declared_licenses')
