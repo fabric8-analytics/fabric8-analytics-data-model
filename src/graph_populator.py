@@ -146,7 +146,7 @@ class GraphPopulator(object):
                     else:  # default behavior
                         # split by comma
                         declared_licenses = [x.strip() for x in declared_str.split(",")]
-                    declared_licenses = cls.correct_license_splitting(declared_licenses)
+                declared_licenses = cls.correct_license_splitting(declared_licenses)
 
                 # Clear declared licenses field before refreshing
                 drop_props.append('declared_licenses')
