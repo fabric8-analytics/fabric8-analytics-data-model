@@ -18,8 +18,7 @@ class GraphPopulator(object):
         for dl in license_list:
             if dl.startswith(("version", "Version")):
                 dl = " ".join([li.strip() for li in dl.split("\n")])
-                final_declared_licenses[-1] = final_declared_licenses[-1] + ", " \
-                                              + dl
+                final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
             else:
                 final_declared_licenses.append(dl)
         return final_declared_licenses
