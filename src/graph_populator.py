@@ -13,6 +13,7 @@ class GraphPopulator(object):
 
     @classmethod
     def correct_license_splitting(cls, license_list):
+        """This function is responsible for correcting the incorrect splitting of licenses"""
         final_declared_licenses = list()
         for dl in license_list:
             if dl.startswith(("version", "Version")):
