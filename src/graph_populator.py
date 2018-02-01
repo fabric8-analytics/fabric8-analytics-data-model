@@ -12,6 +12,18 @@ class GraphPopulator(object):
     """Class containing classmethods used to construct queries to the graph database."""
 
     @classmethod
+    def correct_license_splitting(cls, license_list):
+        """Correct the incorrect splitting of licenses."""
+        final_declared_licenses = list()
+        for dl in license_list:
+            dl = " ".join([li.strip() for li in dl.split("\n")])
+            if dl.startswith(("version", "Version")):
+                final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
+            else:
+                final_declared_licenses.append(dl)
+        return final_declared_licenses
+
+    @classmethod
     def construct_version_query(cls, input_json):
         """Construct the query to retrieve detailed information of given version of a package."""
         pkg_name = input_json.get('package')
@@ -118,7 +130,7 @@ class GraphPopulator(object):
 
                     above string becomes
 
-                    ['Apache License, Version 2.0 and',
+                    ['Apache License, Version 2.0',
                     'Common Development And Distribution License (CDDL) Version 1.0']
 
                     """
@@ -134,6 +146,7 @@ class GraphPopulator(object):
                     else:  # default behavior
                         # split by comma
                         declared_licenses = [x.strip() for x in declared_str.split(",")]
+                declared_licenses = cls.correct_license_splitting(declared_licenses)
 
                 # Clear declared licenses field before refreshing
                 drop_props.append('declared_licenses')
