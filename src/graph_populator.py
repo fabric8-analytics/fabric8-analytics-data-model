@@ -16,11 +16,10 @@ class GraphPopulator(object):
         """Correct the incorrect splitting of licenses."""
         final_declared_licenses = list()
         for dl in license_list:
+            dl = " ".join([li.strip() for li in dl.split("\n")])
             if dl.startswith(("version", "Version")):
-                dl = " ".join([li.strip() for li in dl.split("\n")])
                 final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
             else:
-                dl = " ".join([li.strip() for li in dl.split("\n")])
                 final_declared_licenses.append(dl)
         return final_declared_licenses
 
