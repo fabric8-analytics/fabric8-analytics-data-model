@@ -20,6 +20,7 @@ class GraphPopulator(object):
                 dl = " ".join([li.strip() for li in dl.split("\n")])
                 final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
             else:
+                dl = " ".join([li.strip() for li in dl.split("\n")])
                 final_declared_licenses.append(dl)
         return final_declared_licenses
 
