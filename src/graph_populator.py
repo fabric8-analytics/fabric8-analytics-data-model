@@ -17,7 +17,8 @@ class GraphPopulator(object):
         """Correct the incorrect splitting of licenses."""
         final_declared_licenses = list()
         for dl in license_list:
-            dl = " ".join([li.strip() for li in dl.split("\n")])
+            dl = " ".join([li.strip() for li in dl.split("\n")])  # remove newlines
+            dl = re.sub("""['"]""", "", dl)  # remove quotes
             if dl.startswith(("version", "Version")):
                 final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
             else:
