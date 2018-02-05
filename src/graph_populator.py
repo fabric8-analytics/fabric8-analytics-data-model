@@ -271,7 +271,7 @@ class GraphPopulator(object):
             if v2:
                 libio_latest = releases.get('recent', [{}])[-1]  # last is latest
                 libio_latest_published_at = libio_latest.get('published_at', '')
-                libio_latest_version = libio_latest.get('version', '')
+                libio_latest_version = libio_latest.get('number', '')
             else:
                 libio_latest_published_at = releases.get('latest', {}).get('published_at', '')
                 libio_latest_version = releases.get('latest', {}).get('version', '')
