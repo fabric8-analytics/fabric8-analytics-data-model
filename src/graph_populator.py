@@ -19,6 +19,7 @@ class GraphPopulator(object):
         for dl in license_list:
             dl = " ".join([li.strip() for li in dl.split("\n")])  # remove newlines
             dl = re.sub("""['"]""", "", dl)  # remove quotes
+            dl = dl.replace('\\', "")  # remove backslash characters
             if dl.startswith(("version", "Version")):
                 final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
             else:
