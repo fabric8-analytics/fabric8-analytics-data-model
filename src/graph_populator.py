@@ -268,13 +268,15 @@ class GraphPopulator(object):
             libio_dependents_repos = details.get('dependent_repositories', {}).get('count', -1)
             releases = details.get('releases', {})
             libio_total_releases = releases.get('count', -1)
-            if v2:
-                libio_latest = releases.get('recent', [{}])[-1]  # last is latest
-                libio_latest_published_at = libio_latest.get('published_at', '')
-                libio_latest_version = libio_latest.get('number', '')
-            else:
-                libio_latest_published_at = releases.get('latest', {}).get('published_at', '')
-                libio_latest_version = releases.get('latest', {}).get('version', '')
+            libio_latest_version = libio_latest_published_at = ''
+            if libio_total_releases > 0:
+                if v2:
+                    libio_latest = releases.get('recent', [{}])[-1]  # last is latest
+                    libio_latest_published_at = libio_latest.get('published_at', '')
+                    libio_latest_version = libio_latest.get('number', '')
+                else:
+                    libio_latest_published_at = releases.get('latest', {}).get('published_at', '')
+                    libio_latest_version = releases.get('latest', {}).get('version', '')
 
             if libio_latest_published_at:
                 try:
