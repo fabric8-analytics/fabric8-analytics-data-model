@@ -37,7 +37,11 @@ class GraphPopulator(object):
             if len(input_json.get('analyses', {}).get('metadata', {}).get('details')) > 0:
                 description = input_json.get('analyses').get('metadata').get('details')[0].get(
                     'description', '')
-                description = description.replace("'", "\\'")
+
+                # remove newlines, quotes and backslash characters
+                description = " ".join([l.strip() for l in description.split("\n")])
+                description = re.sub("""['"]""", "", description)
+                description = description.replace('\\', "")
         except Exception:
             # we pass and move forward without description
             pass
@@ -385,5 +389,5 @@ class GraphPopulator(object):
                                     ecosystem=ecosystem, pkg_name=pkg_name, version=version
                                )
 
-        print(str_gremlin)
+        logger.info("Gremlin Query: %s" % str_gremlin)
         return str_gremlin
