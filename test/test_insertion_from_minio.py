@@ -92,5 +92,7 @@ def test_insertion():
         assert report["epv"] == ["pypi:access_points:0.4.59"]
         assert report["count_imported_EPVs"] == 1
     except Exception:
+        # TODO this is probably bad approach how to handle/ignore exceptions
+        # see https://github.com/openshiftio/openshift.io/issues/2263
         tb = traceback.format_exc()
         logger.error("Traceback for latest failure in import call: %s" % tb)
