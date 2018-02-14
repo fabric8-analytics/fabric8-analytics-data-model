@@ -114,10 +114,11 @@ class GraphPopulator(object):
         # Add CVE property if it exists
         if 'security_issues' in input_json.get('analyses', {}):
             cves = []
-            prp_version += " ".join(["ver.property('cve_ids', '{}');".format(c) for c in cves])
             for cve in input_json.get('analyses').get('security_issues', {}).get('details', []):
                 cves.append(cve.get('id', '') + ":" +
                             str(cve.get('cvss', {}).get('score', '')))
+            prp_version += " ".join(["ver.property('cve_ids', '{}');".format(c) for c in cves])
+            
 
         # Get Metadata Details
         if 'metadata' in input_json.get('analyses', {}):
