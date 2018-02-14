@@ -13,13 +13,19 @@ class GraphPopulator(object):
     """Class containing classmethods used to construct queries to the graph database."""
 
     @classmethod
+    def _sanitize_text_for_query(cls, text):
+        # remove newlines, quotes and backslash character
+        text = " ".join([l.strip() for l in text.split("\n")])
+        text = re.sub("""['"]""", "", text)
+        text = text.replace('\\', "")
+        return text
+
+    @classmethod
     def correct_license_splitting(cls, license_list):
         """Correct the incorrect splitting of licenses."""
         final_declared_licenses = list()
         for dl in license_list:
-            dl = " ".join([li.strip() for li in dl.split("\n")])  # remove newlines
-            dl = re.sub("""['"]""", "", dl)  # remove quotes
-            dl = dl.replace('\\', "")  # remove backslash characters
+            dl = cls._sanitize_text_for_query(dl)
             if dl.startswith(("version", "Version")):
                 final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
             else:
@@ -37,11 +43,8 @@ class GraphPopulator(object):
             if len(input_json.get('analyses', {}).get('metadata', {}).get('details')) > 0:
                 description = input_json.get('analyses').get('metadata').get('details')[0].get(
                     'description', '')
+                description = cls._sanitize_text_for_query(description)
 
-                # remove newlines, quotes and backslash characters
-                description = " ".join([l.strip() for l in description.split("\n")])
-                description = re.sub("""['"]""", "", description)
-                description = description.replace('\\', "")
         except Exception:
             # we pass and move forward without description
             pass
