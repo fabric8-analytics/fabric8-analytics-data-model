@@ -37,6 +37,9 @@ pip install -r requirements.txt
 # Install profiling module
 pip install pytest-profiling
 
+# Install pytest-coverage module
+pip install pytest-cov
+
 echo "Create a default configuration file..."
 cp src/config.py.template src/config.py
 
@@ -49,7 +52,7 @@ python src/sanitycheck.py || exit -1
 
 # py.test --profile-svg -s test/
 
-py.test -s test/
+py.test --cov=src/ --cov-report term-missing -vv -s test/
 
 rm -rf env-test/
 
