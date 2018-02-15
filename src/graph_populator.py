@@ -40,7 +40,7 @@ class GraphPopulator(object):
         version = input_json.get('version')
         description = ''
         try:
-            if len(input_json.get('analyses', {}).get('metadata', {}).get('details')) > 0:
+            if len(input_json.get('analyses', {}).get('metadata', {}).get('details', [])) > 0:
                 description = input_json.get('analyses').get('metadata').get('details')[0].get(
                     'description', '')
                 description = cls._sanitize_text_for_query(description)
@@ -75,7 +75,7 @@ class GraphPopulator(object):
         if 'code_metrics' in input_json.get('analyses', {}):
             count = 0
             tot_complexity = 0.0
-            languages = input_json.get('analyses').get('code_metrics').get('details', {}) \
+            languages = input_json.get('analyses').get('code_metrics', {}).get('details', {}) \
                 .get('languages', [])
             for lang in languages:
                 if lang.get('metrics', {}).get('functions', {}).get(
@@ -83,10 +83,10 @@ class GraphPopulator(object):
                     count += 1
                     tot_complexity += lang['metrics']['functions']['average_cyclomatic_complexity']
             cm_avg_cyclomatic_complexity = str(tot_complexity / count) if count > 0 else '-1'
-            cm_loc = str(input_json.get('analyses').get('code_metrics').get('summary', {})
+            cm_loc = str(input_json.get('analyses').get('code_metrics', {}).get('summary', {})
                          .get('total_lines', -1))
 
-            cm_num_files = str(input_json.get('analyses').get('code_metrics').get('summary', {})
+            cm_num_files = str(input_json.get('analyses').get('code_metrics', {}).get('summary', {})
                                .get('total_files', -1))
             prp_version += "ver.property('cm_num_files',{cm_num_files});" \
                            "ver.property('cm_avg_cyclomatic_complexity', " \
@@ -107,16 +107,18 @@ class GraphPopulator(object):
 
         # Add license details
         if 'source_licenses' in input_json.get('analyses', {}):
-            licenses = input_json.get('analyses').get('source_licenses').get('summary', {}) \
-                                     .get('sure_licenses', [])
             prp_version += " ".join(["ver.property('licenses', '{}');".format(l) for l in licenses])
+            licenses = input_json.get('analyses').get('source_licenses', {}).get('summary', {}) \
+                .get('sure_licenses', [])
 
         # Add CVE property if it exists
         if 'security_issues' in input_json.get('analyses', {}):
             cves = []
-            for cve in input_json.get('analyses', {}).get('security_issues', {}).get('details', []):
-                cves.append(cve.get('id') + ":" + str(cve.get('cvss', {}).get('score')))
+            for cve in input_json.get('analyses').get('security_issues', {}).get('details', []):
+                cves.append(cve.get('id', '') + ":" +
+                            str(cve.get('cvss', {}).get('score', '')))
             prp_version += " ".join(["ver.property('cve_ids', '{}');".format(c) for c in cves])
+            
 
         # Get Metadata Details
         if 'metadata' in input_json.get('analyses', {}):
@@ -187,7 +189,7 @@ class GraphPopulator(object):
     @classmethod
     def construct_package_query(cls, input_json):
         """Construct the query to retrieve detailed information of given package."""
-        pkg_name = input_json.get('package')
+        pkg_name = input_json.get('package', '')
         ecosystem = input_json.get('ecosystem')
         pkg_name_tokens = re.split('\W+', pkg_name)
         prp_package = ""
@@ -206,7 +208,8 @@ class GraphPopulator(object):
 
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):
-            gh_details = input_json.get('analyses').get('github_details').get('details', {})
+            gh_details = input_json.get('analyses').get(
+                'github_details', {}).get('details', {})
             gh_prs_last_year_opened = str(gh_details.get('updated_pull_requests', {})
                                           .get('year', {}).get('opened', -1))
             gh_prs_last_month_opened = str(gh_details.get('updated_pull_requests', {})
