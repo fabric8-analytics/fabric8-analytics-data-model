@@ -37,7 +37,7 @@ class GraphPopulator(object):
         """Construct the query to retrieve detailed information of given version of a package."""
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
-        version = input_json.get('version')
+        version = cls._sanitize_text_for_query(input_json.get('version'))
         description = ''
         try:
             if len(input_json.get('analyses', {}).get('metadata', {}).get('details')) > 0:
