@@ -109,6 +109,7 @@ class GraphPopulator(object):
         if 'source_licenses' in input_json.get('analyses', {}):
             licenses = input_json.get('analyses').get('source_licenses').get('summary', {}) \
                                      .get('sure_licenses', [])
+            licenses = [cls._sanitize_text_for_query(l) for l in licenses]
             prp_version += " ".join(["ver.property('licenses', '{}');".format(l) for l in licenses])
 
         # Add CVE property if it exists
