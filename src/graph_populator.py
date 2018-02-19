@@ -201,7 +201,7 @@ class GraphPopulator(object):
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time())
                       )
 
-        latest_version = input_json.get('latest_version') or ''
+        latest_version = cls._sanitize_text_for_query(input_json.get('latest_version')) or ''
         if latest_version:
             prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
 
@@ -365,7 +365,7 @@ class GraphPopulator(object):
         pkg_name = input_json.get('package')
         # TODO add check for existence of this attribute
         ecosystem = input_json.get('ecosystem')
-        version = input_json.get('version')
+        version = cls._sanitize_text_for_query(input_json.get('version'))
         # creation of query string
         str_gremlin = ""
         str_package, prp_package = cls.construct_package_query(input_json)
