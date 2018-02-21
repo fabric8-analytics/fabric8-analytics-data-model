@@ -105,11 +105,12 @@ def _import_keys_from_s3_http(data_source, epv_list):
 
                         # update first key with graph synced tag
                         logger.info("Mark as synced in RDS %s" % last_imported_EPV)
-                        PostgresHandler().mark_epv_synced(
-                            obj.get('ecosystem'),
-                            obj.get('package'),
-                            obj.get('version')
-                        )
+                        if not config.AWS_S3_IS_LOCAL:
+                            PostgresHandler().mark_epv_synced(
+                                obj.get('ecosystem'),
+                                obj.get('package'),
+                                obj.get('version')
+                            )
 
             except Exception as e:
                 msg = _get_exception_msg("The import failed", e)
@@ -219,10 +220,11 @@ class PostgresHandler(object):
 
     def __init__(self):
         """Initialize Handler with session to Postgres Database."""
-        # connect to RDS
-        engine = create_engine(config.PGSQL_ENDPOINT_URL)
-        session = sessionmaker(bind=engine)
-        self.rdb = session()
+        # connect to RDS only if its not local environment
+        if not config.AWS_S3_IS_LOCAL:
+            engine = create_engine(config.PGSQL_ENDPOINT_URL)
+            session = sessionmaker(bind=engine)
+            self.rdb = session()
 
     def fetch_pending_epvs(self, ecosystem=None, package=None, version=None):
         """Enlist all the EPVs which are not yet synced to Graph."""
