@@ -14,11 +14,14 @@ class GraphPopulator(object):
 
     @classmethod
     def _sanitize_text_for_query(cls, text):
-        # remove newlines, quotes and backslash character
-        text = " ".join([l.strip() for l in text.split("\n")])
-        text = re.sub("""['"]""", "", text)
-        text = text.replace('\\', "")
-        return text
+        if text and isinstance(text, str):
+            # remove newlines, quotes and backslash character
+            text = " ".join([l.strip() for l in text.split("\n")])
+            text = re.sub("""['"]""", "", text)
+            text = text.replace('\\', "")
+            return text
+        else:
+            return ''
 
     @classmethod
     def correct_license_splitting(cls, license_list):
@@ -201,7 +204,7 @@ class GraphPopulator(object):
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time())
                       )
 
-        latest_version = cls._sanitize_text_for_query(input_json.get('latest_version')) or ''
+        latest_version = cls._sanitize_text_for_query(input_json.get('latest_version'))
         if latest_version:
             prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
 
