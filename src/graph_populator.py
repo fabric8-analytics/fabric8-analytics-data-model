@@ -14,6 +14,9 @@ class GraphPopulator(object):
 
     @classmethod
     def _sanitize_text_for_query(cls, text):
+        if text is None:
+            return ''
+
         # remove newlines, quotes and backslash character
         text = " ".join([l.strip() for l in text.split("\n")])
         text = re.sub("""['"]""", "", text)
@@ -37,7 +40,7 @@ class GraphPopulator(object):
         """Construct the query to retrieve detailed information of given version of a package."""
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
-        version = cls._sanitize_text_for_query(input_json.get('version'))
+        version = cls._sanitize_text_for_query(input_json.get('version') or '')
         description = ''
         try:
             if len(input_json.get('analyses', {}).get('metadata', {}).get('details')) > 0:
@@ -201,7 +204,7 @@ class GraphPopulator(object):
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time())
                       )
 
-        latest_version = cls._sanitize_text_for_query(input_json.get('latest_version')) or ''
+        latest_version = cls._sanitize_text_for_query(input_json.get('latest_version') or '')
         if latest_version:
             prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
 
@@ -365,7 +368,7 @@ class GraphPopulator(object):
         pkg_name = input_json.get('package')
         # TODO add check for existence of this attribute
         ecosystem = input_json.get('ecosystem')
-        version = cls._sanitize_text_for_query(input_json.get('version'))
+        version = cls._sanitize_text_for_query(input_json.get('version') or '')
         # creation of query string
         str_gremlin = ""
         str_package, prp_package = cls.construct_package_query(input_json)
