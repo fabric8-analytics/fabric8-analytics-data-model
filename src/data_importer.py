@@ -234,17 +234,7 @@ class PostgresHandler(object):
         ecosystem = strip_or_empty(ecosystem)
         package = strip_or_empty(package)
         version = strip_or_empty(version)
-
-        query = """
-                SELECT e.name AS ename, p.name AS pname, v.identifier AS versionid
-                FROM versions v
-                     JOIN packages p ON v.package_id = p.id
-                     JOIN ecosystems e ON p.ecosystem_id = e.id
-                WHERE v.synced2graph = FALSE
-                  AND (e.name = :ecosystem OR :ecosystem = '')
-                  AND (p.name = :package OR :package = '')
-                  AND (v.identifier = :version OR :version = '');
-                """
+        query = self._generate_fetch_query(ecosystem, package, version)
 
         pending_list = []
         try:
@@ -274,3 +264,28 @@ class PostgresHandler(object):
         # print("query: %s, params: %s" % (query, params))
         self.rdb.execute(query, params)
         self.rdb.commit()
+
+    def _generate_fetch_query(self, ecosystem, package, version):
+        query = """
+                    SELECT e.name AS ename, p.name AS pname, v.identifier AS versionid
+                    FROM versions v
+                         JOIN packages p ON v.package_id = p.id
+                         JOIN ecosystems e ON p.ecosystem_id = e.id
+                    WHERE v.synced2graph = FALSE
+                    """
+
+        if ecosystem:
+            query += """
+                      AND e.name = :ecosystem
+                """
+
+        if package:
+            query += """
+                      AND p.name = :package
+                """
+
+        if version:
+            query += """
+                      AND v.identifier = :version
+                """
+        return query
