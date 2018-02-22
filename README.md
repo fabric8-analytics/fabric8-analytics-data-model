@@ -32,7 +32,7 @@ Now you can run the tests or the REST API
 ### How to run run REST API:
 
 This REST API serves as a language-independent interface to data-model functionality such as importing the given list
-of EPVs. It enables the consumers like UI-component to easily invoke data-model APIs.
+of EPVs (ecosystem+package+version). It enables the consumers like UI-component to easily invoke data-model APIs.
 
 ```
 virtualenv --python /usr/bin/python2.7 env
@@ -206,4 +206,4 @@ oc process -f data-model-importer-openshift-template.yaml -v AWS_BUCKET=<value> 
 
 - For any queries regarding deployment of the application on OpenShift, contact the Deploy team at devtools-deploy@redhat.com or at `devtools-deploy` channel under RH-DevTools on Mattermost.
 
-- User a Linter and follow PEP8 coding standard. 
+- Use a Linter and follow PEP8 coding standard. You can use helper scripts `check-docstyle.sh` and `run-linter.sh` that are part of this repository.
