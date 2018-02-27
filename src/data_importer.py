@@ -288,4 +288,4 @@ class PostgresHandler(object):
             query += """
                       AND v.identifier = :version
                 """
-        return query
+        return query + ";"
