@@ -17,6 +17,16 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 
 
+def parse_int_or_none(s):
+    if not s:
+        return None
+    try:
+        i = int(float(s))
+    except ValueError:
+        i = None
+    return i
+
+
 def _first_key_info(data_source, first_key, bucket_name=None):
     obj = {}
     t = data_source.read_json_file(first_key, bucket_name)
@@ -226,7 +236,7 @@ class PostgresHandler(object):
             session = sessionmaker(bind=engine)
             self.rdb = session()
 
-    def fetch_pending_epvs(self, ecosystem=None, package=None, version=None):
+    def fetch_pending_epvs(self, ecosystem=None, package=None, version=None, limit=None, offset=None):
         """Enlist all the EPVs which are not yet synced to Graph."""
         def strip_or_empty(x):
             return '' if x is None else x.strip()
@@ -234,11 +244,14 @@ class PostgresHandler(object):
         ecosystem = strip_or_empty(ecosystem)
         package = strip_or_empty(package)
         version = strip_or_empty(version)
-        query = self._generate_fetch_query(ecosystem, package, version)
+        limit = parse_int_or_none(limit) or 0
+        offset = parse_int_or_none(offset) or 0
 
         pending_list = []
         try:
-            params = {"ecosystem": ecosystem, "package": package, "version": version}
+            query = self._generate_fetch_query(ecosystem, package, version, limit, offset)
+            params = {"ecosystem": ecosystem, "package": package, "version": version,
+                      "limit": limit, "offset": offset}
             items = self.rdb.execute(query, params)
             for e, p, v in items:
                 pending_list.append({"ecosystem": e, "name": p, "version": v})
@@ -261,11 +274,10 @@ class PostgresHandler(object):
             """
 
         params = {"ecosystem": ecosystem, "package": package, "version": version}
-        # print("query: %s, params: %s" % (query, params))
         self.rdb.execute(query, params)
         self.rdb.commit()
 
-    def _generate_fetch_query(self, ecosystem, package, version):
+    def _generate_fetch_query(self, ecosystem, package, version, limit, offset):
         query = """
                     SELECT e.name AS ename, p.name AS pname, v.identifier AS versionid
                     FROM versions v
@@ -288,4 +300,15 @@ class PostgresHandler(object):
             query += """
                       AND v.identifier = :version
                 """
+
+        if limit and int(limit) > 0:
+            query += """
+                      LIMIT :limit
+                """
+
+        if offset and int(offset) > 0:
+            query += """
+                      OFFSET :offset
+                """
+
         return query + ";"

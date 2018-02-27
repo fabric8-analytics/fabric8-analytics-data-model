@@ -52,10 +52,14 @@ def pending():
     ecosystem_name = request.args.get('ecosystem', None)
     package_name = request.args.get('package', None)
     version_id = request.args.get('version', None)
+    limit = request.args.get('limit', None)
+    offset = request.args.get('offset', None)
     pending_list = data_importer.PostgresHandler().fetch_pending_epvs(
         ecosystem=ecosystem_name,
         package=package_name,
-        version=version_id)
+        version=version_id,
+        limit=limit,
+        offset=offset)
 
     return flask.jsonify(pending_list), 200
 
@@ -66,11 +70,15 @@ def sync_all():
     ecosystem_name = request.args.get('ecosystem', None)
     package_name = request.args.get('package', None)
     version_id = request.args.get('version', None)
+    limit = request.args.get('limit', None)
+    offset = request.args.get('offset', None)
 
     pending_list = data_importer.PostgresHandler().fetch_pending_epvs(
         ecosystem=ecosystem_name,
         package=package_name,
-        version=version_id)
+        version=version_id,
+        limit=limit,
+        offset=offset)
 
     try:
         report = data_importer.import_epv_from_s3_http(list_epv=pending_list)
