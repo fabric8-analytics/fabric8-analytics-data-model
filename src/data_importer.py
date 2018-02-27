@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 
 def parse_int_or_none(s):
     """
-    Parse string into an integer if it is valid. Otherwise return None
+    Parse string into an integer if it is valid. Otherwise return None.
+
     :param s: Input string
     :return: Integer value or None
     """
