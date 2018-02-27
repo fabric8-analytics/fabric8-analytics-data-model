@@ -18,6 +18,11 @@ logger = logging.getLogger(__name__)
 
 
 def parse_int_or_none(s):
+    """
+    Parse string into an integer if it is valid. Otherwise return None
+    :param s: Input string
+    :return: Integer value or None
+    """
     if not s:
         return None
     try:
@@ -236,7 +241,8 @@ class PostgresHandler(object):
             session = sessionmaker(bind=engine)
             self.rdb = session()
 
-    def fetch_pending_epvs(self, ecosystem=None, package=None, version=None, limit=None, offset=None):
+    def fetch_pending_epvs(self, ecosystem=None, package=None, version=None,
+                           limit=None, offset=None):
         """Enlist all the EPVs which are not yet synced to Graph."""
         def strip_or_empty(x):
             return '' if x is None else x.strip()
