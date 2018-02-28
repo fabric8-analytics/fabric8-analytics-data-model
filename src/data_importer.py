@@ -263,9 +263,20 @@ class PostgresHandler(object):
             for e, p, v in items:
                 pending_list.append({"ecosystem": e, "name": p, "version": v})
         except NoResultFound:
-            logger("No pending EPVs found for graph sync")
+            logger.info("No pending EPVs found for graph sync")
 
-        return pending_list
+        all_counts = 0
+        try:
+            count_query = self._generate_count_query(ecosystem, package, version)
+            count_params = {"ecosystem": ecosystem, "package": package, "version": version}
+            items = list(self.rdb.execute(count_query, count_params))
+            print(items)
+            all_counts = items[0][0]
+        except NoResultFound:
+            logger.info("No pending EPVs found for graph sync")
+
+        data = {"pending_list": pending_list, "all_counts": all_counts}
+        return data
 
     def mark_epv_synced(self, ecosystem, package, version):
         """Mark the given EPV as synced to Graph."""
@@ -316,6 +327,32 @@ class PostgresHandler(object):
         if offset and int(offset) > 0:
             query += """
                       OFFSET :offset
+                """
+
+        return query + ";"
+
+    def _generate_count_query(self, ecosystem, package, version):
+        query = """
+                    SELECT COUNT(*) as CNT
+                    FROM versions v
+                         JOIN packages p ON v.package_id = p.id
+                         JOIN ecosystems e ON p.ecosystem_id = e.id
+                    WHERE v.synced2graph = FALSE
+                    """
+
+        if ecosystem:
+            query += """
+                      AND e.name = :ecosystem
+                """
+
+        if package:
+            query += """
+                      AND p.name = :package
+                """
+
+        if version:
+            query += """
+                      AND v.identifier = :version
                 """
 
         return query + ";"
