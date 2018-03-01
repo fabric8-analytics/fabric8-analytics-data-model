@@ -270,7 +270,6 @@ class PostgresHandler(object):
             count_query = self._generate_count_query(ecosystem, package, version)
             count_params = {"ecosystem": ecosystem, "package": package, "version": version}
             items = list(self.rdb.execute(count_query, count_params))
-            print(items)
             all_counts = items[0][0]
         except NoResultFound:
             logger.info("No pending EPVs found for graph sync")
