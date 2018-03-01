@@ -49,17 +49,18 @@ def liveness():
 @app.route('/api/v1/pending')
 def pending():
     """Get request to enlist all the EPVs which are not yet synced to Graph."""
+    app.logger.info("/api/v1/pending - %s" % dict(request.args))
     ecosystem_name = request.args.get('ecosystem', None)
     package_name = request.args.get('package', None)
     version_id = request.args.get('version', None)
     limit = request.args.get('limit', None)
     offset = request.args.get('offset', None)
-    pending_list = data_importer.PostgresHandler().fetch_pending_epvs(
-        ecosystem=ecosystem_name,
-        package=package_name,
-        version=version_id,
-        limit=limit,
-        offset=offset)
+
+    params = {"ecosystem": ecosystem_name, "package": package_name, "version": version_id,
+              "limit": limit, "offset": offset}
+    app.logger.info("params - %s" % params)
+
+    pending_list = data_importer.PostgresHandler().fetch_pending_epvs(**params)
 
     return flask.jsonify(pending_list), 200
 
@@ -67,20 +68,20 @@ def pending():
 @app.route('/api/v1/sync_all')
 def sync_all():
     """Generate response for the GET request to /api/v1/sync_all."""
+    app.logger.info("/api/v1/sync_all - %s" % dict(request.args))
     ecosystem_name = request.args.get('ecosystem', None)
     package_name = request.args.get('package', None)
     version_id = request.args.get('version', None)
     limit = request.args.get('limit', None)
     offset = request.args.get('offset', None)
+    params = {"ecosystem": ecosystem_name, "package": package_name, "version": version_id,
+              "limit": limit, "offset": offset}
+    app.logger.info("params - %s" % params)
 
-    pending_list = data_importer.PostgresHandler().fetch_pending_epvs(
-        ecosystem=ecosystem_name,
-        package=package_name,
-        version=version_id,
-        limit=limit,
-        offset=offset)
+    data = data_importer.PostgresHandler().fetch_pending_epvs(**params)
 
     try:
+        pending_list = data["pending_list"]
         report = data_importer.import_epv_from_s3_http(list_epv=pending_list)
         response = {'message': report.get('message'),
                     'epv': pending_list,
