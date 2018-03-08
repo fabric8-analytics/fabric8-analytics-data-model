@@ -23,7 +23,7 @@ class GraphPopulator(object):
         text = " ".join([l.strip() for l in text.split("\n")])
         text = re.sub("""['"]""", "", text)
         text = text.replace('\\', "")
-        return text
+        return text.strip()
 
     @classmethod
     def correct_license_splitting(cls, license_list):
