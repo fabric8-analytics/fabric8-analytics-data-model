@@ -20,7 +20,6 @@ class GraphPopulator(object):
         :param text: string, text to sanitize
         :return: sanitized text
         """
-
         if text is None:
             return ''
 
