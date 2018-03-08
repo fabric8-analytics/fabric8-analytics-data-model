@@ -1,3 +1,5 @@
+"""Tests for the graph_populator module."""
+
 from graph_populator import GraphPopulator
 import pytest
 
