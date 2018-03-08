@@ -402,6 +402,22 @@
             tokens = mgmt.makePropertyKey('tokens').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
+        // for category search
+        category_runtime = mgmt.getPropertyKey('category_runtime');
+        if(category_runtime == null) {
+            category_runtime = mgmt.makePropertyKey('category_runtime').dataType(String.class).make();
+        }
+
+        ctname = mgmt.getPropertyKey('ctname');
+        if(ctname == null) {
+            ctname = mgmt.makePropertyKey('ctname').dataType(String.class).make();
+        }
+
+        category_deps_count = mgmt.getPropertyKey('category_deps_count');
+        if(category_deps_count == null) {
+            category_deps_count = mgmt.makePropertyKey('category_deps_count').dataType(Integer.class).make();
+        }
+
         // for intents
 
         topics = mgmt.getPropertyKey('topics');
@@ -540,6 +556,11 @@
             mgmt.buildIndex('TagEcosystemIndex', Vertex.class).addKey(manual_tagging_required).addKey(ecosystem).buildCompositeIndex();
         }
 
+        if(null == mgmt.getGraphIndex('CategoryNameIndex')) {
+            mgmt.buildIndex('CategoryNameIndex', Vertex.class).addKey(ctname).unique().buildCompositeIndex();
+        }
+
+
         List<String> allKeys = [
                 'ecosystem',
                 'name',
@@ -611,7 +632,9 @@
                 'manual_tagging_required',
                 'tags',
                 'user_tags',
-                'tags_count'
+                'tags_count',
+                'category_deps_count',
+                'category_runtime'
         ]
 
         allKeys.each { k ->
