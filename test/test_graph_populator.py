@@ -14,6 +14,7 @@ def test_sanitize_text_for_query():
     assert 'ASL 2.0' == f('ASL\n"2.0"')
     assert '[ok]' == f('["ok\']')
     assert 'ok' == f("'ok'")
+    assert '' == f(None)
     with pytest.raises(ValueError):
         f(100)
 
