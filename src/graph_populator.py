@@ -19,9 +19,8 @@ class GraphPopulator(object):
             text = " ".join([l.strip() for l in text.split("\n")])
             text = re.sub("""['"]""", "", text)
             text = text.replace('\\', "")
-            return text
-        else:
-            return ''
+
+        return text
 
     @classmethod
     def correct_license_splitting(cls, license_list):
@@ -51,7 +50,6 @@ class GraphPopulator(object):
         except Exception:
             # we pass and move forward without description
             pass
-
         drop_props = []
         str_version = prp_version = drop_prop = ""
         # Check if license and cve analyses succeeded. Then we refresh the property
