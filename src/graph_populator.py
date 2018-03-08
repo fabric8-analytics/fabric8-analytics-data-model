@@ -5,6 +5,7 @@ import re
 import time
 from datetime import datetime
 from dateutil.parser import parse as parse_datetime
+from six import string_types
 
 logger = logging.getLogger(__name__)
 
@@ -14,14 +15,15 @@ class GraphPopulator(object):
 
     @classmethod
     def _sanitize_text_for_query(cls, text):
-        if text and isinstance(text, str):
-            # remove newlines, quotes and backslash character
-            text = " ".join([l.strip() for l in text.split("\n")])
-            text = re.sub("""['"]""", "", text)
-            text = text.replace('\\', "")
-            return text
-        else:
-            return ''
+        if not isinstance(text, string_types):
+            raise ValueError(
+                'Invalid query text: expected string, got {t}'.format(t=type(text))
+            )
+        # remove newlines, quotes and backslash character
+        text = " ".join([l.strip() for l in text.split("\n")])
+        text = re.sub("""['"]""", "", text)
+        text = text.replace('\\', "")
+        return text
 
     @classmethod
     def correct_license_splitting(cls, license_list):
