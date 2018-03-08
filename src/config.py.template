@@ -40,3 +40,5 @@ PG_PORT = os.environ.get("BAYESIAN_PGBOUNCER_SERVICE_PORT", 5432)
 
 PGSQL_ENDPOINT_URL = 'postgresql://{}:{}@{}:{}/{}'.format(
     PG_USER, PG_PASSWORD, PG_HOST, PG_PORT, PG_DB)
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
+

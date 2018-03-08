@@ -12,3 +12,4 @@ sqlalchemy==1.1.3
 minio==2.2.4
 gevent
 six
+raven[flask]

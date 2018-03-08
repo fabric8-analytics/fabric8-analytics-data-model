@@ -9,6 +9,10 @@ import codecs
 import urllib
 import data_importer
 from graph_manager import BayesianGraph
+from raven.contrib.flask import Sentry
+import config
+from werkzeug.contrib.fixers import ProxyFix
+import logging
 
 # Python2.x: Make default encoding as UTF-8
 if sys.version_info.major == 2:
@@ -19,6 +23,8 @@ if sys.version_info.major == 2:
 app = Flask(__name__)
 app.config.from_object('config')
 CORS(app)
+app.wsgi_app = ProxyFix(app.wsgi_app)
+sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
 
 # Check whether schema is created or not
 # populate schema if not already done
@@ -30,6 +36,7 @@ try:
         app.logger.error(json_result)
         raise RuntimeError("Failed to setup graph schema")
 except Exception:
+    sentry.captureException()
     raise RuntimeError("Failed to initialized graph schema")
 
 
