@@ -15,8 +15,21 @@ def test_sanitize_text_for_query():
     assert '[ok]' == f('["ok\']')
     assert 'ok' == f("'ok'")
     assert '' == f(None)
+    assert '' == f('')
+    assert '' == f(' ')
+    assert '' == f('\n')
+    assert '' == f('\n ')
+    assert '' == f(' \n ')
+    assert '' == f('\n\n')
+    assert '' == f('\t')
     with pytest.raises(ValueError):
         f(100)
+    with pytest.raises(ValueError):
+        f(None)
+    with pytest.raises(ValueError):
+        f(True)
+    with pytest.raises(ValueError):
+        f(False)
 
 
 if __name__ == '__main__':
