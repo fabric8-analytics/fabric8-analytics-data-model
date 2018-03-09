@@ -1,6 +1,6 @@
 """Tests for the data_importer module (to be done)."""
 
-from graph_importer import *
+from data_importer import *
 import pytest
 
 
@@ -28,6 +28,16 @@ def test_parse_int_or_none_for_string_input():
     assert -42 == parse_int_or_none("-42")
     assert -42 == parse_int_or_none("-42.1")
     assert -42 == parse_int_or_none("-41.9")
+
+
+def test_parse_int_or_none_for_unicode_string_input():
+    """Test the function parse_int_or_none() for Unicode string input."""
+    assert 42 == parse_int_or_none(u"42")
+    assert 42 == parse_int_or_none(u"42.1")
+    assert 42 == parse_int_or_none(u"41.9")
+    assert -42 == parse_int_or_none(u"-42")
+    assert -42 == parse_int_or_none(u"-42.1")
+    assert -42 == parse_int_or_none(u"-41.9")
 
 
 def test_parse_int_or_none_for_invalid_input():
