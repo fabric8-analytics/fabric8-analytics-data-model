@@ -24,13 +24,12 @@ def parse_int_or_none(s):
     :param s: Input string
     :return: Integer value or None
     """
-    if not s:
+    if s is None:
         return None
     try:
-        i = int(float(s))
-    except ValueError:
-        i = None
-    return i
+        return int(float(s))
+    except (ValueError, TypeError):
+        return None
 
 
 def _first_key_info(data_source, first_key, bucket_name=None):
