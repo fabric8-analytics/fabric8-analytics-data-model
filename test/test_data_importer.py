@@ -49,9 +49,19 @@ def test_parse_int_or_none_for_invalid_input():
     assert data_importer.parse_int_or_none({}) is None
 
 
+def test_get_exception_msg():
+    """Test the function _get_exception_msg()."""
+    e1 = ValueError('hello world!')
+    assert data_importer._get_exception_msg("prefix", e1) == "prefix: hello world!"
+
+    e2 = ValueError('hello world!')
+    assert data_importer._get_exception_msg("", e2) == ": hello world!"
+
+
 if __name__ == '__main__':
     test_parse_int_or_none_for_integer_input()
     test_parse_int_or_none_for_float_input()
     test_parse_int_or_none_for_string_input()
     test_parse_int_or_none_for_unicode_string_input()
     test_parse_int_or_none_for_invalid_input()
+    test_get_exception_msg()
