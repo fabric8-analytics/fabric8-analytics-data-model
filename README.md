@@ -29,7 +29,7 @@ docker-compose up
 ```
 Now you can run the tests or the REST API
 
-### How to run run REST API:
+### How to run REST API:
 
 This REST API serves as a language-independent interface to data-model functionality such as importing the given list
 of EPVs (ecosystem+package+version). It enables the consumers like UI-component to easily invoke data-model APIs.
