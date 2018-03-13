@@ -3,6 +3,7 @@
 import __init__
 import pytest
 
+
 def test_logger():
     """Test the logger initialized in __init__."""
     assert __init__.logger is not None
