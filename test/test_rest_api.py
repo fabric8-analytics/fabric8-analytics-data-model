@@ -1,3 +1,5 @@
 """Tests for the rest_api module (to be done)."""
 
-# TODO: to be implemented
+from flask import current_app, url_for
+import pytest
+
