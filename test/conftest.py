@@ -5,7 +5,7 @@ import os
 from flask import current_app
 import pytest
 
-from src.rest_api import *
+from rest_api import *
 
 
 @pytest.fixture
