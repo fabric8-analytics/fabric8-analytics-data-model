@@ -22,6 +22,7 @@ if sys.version_info.major == 2:
     reload(sys)
     sys.setdefaultencoding('UTF8')
 
+
 def create_app():
     """Create Flask app object."""
     new_app = Flask(config.APP_NAME)
@@ -29,6 +30,7 @@ def create_app():
     CORS(new_app)
     new_app.register_blueprint(api_v1)
     return new_app
+
 
 app = create_app()
 app.wsgi_app = ProxyFix(app.wsgi_app)
