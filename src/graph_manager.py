@@ -3,16 +3,10 @@
 import config
 import json
 import requests
-from gremlin_python import statics
-from gremlin_python.structure.graph import Graph
-from gremlin_python.process.graph_traversal import __
-from gremlin_python.process.strategies import *
-from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 import os
-import sys
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(config.APP_NAME)
 
 
 class BayesianGraph(object):

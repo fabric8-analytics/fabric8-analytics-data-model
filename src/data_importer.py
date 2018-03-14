@@ -6,15 +6,13 @@ import config
 import traceback
 import json
 import requests
-from datetime import datetime
 from data_source.s3_data_source import S3DataSource
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 
-logging.basicConfig()
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(config.APP_NAME)
 
 
 def parse_int_or_none(s):

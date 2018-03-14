@@ -5,8 +5,9 @@ import traceback
 import time
 import sys
 import logging
+import config
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(config.APP_NAME)
 
 
 MAX_DELAY = 20 * 60  # 5 minutes
