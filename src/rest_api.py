@@ -12,7 +12,7 @@ from raven.contrib.flask import Sentry
 import config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
-from flask import Blueprint
+from flask import Blueprint, current_app
 
 
 api_v1 = Blueprint('api_v1', __name__, url_prefix='/api/v1')
@@ -66,7 +66,7 @@ def liveness():
 @api_v1.route('/api/v1/pending')
 def pending():
     """Get request to enlist all the EPVs which are not yet synced to Graph."""
-    app.logger.info("/api/v1/pending - %s" % dict(request.args))
+    current_app.logger.info("/api/v1/pending - %s" % dict(request.args))
     ecosystem_name = request.args.get('ecosystem', None)
     package_name = request.args.get('package', None)
     version_id = request.args.get('version', None)
@@ -75,7 +75,7 @@ def pending():
 
     params = {"ecosystem": ecosystem_name, "package": package_name, "version": version_id,
               "limit": limit, "offset": offset}
-    app.logger.info("params - %s" % params)
+    current_app.logger.info("params - %s" % params)
 
     pending_list = data_importer.PostgresHandler().fetch_pending_epvs(**params)
 
@@ -85,7 +85,7 @@ def pending():
 @api_v1.route('/api/v1/sync_all')
 def sync_all():
     """Generate response for the GET request to /api/v1/sync_all."""
-    app.logger.info("/api/v1/sync_all - %s" % dict(request.args))
+    current_app.logger.info("/api/v1/sync_all - %s" % dict(request.args))
     ecosystem_name = request.args.get('ecosystem', None)
     package_name = request.args.get('package', None)
     version_id = request.args.get('version', None)
@@ -93,7 +93,7 @@ def sync_all():
     offset = request.args.get('offset', None)
     params = {"ecosystem": ecosystem_name, "package": package_name, "version": version_id,
               "limit": limit, "offset": offset}
-    app.logger.info("params - %s" % params)
+    current_app.logger.info("params - %s" % params)
 
     data = data_importer.PostgresHandler().fetch_pending_epvs(**params)
 
@@ -117,7 +117,7 @@ def sync_all():
 def ingest_to_graph():
     """Import e/p/v data and generate response for the POST request to /api/v1/ingest_to_graph."""
     input_json = request.get_json()
-    app.logger.info("Ingesting the given list of EPVs - " + json.dumps(input_json))
+    current_app.logger.info("Ingesting the given list of EPVs - " + json.dumps(input_json))
 
     expected_keys = set(['ecosystem', 'name', 'version'])
     for epv in input_json:
@@ -151,7 +151,7 @@ def selective_ingest():
             response = {'message': 'Invalid keys found in input: ' + ','.join(epv.keys())}
             return flask.jsonify(response), 400
 
-    app.logger.info("Selective Ingestion with payload - " + json.dumps(input_json))
+    current_app.logger.info("Selective Ingestion with payload - " + json.dumps(input_json))
 
     report = data_importer.import_epv_from_s3_http(list_epv=input_json.get('package_list'),
                                                    select_doc=input_json.get('select_ingest', None))
@@ -159,7 +159,7 @@ def selective_ingest():
                 'epv': input_json,
                 'count_imported_EPVs': report.get('count_imported_EPVs')}
 
-    app.logger.info(response)
+    current_app.logger.info(response)
 
     # TODO the previous code can raise a runtime exception, does not we need to handle that?
     if report.get('status') is not 'Success':
@@ -207,7 +207,7 @@ def handle_properties(ecosystem, package, version):
             return error, 400
 
     log_msg = '[{m}] Updating properties for {e}/{p}/{v} with payload {b}'
-    app.logger.info(log_msg.format(m=request.method, e=ecosystem, p=package,
+    current_app.logger.info(log_msg.format(m=request.method, e=ecosystem, p=package,
                                    v=version, b=input_json))
 
     query_statement = "g.V()" \
@@ -235,7 +235,7 @@ def handle_properties(ecosystem, package, version):
             )
         statement += query_statement + add_str + ';'
 
-    app.logger.info('Gremlin statement: {s}'.format(s=statement))
+    current_app.logger.info('Gremlin statement: {s}'.format(s=statement))
     success, response_json = BayesianGraph.execute(statement)
     if not success:
         return flask.jsonify(response_json), 400
