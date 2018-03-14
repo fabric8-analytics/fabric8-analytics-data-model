@@ -221,8 +221,8 @@ def handle_properties(ecosystem, package, version):
         # build "delete" part of the statement
         drop_str = ""
         for prop in properties:
-            drop_str += query_statement\
-                        + ".properties('{property}').drop().iterate();".format(property=prop['name'])
+            drop_str += query_statement
+            drop_str += ".properties('{property}').drop().iterate();".format(property=prop['name'])
         statement += drop_str
 
     if request.method == 'PUT':
