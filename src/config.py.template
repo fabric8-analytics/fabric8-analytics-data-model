@@ -42,3 +42,4 @@ PGSQL_ENDPOINT_URL = 'postgresql://{}:{}@{}:{}/{}'.format(
     PG_USER, PG_PASSWORD, PG_HOST, PG_PORT, PG_DB)
 SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 
+APP_NAME = "data_importer_app"

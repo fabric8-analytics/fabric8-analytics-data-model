@@ -19,8 +19,7 @@ if sys.version_info.major == 2:
     reload(sys)
     sys.setdefaultencoding('UTF8')
 
-
-app = Flask(__name__)
+app = Flask(config.APP_NAME)
 app.config.from_object('config')
 CORS(app)
 app.wsgi_app = ProxyFix(app.wsgi_app)

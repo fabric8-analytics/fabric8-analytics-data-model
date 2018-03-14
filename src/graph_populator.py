@@ -3,11 +3,11 @@
 import logging
 import re
 import time
-from datetime import datetime
 from dateutil.parser import parse as parse_datetime
 from six import string_types
+import config
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(config.APP_NAME)
 
 
 class GraphPopulator(object):
