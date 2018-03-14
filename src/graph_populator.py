@@ -14,7 +14,7 @@ class GraphPopulator(object):
     """Class containing classmethods used to construct queries to the graph database."""
 
     @classmethod
-    def _sanitize_text_for_query(cls, text):
+    def sanitize_text_for_query(cls, text):
         """Sanitize text so it can used in queries.
 
         :param text: string, text to sanitize
@@ -38,7 +38,7 @@ class GraphPopulator(object):
         """Correct the incorrect splitting of licenses."""
         final_declared_licenses = list()
         for dl in license_list:
-            dl = cls._sanitize_text_for_query(dl)
+            dl = cls.sanitize_text_for_query(dl)
             if dl.startswith(("version", "Version")):
                 final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
             else:
@@ -50,13 +50,13 @@ class GraphPopulator(object):
         """Construct the query to retrieve detailed information of given version of a package."""
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
-        version = cls._sanitize_text_for_query(input_json.get('version'))
+        version = cls.sanitize_text_for_query(input_json.get('version'))
         description = ''
 
         details_data = input_json.get('analyses', {}).get('metadata', {}).get('details', [])
         if len(details_data) > 0:
             description = details_data[0].get('description', '')
-            description = cls._sanitize_text_for_query(description)
+            description = cls.sanitize_text_for_query(description)
 
         drop_props = []
         str_version = prp_version = drop_prop = ""
@@ -118,7 +118,7 @@ class GraphPopulator(object):
         if 'source_licenses' in input_json.get('analyses', {}):
             licenses = input_json.get('analyses').get('source_licenses').get('summary', {}) \
                                      .get('sure_licenses', [])
-            licenses = [cls._sanitize_text_for_query(l) for l in licenses]
+            licenses = [cls.sanitize_text_for_query(l) for l in licenses]
             prp_version += " ".join(["ver.property('licenses', '{}');".format(l) for l in licenses])
 
         # Add CVE property if it exists
@@ -210,7 +210,7 @@ class GraphPopulator(object):
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time())
                       )
 
-        latest_version = cls._sanitize_text_for_query(input_json.get('latest_version'))
+        latest_version = cls.sanitize_text_for_query(input_json.get('latest_version'))
         if latest_version:
             prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
 
@@ -369,7 +369,7 @@ class GraphPopulator(object):
         pkg_name = input_json.get('package')
         # TODO add check for existence of this attribute
         ecosystem = input_json.get('ecosystem')
-        version = cls._sanitize_text_for_query(input_json.get('version'))
+        version = cls.sanitize_text_for_query(input_json.get('version'))
         # creation of query string
         str_gremlin = ""
         str_package, prp_package = cls.construct_package_query(input_json)
