@@ -1,10 +1,12 @@
-"""Tests for the rest_api module (to be done)."""
+"""Tests for the rest_api module."""
 
 import rest_api
 import unittest
 import logging
 import config
 import json
+from flask import url_for
+
 
 logger = logging.getLogger(config.APP_NAME)
 
@@ -130,6 +132,51 @@ class RestApiTestCase(unittest.TestCase):
         logger.info(data)
         assert response.status_code == 200
         assert 'The import finished successfully!' in data['message']
+
+    def test_handle_properties_put(self, client, mocker):
+        """Test PUT on /api/v1/<e>/<p>/<v>/properties."""
+        gremlin_mock = mocker.patch('rest_api.BayesianGraph.execute')
+        gremlin_mock.return_value = (True, {})
+        url = url_for('api_v1.handle_properties', ecosystem='maven',
+                      package='net.iharder:base64', version='2.3.9')
+        payload = {'properties': [{'name': 'cve_ids', 'value': 'CVE-3005-1234:10'}]}
+        response = client.put(url, content_type='application/json', data=json.dumps(payload))
+        assert response.status_code == 200
+
+        expected_statement = \
+            "g.V()" \
+            ".has('pecosystem','maven')" \
+            ".has('pname','net.iharder:base64')" \
+            ".has('version','2.3.9')" \
+            ".properties('cve_ids')" \
+            ".drop()" \
+            ".iterate();" \
+            "g.V()" \
+            ".has('pecosystem','maven')" \
+            ".has('pname','net.iharder:base64')" \
+            ".has('version','2.3.9')" \
+            ".property('cve_ids','CVE-3005-1234:10');"
+        gremlin_mock.assert_called_once_with(expected_statement)
+
+    def test_handle_properties_delete(self, client, mocker):
+        """Test DELETE on /api/v1/<e>/<p>/<v>/properties."""
+        gremlin_mock = mocker.patch('rest_api.BayesianGraph.execute')
+        gremlin_mock.return_value = (True, {})
+        url = url_for('api_v1.handle_properties', ecosystem='maven',
+                      package='net.iharder:base64', version='2.3.9')
+        payload = {'properties': [{'name': 'cve_ids'}]}
+        response = client.delete(url, content_type='application/json', data=json.dumps(payload))
+        assert response.status_code == 200
+
+        expected_statement = \
+            "g.V()" \
+            ".has('pecosystem','maven')" \
+            ".has('pname','net.iharder:base64')" \
+            ".has('version','2.3.9')" \
+            ".properties('cve_ids')" \
+            ".drop()" \
+            ".iterate();"
+        gremlin_mock.assert_called_once_with(expected_statement)
 
 
 if __name__ == '__main__':

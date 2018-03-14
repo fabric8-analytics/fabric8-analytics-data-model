@@ -12,3 +12,5 @@ minio==2.2.4
 gevent
 six
 raven[flask]
+pytest-mock
+pytest-flask

@@ -7,6 +7,7 @@ import json
 import sys
 import data_importer
 from graph_manager import BayesianGraph
+from graph_populator import GraphPopulator
 from raven.contrib.flask import Sentry
 import config
 from werkzeug.contrib.fixers import ProxyFix
@@ -163,6 +164,82 @@ def selective_ingest():
         return flask.jsonify(response), 500
     else:
         return flask.jsonify(response)
+
+
+@api_v1.route('/api/v1/vertex/<string:ecosystem>/<string:package>/<string:version>/properties',
+              methods=['PUT', 'DELETE'])
+def handle_properties(ecosystem, package, version):
+    """
+    Handle (update/delete) properties associated with given EPV.
+
+    Update replaces properties with the same name.
+
+    Expects JSON payload in following format:
+    {
+        "properties": [
+            {
+                "name": "cve_ids",
+                "value": "CVE-3005-0001:10"
+            }
+        ]
+    }
+
+    "value" can be omitted in DELETE requests.
+
+    :param ecosystem: str, ecosystem
+    :param package: str, package name
+    :param version: str, package version
+    :return: 200 on success, 400 on failure
+    """
+
+    input_json = request.get_json()
+    properties = input_json.get('properties')
+
+    error = flask.jsonify({'error': 'invalid input'})
+    if not properties:
+        return error, 400
+
+    input_json = {k: GraphPopulator.sanitize_text_for_query(str(v)) for k, v in input_json.items()}
+
+    if request.method == 'PUT':
+        if [x for x in properties if x.get('name') is None or x.get('value' is None)]:
+            return error, 400
+
+    log_msg = '[{m}] Updating properties for {e}/{p}/{v} with payload {b}'
+    app.logger.info(log_msg.format(m=request.method, e=ecosystem, p=package,
+                                   v=version, b=input_json))
+
+    query_statement = "g.V()" \
+                      ".has('pecosystem','{ecosystem}')" \
+                      ".has('pname','{pkg_name}')" \
+                      ".has('version','{version}')".format(ecosystem=ecosystem,
+                                                           pkg_name=package,
+                                                           version=version)
+    statement = ''
+
+    if request.method in ('DELETE', 'PUT'):
+        # build "delete" part of the statement
+        drop_str = ""
+        for prop in properties:
+            drop_str += query_statement\
+                        + ".properties('{property}').drop().iterate();".format(property=prop['name'])
+        statement += drop_str
+
+    if request.method == 'PUT':
+        # build "add" part of the statement
+        add_str = ""
+        for prop in properties:
+            add_str += ".property('{property}','{value}')".format(
+                property=prop['name'], value=prop['value']
+            )
+        statement += query_statement + add_str + ';'
+
+    app.logger.info('Gremlin statement: {s}'.format(s=statement))
+    success, response_json = BayesianGraph.execute(statement)
+    if not success:
+        return flask.jsonify(response_json), 400
+
+    return flask.jsonify(response_json), 200
 
 
 if __name__ == "__main__":
