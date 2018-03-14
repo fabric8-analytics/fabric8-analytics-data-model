@@ -208,7 +208,7 @@ def handle_properties(ecosystem, package, version):
 
     log_msg = '[{m}] Updating properties for {e}/{p}/{v} with payload {b}'
     current_app.logger.info(log_msg.format(m=request.method, e=ecosystem, p=package,
-                                   v=version, b=input_json))
+                                           v=version, b=input_json))
 
     query_statement = "g.V()" \
                       ".has('pecosystem','{ecosystem}')" \
