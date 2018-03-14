@@ -203,7 +203,7 @@ def handle_properties(ecosystem, package, version):
     input_json = {k: GraphPopulator.sanitize_text_for_query(str(v)) for k, v in input_json.items()}
 
     if request.method == 'PUT':
-        if [x for x in properties if x.get('name') is None or x.get('value' is None)]:
+        if [x for x in properties if not x.get('name') or x.get('value') is None]:
             return error, 400
 
     log_msg = '[{m}] Updating properties for {e}/{p}/{v} with payload {b}'
