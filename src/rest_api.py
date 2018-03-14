@@ -5,23 +5,31 @@ from flask import Flask, request, redirect, make_response
 from flask_cors import CORS
 import json
 import sys
-import codecs
-import urllib
 import data_importer
 from graph_manager import BayesianGraph
 from raven.contrib.flask import Sentry
 import config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
+from flask import Blueprint
+
+
+api_v1 = Blueprint('api_v1', __name__, url_prefix='/api/v1')
 
 # Python2.x: Make default encoding as UTF-8
 if sys.version_info.major == 2:
     reload(sys)
     sys.setdefaultencoding('UTF8')
 
-app = Flask(config.APP_NAME)
-app.config.from_object('config')
-CORS(app)
+def create_app():
+    new_app = Flask(config.APP_NAME)
+    new_app.config.from_object('config')
+    CORS(new_app)
+    new_app.register_blueprint(api_v1)
+    return new_app
+
+
+app = create_app()
 app.wsgi_app = ProxyFix(app.wsgi_app)
 sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
 
@@ -39,20 +47,20 @@ except Exception:
     raise RuntimeError("Failed to initialized graph schema")
 
 
-@app.route('/api/v1/readiness')
+@api_v1.route('/api/v1/readiness')
 def readiness():
     """Generate response for the GET request to /api/v1/readiness."""
     return flask.jsonify({}), 200
 
 
-@app.route('/api/v1/liveness')
+@api_v1.route('/api/v1/liveness')
 def liveness():
     """Generate response for the GET request to /api/v1/liveness."""
     # TODO Check graph database connection
     return flask.jsonify({}), 200
 
 
-@app.route('/api/v1/pending')
+@api_v1.route('/api/v1/pending')
 def pending():
     """Get request to enlist all the EPVs which are not yet synced to Graph."""
     app.logger.info("/api/v1/pending - %s" % dict(request.args))
@@ -71,7 +79,7 @@ def pending():
     return flask.jsonify(pending_list), 200
 
 
-@app.route('/api/v1/sync_all')
+@api_v1.route('/api/v1/sync_all')
 def sync_all():
     """Generate response for the GET request to /api/v1/sync_all."""
     app.logger.info("/api/v1/sync_all - %s" % dict(request.args))
@@ -102,7 +110,7 @@ def sync_all():
         return flask.jsonify(response), 500
 
 
-@app.route('/api/v1/ingest_to_graph', methods=['POST'])
+@api_v1.route('/api/v1/ingest_to_graph', methods=['POST'])
 def ingest_to_graph():
     """Import e/p/v data and generate response for the POST request to /api/v1/ingest_to_graph."""
     input_json = request.get_json()
@@ -126,7 +134,7 @@ def ingest_to_graph():
         return flask.jsonify(response)
 
 
-@app.route('/api/v1/selective_ingest', methods=['POST'])
+@api_v1.route('/api/v1/selective_ingest', methods=['POST'])
 def selective_ingest():
     """Import e/p/v data and generate response for the POST request to /api/v1/selective."""
     input_json = request.get_json()
