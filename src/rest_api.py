@@ -23,12 +23,12 @@ if sys.version_info.major == 2:
     sys.setdefaultencoding('UTF8')
 
 def create_app():
+    """Create Flask app object."""
     new_app = Flask(config.APP_NAME)
     new_app.config.from_object('config')
     CORS(new_app)
     new_app.register_blueprint(api_v1)
     return new_app
-
 
 app = create_app()
 app.wsgi_app = ProxyFix(app.wsgi_app)
@@ -191,7 +191,6 @@ def handle_properties(ecosystem, package, version):
     :param version: str, package version
     :return: 200 on success, 400 on failure
     """
-
     input_json = request.get_json()
     properties = input_json.get('properties')
 
