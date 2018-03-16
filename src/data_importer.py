@@ -70,7 +70,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
                 continue
             pkg_ecosystem = contents.get('ecosystem')
             pkg_name = contents.get('package')
-            pkg_version = contents.get('version', '') or ''
+            pkg_version = contents.get('version') or ''
 
             obj = {'ecosystem': pkg_ecosystem, 'package': pkg_name, 'version': pkg_version}
 
