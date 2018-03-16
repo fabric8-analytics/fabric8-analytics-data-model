@@ -68,11 +68,11 @@ def _import_keys_from_s3_http(data_source, epv_list):
             if len(contents.get('pkg_list_keys')) == 0 and len(contents.get('ver_list_keys')) == 0:
                 report['message'] = 'Nothing to be imported! No data found on S3 to be imported!'
                 continue
-            obj = {
-                'ecosystem': contents.get('ecosystem'),
-                'package': contents.get('package'),
-                'version': contents.get('version')
-            }
+            pkg_ecosystem = contents.get('ecosystem')
+            pkg_name = contents.get('package')
+            pkg_version = contents.get('version', '') or ''
+
+            obj = {'ecosystem': pkg_ecosystem, 'package': pkg_name, 'version': pkg_version}
 
             try:
                 # Check other Version level information and add it to common object
@@ -101,11 +101,9 @@ def _import_keys_from_s3_http(data_source, epv_list):
 
                 if str_gremlin:
                     # Fire Gremlin HTTP query now
-                    logger.info("Ingestion initialized for EPV - " +
-                                obj.get('ecosystem') + ":" + obj.get('package') + ":" +
-                                obj.get('version'))
-                    epv.append(obj.get('ecosystem') + ":" + obj.get('package') + ":" +
-                               obj.get('version'))
+                    epv_full = pkg_ecosystem + ":" + pkg_name + ":" + pkg_version
+                    logger.info("Ingestion initialized for EPV - %s" % epv_full)
+                    epv.append(epv_full)
                     payload = {'gremlin': str_gremlin}
                     response = requests.post(config.GREMLIN_SERVER_URL_REST,
                                              data=json.dumps(payload), timeout=30)
@@ -161,49 +159,59 @@ def _log_report_msg(import_type, report):
 
 def import_epv_http(data_source, list_epv, select_doc=None):
     """Import the ecostystem+package+version triple from S3 database using selected data source."""
+
+    if select_doc is None or len(select_doc) == 0:
+        select_doc = []
+
     try:
         # Collect relevant files from data-source and group them by package-version.
-        list_keys = []
+        s3_keys_list = []
         for epv in list_epv:
-            ver_list_keys = []
-            pkg_list_keys = []
 
-            if 'name' not in epv or 'ecosystem' not in epv:
+            epv_ecosystem = epv.get('ecosystem', None)
+            epv_name = epv.get('name', None)
+            epv_version = epv.get('version', '')
+
+            if not epv_ecosystem or not epv_name:
+                # this must be logged
+                logger.info("Skipping %s" % epv)
                 continue
-            else:
-                # Get Package level keys
-                pkg_key_prefix = ver_key_prefix = (epv.get('ecosystem') + "/" + epv.get('name') +
-                                                   "/")
-                pkg_list_keys.extend(data_source.list_files(bucket_name=config.AWS_PKG_BUCKET,
-                                                            prefix=pkg_key_prefix))
 
-            if 'version' in epv and epv.get('version') is not None:
+            pkg_data = {'package': epv_name, 'version': epv_version, 'ecosystem': epv_ecosystem}
+
+            # Get Package level keys
+            package_prefix = version_prefix = (epv.get('ecosystem') + "/" + epv.get('name') +
+                                               "/")
+
+            pkg_list_keys = data_source.list_files(bucket_name=config.AWS_PKG_BUCKET,
+                                                   prefix=package_prefix)
+
+            ver_list_keys = []
+            if epv_version:
                 # Get EPV level keys
-                ver_key_prefix = (epv.get('ecosystem') + "/" + epv.get('name') + "/" +
+                version_prefix = (epv.get('ecosystem') + "/" + epv.get('name') + "/" +
                                   epv.get('version'))
                 ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET,
-                                                            prefix=ver_key_prefix + "/"))
-            else:
-                epv['version'] = ''
-            if select_doc is not None and len(select_doc) > 0:
-                select_ver_doc = [ver_key_prefix + '/' + x + '.json' for x in select_doc]
-                select_pkg_doc = [pkg_key_prefix + x + '.json' for x in select_doc]
+                                                            prefix=version_prefix + "/"))
+
+            if select_doc:  # select_doc is a list
+                select_ver_doc = [version_prefix + '/' + x + '.json' for x in select_doc]
+                select_pkg_doc = [package_prefix + x + '.json' for x in select_doc]
                 ver_list_keys = list(set(ver_list_keys).intersection(set(select_ver_doc)))
                 pkg_list_keys = list(set(pkg_list_keys).intersection(set(select_pkg_doc)))
 
-            dict_keys = {pkg_key_prefix: {
-                'ver_list_keys': ver_list_keys,
-                'ver_key_prefix': ver_key_prefix,
-                'pkg_list_keys': pkg_list_keys,
-                'pkg_key_prefix': pkg_key_prefix,
-                'package': epv.get('name'),
-                'version': epv.get('version', ''),
-                'ecosystem': epv.get('ecosystem')}}
+            # store s3 object paths for this epv
+            pkg_data['ver_key_prefix'] = version_prefix
+            pkg_data['ver_list_keys'] = ver_list_keys
+            pkg_data['pkg_key_prefix'] = package_prefix
+            pkg_data['pkg_list_keys'] = pkg_list_keys
 
-            list_keys.append(dict_keys)
+            object_paths = {package_prefix: pkg_data}
 
-        # Import the S3 data
-        report = _import_keys_from_s3_http(data_source, list_keys)
+            s3_keys_list.append(object_paths)
+
+        # Import EPVs data from S3
+        report = _import_keys_from_s3_http(data_source, s3_keys_list)
 
         # Log the report
         _log_report_msg("import_epv()", report)
