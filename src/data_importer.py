@@ -124,6 +124,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
                             )
 
             except Exception as e:
+                logger.error(e)
                 msg = _get_exception_msg("The import failed", e)
                 report['status'] = 'Failure'
                 report['message'] = msg
@@ -159,7 +160,6 @@ def _log_report_msg(import_type, report):
 
 def import_epv_http(data_source, list_epv, select_doc=None):
     """Import the ecostystem+package+version triple from S3 database using selected data source."""
-
     if select_doc is None or len(select_doc) == 0:
         select_doc = []
 
