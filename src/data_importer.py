@@ -177,7 +177,6 @@ def import_epv_http(data_source, list_epv, select_doc=None):
                 logger.info("Skipping %s" % epv)
                 continue
 
-
             # Get Package level keys
             package_prefix = version_prefix = epv_ecosystem + "/" + epv_name + "/"
 
