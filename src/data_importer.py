@@ -177,11 +177,9 @@ def import_epv_http(data_source, list_epv, select_doc=None):
                 logger.info("Skipping %s" % epv)
                 continue
 
-            pkg_data = {'package': epv_name, 'version': epv_version, 'ecosystem': epv_ecosystem}
 
             # Get Package level keys
-            package_prefix = version_prefix = (epv.get('ecosystem') + "/" + epv.get('name') +
-                                               "/")
+            package_prefix = version_prefix = epv_ecosystem + "/" + epv_name + "/"
 
             pkg_list_keys = data_source.list_files(bucket_name=config.AWS_PKG_BUCKET,
                                                    prefix=package_prefix)
@@ -189,8 +187,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
             ver_list_keys = []
             if epv_version:
                 # Get EPV level keys
-                version_prefix = (epv.get('ecosystem') + "/" + epv.get('name') + "/" +
-                                  epv.get('version'))
+                version_prefix = epv_ecosystem + "/" + epv_name + "/" + epv_version
                 ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET,
                                                             prefix=version_prefix + "/"))
 
@@ -201,10 +198,10 @@ def import_epv_http(data_source, list_epv, select_doc=None):
                 pkg_list_keys = list(set(pkg_list_keys).intersection(set(select_pkg_doc)))
 
             # store s3 object paths for this epv
-            pkg_data['ver_key_prefix'] = version_prefix
-            pkg_data['ver_list_keys'] = ver_list_keys
-            pkg_data['pkg_key_prefix'] = package_prefix
-            pkg_data['pkg_list_keys'] = pkg_list_keys
+            pkg_data = {'package': epv_name, 'version': epv_version, 'ecosystem': epv_ecosystem,
+                        'ver_key_prefix': version_prefix, 'ver_list_keys': ver_list_keys,
+                        'pkg_key_prefix': package_prefix, 'pkg_list_keys': pkg_list_keys
+                        }
 
             object_paths = {package_prefix: pkg_data}
 
