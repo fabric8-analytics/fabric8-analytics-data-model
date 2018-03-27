@@ -59,6 +59,8 @@ class S3DataSource(AbstractDataSource):
         # TODO: Marker ??
         #   For retry after a previously failed full-import,
         #   we can use 'Marker' = graph_meta.last_imported_s3_key
+        # INFO: the following code could be reused for huge buckets:
+        # https://github.com/fabric8-analytics/fabric8-analytics-common/blob/master/db-integrity-tests/src/s3interface.py#L160
         if prefix is None:
             objects = bucket.objects.all()
             list_filenames = [x.key for x in objects if x.key.endswith('.json')]
