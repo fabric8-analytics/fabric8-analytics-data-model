@@ -97,3 +97,8 @@ def test_insertion():
         # see https://github.com/openshiftio/openshift.io/issues/2263
         tb = traceback.format_exc()
         logger.error("Traceback for latest failure in import call: %s" % tb)
+
+
+if __name__ == '__main__':
+    test_insertion()
+    test_create_minio_bucket()
