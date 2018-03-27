@@ -4,3 +4,6 @@ import json
 import requests
 
 # TODO: to be implemented
+
+if __name__ == '__main__':
+    pass

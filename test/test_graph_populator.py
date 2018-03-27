@@ -55,3 +55,4 @@ def test_sanitize_text_for_query_for_unicode_input():
 
 if __name__ == '__main__':
     test_sanitize_text_for_query()
+    test_sanitize_text_for_query_for_unicode_input
