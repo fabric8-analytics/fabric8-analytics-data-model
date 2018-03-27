@@ -2,6 +2,7 @@
 
 from graph_populator import GraphPopulator
 import pytest
+import json
 
 
 def test_sanitize_text_for_query():
@@ -53,6 +54,29 @@ def test_sanitize_text_for_query_for_unicode_input():
     assert '' == f(u'\t')
 
 
+def test_correct_license_splitting():
+    """Test the GraphPopulator.correct_license_splitting() class method."""
+    pass
+
+
+def test_construct_version_query():
+    """Test the GraphPopulator.construct_version_query() class method."""
+    pass
+
+
+def test_construct_package_query():
+    """Test the GraphPopulator.construct_package_query() class method."""
+    pass
+
+
+def test_create_query_string():
+    """Test the GraphPopulator.create_query_string() class method."""
+    pass
+
+
 if __name__ == '__main__':
     test_sanitize_text_for_query()
     test_sanitize_text_for_query_for_unicode_input
+    test_construct_version_query()
+    test_construct_package_query()
+    test_create_query_string()
