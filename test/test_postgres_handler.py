@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 def test_fetch_pending_list():
     h = PostgresHandler()
-    pending_list = h.fetch_pending_epvs()
+    data = h.fetch_pending_epvs()
+    pending_list = data["pending_list"]
     assert pending_list == []
 
 
