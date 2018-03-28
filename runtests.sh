@@ -1,55 +1,92 @@
 #!/usr/bin/bash -ex
 
+DOCKER_CMD="docker-compose -f docker-compose.dm-test.yml"
+
 gc() {
   retval=$?
-  sudo docker-compose -f local-setup/docker-compose.yaml down -v || :
+  pushd fabric8-analytics-deployment/
+  $DOCKER_CMD down -v || :
+  popd
   exit $retval
 }
+
 trap gc EXIT SIGINT
 
-# Enter local-setup/ directory
-# Run local instances for: dynamodb, gremlin-websocket, gremlin-http
-function start_gremlin_http {
-    pushd local-setup/
-    echo "Invoke Docker Compose Start Gremlin HTTP and WebSocket services"
-    sudo docker-compose -f docker-compose.yaml up --force-recreate -d 
+# Run local instances: dynamodb, gremlin, gremlin-http, worker-ingestion, pgsql
+function start_services {
+    echo "Start Gremlin HTTP and Ingestion Workers ..."
+
+    pushd fabric8-analytics-deployment/
+
+    $DOCKER_CMD down
+    $DOCKER_CMD up -d gremlin-http
+    sleep 5
+    $DOCKER_CMD up -d worker-ingestion
     popd
+
 }
 
+function setup_virtualenv {
+    echo "Create Virtualenv for Python deps ..."
+    virtualenv --python /usr/bin/python2.7 env-test
+    source env-test/bin/activate
+
+    pip install -U pip
+    pip install -r requirements.txt
+
+    # Install profiling module
+    pip install pytest-profiling
+
+    # Install pytest-coverage module
+    pip install pytest-cov
+}
+
+function destroy_virtualenv {
+    echo "Remove Virtualenv ..."
+    rm -rf env-test/
+}
+
+echo "Setup fabric8-analytics-deployment... "
+
+if [ -d fabric8-analytics-deployment ]
+then
+    echo "...already exists"
+else
+    export GIT_SSL_NO_VERIFY=true
+    git clone https://github.com/fabric8-analytics/fabric8-analytics-deployment.git
+    pushd fabric8-analytics-deployment
+
+    # remove data-model-importer dependency from worker because we are testing DM importer here
+    sed '/     - data-model-importer/d' docker-compose.yml > docker-compose.dm-test.yml
+    popd
+    echo "...done"
+fi
 
 echo JAVA_OPTIONS value: $JAVA_OPTIONS
 
-start_gremlin_http
+start_services
 
-export LOGFILE_PATH="all-tests.log"
-rm -f "$LOGFILE_PATH"
+setup_virtualenv
+
+source env-test/bin/activate
 
 export PYTHONPATH=`pwd`/src
 
-# rm -rf env-test/
-echo "Create Virtualenv for Python deps ..."
-virtualenv --python /usr/bin/python2.7 env-test
-source env-test/bin/activate
-
-pip install -U pip
-pip install -r requirements.txt
-
-# Install profiling module
-pip install pytest-profiling
-
-# Install pytest-coverage module
-pip install pytest-cov
+export BAYESIAN_PGBOUNCER_SERVICE_HOST="localhost"
 
 # Wait for services to be up
 echo "Wait for some time delay..."
 sleep 20
 
-# Check for sanity of the connections
-python src/sanitycheck.py || exit -1
+echo "Check for sanity of the connections..."
 
-# py.test --profile-svg -s test/
+if python sanitycheck.py
+then
+    py.test --cov=src/ --cov-report term-missing -vv -s test/
+else
+    echo "Sanity checks failed"
+fi
 
-py.test --cov=src/ --cov-report term-missing -vv -s test/
+deactivate
 
-rm -rf env-test/
-
+destroy_virtualenv
