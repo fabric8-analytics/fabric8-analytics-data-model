@@ -40,9 +40,6 @@ pip install pytest-profiling
 # Install pytest-coverage module
 pip install pytest-cov
 
-echo "Create a default configuration file..."
-cp src/config.py.template src/config.py
-
 # Wait for services to be up
 echo "Wait for some time delay..."
 sleep 20
