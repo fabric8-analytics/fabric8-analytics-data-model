@@ -1,25 +1,27 @@
 #!/usr/bin/bash -ex
 
+DOCKER_CMD="docker-compose -f docker-compose.dm-test.yml"
+
 gc() {
   retval=$?
-  docker-compose -f fabric8-analytics-deployment/docker-compose.yml down -v || :
+  pushd fabric8-analytics-deployment/
+  $DOCKER_CMD down -v || :
+  popd
   exit $retval
 }
 
 trap gc EXIT SIGINT
 
-# Enter local-setup/ directory
-# Run local instances for: dynamodb, gremlin-websocket, gremlin-http
+# Run local instances: dynamodb, gremlin, gremlin-http, worker-ingestion, pgsql
 function start_services {
     echo "Start Gremlin HTTP and Ingestion Workers ..."
 
-    # pushd local-setup/
     pushd fabric8-analytics-deployment/
-    # sudo docker-compose -f docker-compose.yaml up --force-recreate -d 
-    docker-compose down
-    docker-compose up -d gremlin-http
+
+    $DOCKER_CMD down
+    $DOCKER_CMD up -d gremlin-http
     sleep 5
-    docker-compose up -d worker-ingestion
+    $DOCKER_CMD up -d worker-ingestion
     popd
 
 }
@@ -52,6 +54,11 @@ then
 else
     export GIT_SSL_NO_VERIFY=true
     git clone https://github.com/fabric8-analytics/fabric8-analytics-deployment.git
+    pushd fabric8-analytics-deployment
+
+    # remove data-model-importer dependency from worker because we are testing DM importer here
+    sed '/     - data-model-importer/d' docker-compose.yml > docker-compose.dm-test.yml
+    popd
     echo "...done"
 fi
 
@@ -59,7 +66,7 @@ echo JAVA_OPTIONS value: $JAVA_OPTIONS
 
 start_services
 
-# setup_virtualenv
+setup_virtualenv
 
 source env-test/bin/activate
 
@@ -71,8 +78,7 @@ export BAYESIAN_PGBOUNCER_SERVICE_HOST="localhost"
 cp src/config.py.template src/config.py
 
 # Wait for services to be up
-# echo "Wait for some time delay..."
-
+echo "Wait for some time delay..."
 sleep 20
 
 echo "Check for sanity of the connections..."
@@ -84,6 +90,6 @@ else
     echo "Sanity checks failed"
 fi
 
-# deactivate
+deactivate
 
-# destroy_virtualenv
+destroy_virtualenv
