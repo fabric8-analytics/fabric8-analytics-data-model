@@ -238,10 +238,9 @@ class PostgresHandler(object):
     def __init__(self):
         """Initialize Handler with session to Postgres Database."""
         # connect to RDS only if its not local environment
-        if not config.AWS_S3_IS_LOCAL:
-            engine = create_engine(config.PGSQL_ENDPOINT_URL)
-            session = sessionmaker(bind=engine)
-            self.rdb = session()
+        engine = create_engine(config.PGSQL_ENDPOINT_URL)
+        session = sessionmaker(bind=engine)
+        self.rdb = session()
 
     def fetch_pending_epvs(self, ecosystem=None, package=None, version=None,
                            limit=None, offset=None):
