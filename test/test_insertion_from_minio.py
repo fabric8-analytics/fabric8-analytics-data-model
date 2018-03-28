@@ -11,6 +11,7 @@ from minio import Minio
 from minio.error import ResponseError, BucketAlreadyOwnedByYou, BucketAlreadyExists
 from data_importer import import_epv_from_s3_http
 from graph_manager import BayesianGraph
+import pytest
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -92,6 +93,30 @@ def test_insertion():
         # TODO Need to enable this test with new changes
         # assert report["epv"] == ["pypi:access_points:0.4.59"]
         assert report["count_imported_EPVs"] == 1
+    except Exception:
+        # TODO this is probably bad approach how to handle/ignore exceptions
+        # see https://github.com/openshiftio/openshift.io/issues/2263
+        tb = traceback.format_exc()
+        logger.error("Traceback for latest failure in import call: %s" % tb)
+
+
+def test_insertion_not_exists():
+    """Test if the stored e/p/v data can be retrieved back."""
+    list_epv = [
+        {
+            "version": "0.0.0",
+            "name": "access_points",
+            "ecosystem": "pypi"
+        }
+    ]
+    try:
+        report = import_epv_from_s3_http(list_epv, select_doc=['not_exists_data'])
+        logger.info(report)
+        assert report['status'] == "Success"
+        # TODO Need to enable this test with new changes
+        # assert report["epv"] == ["pypi:access_points:0.4.59"]
+        assert report["count_imported_EPVs"] == 0
+        logger.info(report)
     except Exception:
         # TODO this is probably bad approach how to handle/ignore exceptions
         # see https://github.com/openshiftio/openshift.io/issues/2263
