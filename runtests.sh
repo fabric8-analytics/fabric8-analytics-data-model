@@ -72,10 +72,7 @@ source env-test/bin/activate
 
 export PYTHONPATH=`pwd`/src
 
-echo "Create a default configuration file..."
-
 export BAYESIAN_PGBOUNCER_SERVICE_HOST="localhost"
-cp src/config.py.template src/config.py
 
 # Wait for services to be up
 echo "Wait for some time delay..."

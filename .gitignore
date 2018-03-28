@@ -4,7 +4,6 @@ __pycache__/
 .cache/
 env*/
 venv/
-config.py
 error.log
 env.txt
 tool/
