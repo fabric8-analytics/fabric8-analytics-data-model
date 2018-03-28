@@ -83,7 +83,7 @@ sleep 20
 
 echo "Check for sanity of the connections..."
 
-if python src/sanitycheck.py
+if python sanitycheck.py
 then
     py.test --cov=src/ --cov-report term-missing -vv -s test/
 else
