@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_fetch_pending_list():
+    """Test pending list is empty."""
     h = PostgresHandler()
     data = h.fetch_pending_epvs()
     pending_list = data["pending_list"]
