@@ -1,7 +1,6 @@
 """Sanity check of the graph DB REST API."""
 
 from graph_manager import BayesianGraph
-import traceback
 import time
 import sys
 import logging
@@ -10,7 +9,7 @@ import config
 logger = logging.getLogger(config.APP_NAME)
 
 
-MAX_DELAY = 20 * 60  # 5 minutes
+MAX_DELAY = 20 * 60  # 20 minutes
 
 
 def test_http_connection():
@@ -44,7 +43,6 @@ def main():
             test_http_connection()
             break
         except Exception as e:
-            # tb = traceback.format_exc()
             logger.info("Connection to HTTP endpoint: FAILED... %s" % e)
             logger.info("Retrying after %s seconds" % waittime)
             time.sleep(waittime)
