@@ -2,9 +2,10 @@
 
 gc() {
   retval=$?
-  sudo docker-compose -f fabric8-analytics-deployment/docker-compose.yaml down -v || :
+  docker-compose -f fabric8-analytics-deployment/docker-compose.yml down -v || :
   exit $retval
 }
+
 trap gc EXIT SIGINT
 
 # Enter local-setup/ directory
@@ -13,9 +14,14 @@ function start_services {
     echo "Start Gremlin HTTP and Ingestion Workers ..."
 
     # pushd local-setup/
+    pushd fabric8-analytics-deployment/
     # sudo docker-compose -f docker-compose.yaml up --force-recreate -d 
-    docker-compose -f fabric8-analytics-deployment/docker-compose.yml down
-    docker-compose -f fabric8-analytics-deployment/docker-compose.yml up -d gremlin-http worker-ingestion
+    docker-compose down
+    docker-compose up -d gremlin-http
+    sleep 5
+    docker-compose up -d worker-ingestion
+    popd
+
 }
 
 function setup_virtualenv {
@@ -49,26 +55,25 @@ else
     echo "...done"
 fi
 
-
 echo JAVA_OPTIONS value: $JAVA_OPTIONS
 
 start_services
 
-setup_virtualenv
+# setup_virtualenv
 
 source env-test/bin/activate
-
-export LOGFILE_PATH="all-tests.log"
-rm -f "$LOGFILE_PATH"
 
 export PYTHONPATH=`pwd`/src
 
 echo "Create a default configuration file..."
+
+export BAYESIAN_PGBOUNCER_SERVICE_HOST="localhost"
 cp src/config.py.template src/config.py
 
 # Wait for services to be up
 # echo "Wait for some time delay..."
-# sleep 20
+
+sleep 20
 
 echo "Check for sanity of the connections..."
 
@@ -79,6 +84,6 @@ else
     echo "Sanity checks failed"
 fi
 
-deactivate
+# deactivate
 
-destroy_virtualenv
+# destroy_virtualenv
