@@ -73,8 +73,8 @@ class RestApiTestCase(unittest.TestCase):
         assert 'message' in data
         assert data['message'] == 'Nothing to be synced to Graph!'
 
-    def test_selective_ingest(self):
-        """Add test for selective ingest API."""
+    def test_selective_ingest_empty(self):
+        """Add test for selective ingest API with empty inputs."""
 
         input_data = {}
         response = self.app.post('/api/v1/selective_ingest',
@@ -102,6 +102,20 @@ class RestApiTestCase(unittest.TestCase):
         logger.info(data)
         assert response.status_code == 400
         assert 'No Packages provided. Nothing to be ingested' == data['message']
+
+    def test_selective_ingest_nonempty(self):
+        """Add test for selective ingest API with wrong input."""
+
+        input_data = {
+            'package_list': [{}],
+            'select_ingest': []}
+        response = self.app.post('/api/v1/selective_ingest',
+                                 data=json.dumps(input_data),
+                                 headers={'Content-Type': 'application/json'})
+        data = json.loads(response.get_data())
+        logger.info(data)
+        assert response.status_code == 400
+        assert 'Invalid keys found in input:' in data['message']
 
 
 if __name__ == '__main__':
