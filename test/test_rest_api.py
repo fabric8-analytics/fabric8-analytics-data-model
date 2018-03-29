@@ -10,12 +10,15 @@ logger = logging.getLogger(config.APP_NAME)
 
 
 class RestApiTestCase(unittest.TestCase):
+    """Test cases for Rest API."""
 
     def setUp(self):
+        """Make the application instance ready for testing."""
         rest_api.app.testing = True
         self.app = rest_api.app.test_client()
 
     def tearDown(self):
+        """Cleanup application instance after testing."""
         pass
 
     def test_readiness(self):
