@@ -75,7 +75,6 @@ class RestApiTestCase(unittest.TestCase):
 
     def test_selective_ingest_empty(self):
         """Add test for selective ingest API with empty inputs."""
-
         input_data = {}
         response = self.app.post('/api/v1/selective_ingest',
                                  data=json.dumps(input_data),
@@ -105,7 +104,6 @@ class RestApiTestCase(unittest.TestCase):
 
     def test_selective_ingest_nonempty(self):
         """Add test for selective ingest API with wrong input."""
-
         input_data = {
             'package_list': [{}],
             'select_ingest': []}
