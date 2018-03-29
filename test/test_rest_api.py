@@ -1,9 +1,12 @@
 """Tests for the rest_api module (to be done)."""
 
-from flask import current_app, url_for
-import pytest
 import rest_api
 import unittest
+import logging
+import config
+
+
+logger = logging.getLogger(config.APP_NAME)
 
 
 class RestApiTestCase(unittest.TestCase):
@@ -14,6 +17,11 @@ class RestApiTestCase(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+    def test_readiness(self):
+        response = self.app.get('/api/v1/readiness')
+        logger.info(response)
+        assert response.status_code == 200
 
 
 if __name__ == '__main__':
