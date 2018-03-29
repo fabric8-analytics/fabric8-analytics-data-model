@@ -43,6 +43,18 @@ class RestApiTestCase(unittest.TestCase):
         assert 'pending_list' in data
         assert 'all_counts' in data
 
+    def test_sync_all(self):
+        """Add test for graph sync API."""
+        response = self.app.get('/api/v1/sync_all')
+        logger.info(response)
+        assert response.status_code == 200
+        data = json.loads(response.get_data())
+        logger.info(data)
+        assert 'count_imported_EPVs' in data
+        assert 'epv' in data
+        assert 'message' in data
+        assert data['message'] == 'Nothing to be synced to Graph!'
+
 
 if __name__ == '__main__':
     unittest.main()
