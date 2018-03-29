@@ -59,7 +59,8 @@ class RestApiTestCase(unittest.TestCase):
         """Add test for ingest to graph API."""
         input_data = []
         response = self.app.post('/api/v1/ingest_to_graph',
-                                 data=input_data)
+                                 data=input_data,
+                                 headers={'Content-Type': 'application/json'})
         logger.info(response)
         # assert response.status_code == 200
         data = json.loads(response.get_data())
