@@ -115,6 +115,22 @@ class RestApiTestCase(unittest.TestCase):
         assert response.status_code == 400
         assert 'Invalid keys found in input:' in data['message']
 
+    def test_selective_ingest_valid(self):
+        """Add test for selective ingest API with wrong input."""
+        input_data = {
+            'package_list': [{"version": "0.4.59",
+                              "name": "access_points",
+                              "ecosystem": "pypi"
+                              }],
+            'select_ingest': []}
+        response = self.app.post('/api/v1/selective_ingest',
+                                 data=json.dumps(input_data),
+                                 headers={'Content-Type': 'application/json'})
+        data = json.loads(response.get_data())
+        logger.info(data)
+        assert response.status_code == 200
+        assert 'The import finished successfully!' in data['message']
+
 
 if __name__ == '__main__':
     unittest.main()
