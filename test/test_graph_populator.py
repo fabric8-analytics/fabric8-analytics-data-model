@@ -3,6 +3,11 @@
 from graph_populator import GraphPopulator
 import pytest
 import json
+import logging
+import config
+
+
+logger = logging.getLogger(config.APP_NAME)
 
 
 def test_sanitize_text_for_query():
@@ -56,17 +61,152 @@ def test_sanitize_text_for_query_for_unicode_input():
 
 def test_correct_license_splitting():
     """Test the GraphPopulator.correct_license_splitting() class method."""
-    pass
+    g = GraphPopulator
+    f = g.correct_license_splitting
+    l1 = ["""
+    Apache License, Version 2.0 and
+    Common Development And Distribution License (CDDL) Version 1.0"""]
+
+    logger.info(f(l1))
+    assert f(l1) == ['Apache License, Version 2.0 and '
+                     'Common Development And Distribution License (CDDL) Version 1.0']
+
+    l2 = ['Apache License', 'Version2', 'GPL', 'Version 2.1']
+    logger.info(f(l2))
+    assert f(l2) == ['Apache License, Version2', 'GPL, Version 2.1']
 
 
 def test_construct_version_query():
     """Test the GraphPopulator.construct_version_query() class method."""
-    pass
+    input_json = {
+        "version": "0.4.59",
+        "package": "access_points",
+        "ecosystem": "pypi",
+        "analyses": {
+            "metadata": {}
+        }
+    }
+    q = GraphPopulator.construct_version_query(input_json)
+    logger.info(q)
+
+    assert q is ''
+
+    input_json = {
+        "version": "0.4.59",
+        "package": "access_points",
+        "ecosystem": "pypi",
+        "analyses": {
+            "metadata": {"details": [
+                {"description": "Some description here",
+                 "declared_licenses": ["GPL v3", "APL v2.0"]}
+            ]},
+            "github_details": {},
+            'libraries_io': {},
+            'source_licenses': {},
+            'security_issues': {
+                "details": [
+                    {"id": "CEV-007", "cvss": {"score": 9.7}}
+                ]
+            },
+            'code_metrics': {"details": {"languages": [{
+                "metrics": {
+                    "functions": {
+                        'average_cyclomatic_complexity': 3
+                    }
+                }
+            }]}},
+            'redhat_downstream': {
+                "summary": {
+                    "all_rhsm_product_names": ["access_points_rh"]
+                }
+            }
+
+        }
+    }
+    q = GraphPopulator.construct_version_query(input_json)
+    logger.info(q)
+
+    assert "access_points" in q
+    assert "0.4.59" in q
+    assert "pypi" in q
+
+    input_json = {
+        "version": "0.4.59",
+        "package": "access_points",
+        "ecosystem": "pypi",
+        "analyses": {
+            "metadata": {"details": [
+                {"description": "Some description here",
+                 "declared_license": "GPL \nv2.0"}
+            ]}
+        }
+    }
+    q = GraphPopulator.construct_version_query(input_json)
+    logger.info(q)
+
+    assert "access_points" in q
+    assert "0.4.59" in q
+    assert "pypi" in q
+
+    input_json = {
+        "version": "0.4.59",
+        "package": "access_points",
+        "ecosystem": "pypi",
+        "analyses": {
+            "metadata": {"details": [
+                {"description": "Some description here",
+                 "declared_license": "GPL and\nv2.0"}
+            ]}
+        }
+    }
+    q = GraphPopulator.construct_version_query(input_json)
+    logger.info(q)
+
+    assert "access_points" in q
+    assert "0.4.59" in q
+    assert "pypi" in q
 
 
 def test_construct_package_query():
     """Test the GraphPopulator.construct_package_query() class method."""
-    pass
+    input_json = {
+        "version": "0.4.59",
+        "package": "access_points",
+        "ecosystem": "pypi",
+        "analyses": {
+            "metadata": {"details": [
+                {"description": "Some description here"}
+            ]},
+            "github_details": {},
+            'libraries_io': {'schema': {'version': '2-0-0'},
+                             'details': {'releases': {
+                                 'count': 2
+                             }}}
+        }
+    }
+    q = GraphPopulator.construct_version_query(input_json)
+    logger.info(q)
+
+    assert "access_points" in q
+    assert "pypi" in q
+
+    input_json = {
+        "version": "0.4.59",
+        "package": "access_points",
+        "ecosystem": "pypi",
+        "analyses": {
+            "metadata": {"details": [
+                {"description": "Some description here"}
+            ]},
+            "github_details": {},
+            'libraries_io': {}
+        }
+    }
+    q = GraphPopulator.construct_version_query(input_json)
+    logger.info(q)
+
+    assert "access_points" in q
+    assert "pypi" in q
 
 
 def test_create_query_string():
@@ -80,3 +220,4 @@ if __name__ == '__main__':
     test_construct_version_query()
     test_construct_package_query()
     test_create_query_string()
+    test_correct_license_splitting()
