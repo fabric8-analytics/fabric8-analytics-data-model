@@ -22,16 +22,19 @@ class RestApiTestCase(unittest.TestCase):
         pass
 
     def test_readiness(self):
+        """Add test for readiness API."""
         response = self.app.get('/api/v1/readiness')
         logger.info(response)
         assert response.status_code == 200
 
     def test_liveness(self):
+        """Add test for liveness API."""
         response = self.app.get('/api/v1/liveness')
         logger.info(response)
         assert response.status_code == 200
 
     def test_pending(self):
+        """Add test for pelding graph sync API."""
         response = self.app.get('/api/v1/pending')
         logger.info(response)
         assert response.status_code == 200
