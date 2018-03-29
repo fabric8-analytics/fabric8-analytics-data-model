@@ -58,7 +58,6 @@ class GraphPopulator(object):
             description = details_data[0].get('description', '')
             description = cls._sanitize_text_for_query(description)
 
-
         drop_props = []
         str_version = prp_version = drop_prop = ""
         # Check if license and cve analyses succeeded. Then we refresh the property

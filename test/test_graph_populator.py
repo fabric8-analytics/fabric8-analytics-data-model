@@ -69,7 +69,7 @@ def test_correct_license_splitting():
 
     logger.info(f(l1))
     assert f(l1) == ['Apache License, Version 2.0 and '
-                  'Common Development And Distribution License (CDDL) Version 1.0']
+                     'Common Development And Distribution License (CDDL) Version 1.0']
 
     l2 = ['Apache License', 'Version2', 'GPL', 'Version 2.1']
     logger.info(f(l2))
