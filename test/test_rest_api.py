@@ -77,19 +77,31 @@ class RestApiTestCase(unittest.TestCase):
         """Add test for selective ingest API."""
 
         input_data = {}
-        self.app.post('/api/v1/selective_ingest',
-                      data=json.dumps(input_data),
-                      headers={'Content-Type': 'application/json'})
+        response = self.app.post('/api/v1/selective_ingest',
+                                 data=json.dumps(input_data),
+                                 headers={'Content-Type': 'application/json'})
+        data = json.loads(response.get_data())
+        logger.info(data)
+        assert response.status_code == 400
+        assert 'No Packages provided. Nothing to be ingested' == data['message']
 
         input_data = {'package_list': []}
-        self.app.post('/api/v1/selective_ingest',
-                      data=json.dumps(input_data),
-                      headers={'Content-Type': 'application/json'})
+        response = self.app.post('/api/v1/selective_ingest',
+                                 data=json.dumps(input_data),
+                                 headers={'Content-Type': 'application/json'})
+        data = json.loads(response.get_data())
+        logger.info(data)
+        assert response.status_code == 400
+        assert 'No Packages provided. Nothing to be ingested' == data['message']
 
         input_data = {'package_list': [], 'select_ingest': []}
-        self.app.post('/api/v1/selective_ingest',
-                      data=json.dumps(input_data),
-                      headers={'Content-Type': 'application/json'})
+        response = self.app.post('/api/v1/selective_ingest',
+                                 data=json.dumps(input_data),
+                                 headers={'Content-Type': 'application/json'})
+        data = json.loads(response.get_data())
+        logger.info(data)
+        assert response.status_code == 400
+        assert 'No Packages provided. Nothing to be ingested' == data['message']
 
 
 if __name__ == '__main__':
