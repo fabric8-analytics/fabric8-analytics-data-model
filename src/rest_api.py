@@ -118,7 +118,6 @@ def ingest_to_graph():
     response = {'message': report.get('message'),
                 'epv': input_json,
                 'count_imported_EPVs': report.get('count_imported_EPVs')}
-    print(response)
     # TODO the previous code can raise a runtime exception, does not we need to handle that?
     if report.get('status') is not 'Success':
         return flask.jsonify(response), 500
