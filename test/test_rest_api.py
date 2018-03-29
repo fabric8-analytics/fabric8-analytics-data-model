@@ -73,6 +73,14 @@ class RestApiTestCase(unittest.TestCase):
         assert 'message' in data
         assert data['message'] == 'Nothing to be synced to Graph!'
 
+    def test_selective_ingest(self):
+        """Add test for selective ingest API."""
+
+        input_data = {}
+        self.app.post('/api/v1/selective_ingest',
+                      data=json.dumps(input_data),
+                      headers={'Content-Type': 'application/json'})
+
 
 if __name__ == '__main__':
     unittest.main()
