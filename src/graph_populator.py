@@ -52,15 +52,12 @@ class GraphPopulator(object):
         ecosystem = input_json.get('ecosystem')
         version = cls._sanitize_text_for_query(input_json.get('version'))
         description = ''
-        try:
-            if len(input_json.get('analyses', {}).get('metadata', {}).get('details')) > 0:
-                description = input_json.get('analyses').get('metadata').get('details')[0].get(
-                    'description', '')
-                description = cls._sanitize_text_for_query(description)
 
-        except Exception:
-            # we pass and move forward without description
-            pass
+        details_data = input_json.get('analyses', {}).get('metadata', {}).get('details', [])
+        if len(details_data) > 0:
+            description = details_data[0].get('description', '')
+            description = cls._sanitize_text_for_query(description)
+
 
         drop_props = []
         str_version = prp_version = drop_prop = ""
