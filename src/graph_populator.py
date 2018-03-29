@@ -301,7 +301,6 @@ class GraphPopulator(object):
                 published_at = str(time.mktime(p)) if p else ''
                 prp_package += "pkg.property('libio_latest_release', '{}');".format(published_at)
 
-
             if details.get('dependent_repositories', {}).get('top'):
                 drop_props.append('libio_usedby')
                 for key, val in details.get('dependent_repositories', {}).get('top', {}).items():
