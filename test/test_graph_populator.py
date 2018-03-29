@@ -6,7 +6,6 @@ import json
 import logging
 import config
 
-
 logger = logging.getLogger(config.APP_NAME)
 
 
@@ -180,15 +179,19 @@ def test_construct_package_query():
             "github_details": {},
             'libraries_io': {'schema': {'version': '2-0-0'},
                              'details': {'releases': {
-                                 'count': 2
+                                 'count': 2,
+                                 'recent': [{
+                                     "published_at": "2016-09-09"}
+                                 ],
+                                 "published_at": "2016-09-09"
                              }}}
         }
     }
-    q = GraphPopulator.construct_version_query(input_json)
-    logger.info(q)
+    str_package, prp_package = GraphPopulator.construct_package_query(input_json)
+    logger.info(str_package, prp_package)
 
-    assert "access_points" in q
-    assert "pypi" in q
+    assert 'access_points' in str_package
+    assert "pypi" in str_package
 
     input_json = {
         "version": "0.4.59",
@@ -202,11 +205,39 @@ def test_construct_package_query():
             'libraries_io': {}
         }
     }
-    q = GraphPopulator.construct_version_query(input_json)
-    logger.info(q)
+    str_package, prp_package = GraphPopulator.construct_package_query(input_json)
+    logger.info(str_package, prp_package)
 
-    assert "access_points" in q
-    assert "pypi" in q
+    assert 'access_points' in str_package
+    assert "pypi" in str_package
+
+    input_json = {
+        "version": "0.4.59",
+        "package": "access_points",
+        "ecosystem": "pypi",
+        "analyses": {
+            "metadata": {"details": [
+                {"description": "Some description here"}
+            ]},
+            "github_details": {},
+            'libraries_io': {'schema': {'version': '1-0-0'},
+                             'details': {'releases': {
+                                 'count': 2,
+                                 'recent': [{"published_at": "2016-09-09"}],
+                                 'latest': {
+                                     'recent': {
+                                         "0.4.59": "2016-09-09"
+                                     }
+                                 },
+                                 "published_at": "2016-09-09"
+                             }}}
+        }
+    }
+    str_package, prp_package = GraphPopulator.construct_package_query(input_json)
+    logger.info([str_package, prp_package])
+
+    assert 'access_points' in str_package
+    assert "pypi" in str_package
 
 
 def test_create_query_string():
@@ -216,7 +247,7 @@ def test_create_query_string():
 
 if __name__ == '__main__':
     test_sanitize_text_for_query()
-    test_sanitize_text_for_query_for_unicode_input
+    test_sanitize_text_for_query_for_unicode_input()
     test_construct_version_query()
     test_construct_package_query()
     test_create_query_string()
