@@ -63,6 +63,15 @@ class RestApiTestCase(unittest.TestCase):
                                  headers={'Content-Type': 'application/json'})
         logger.info(response)
         assert response.status_code == 200
+        data = response.get_data()
+        logger.info("Returned data")
+        logger.info(data)
+        data = json.loads(response.get_data())
+        logger.info(data)
+        assert 'count_imported_EPVs' in data
+        assert 'epv' in data
+        assert 'message' in data
+        assert data['message'] == 'Nothing to be synced to Graph!'
 
 
 if __name__ == '__main__':
