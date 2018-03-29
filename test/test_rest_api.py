@@ -81,6 +81,16 @@ class RestApiTestCase(unittest.TestCase):
                       data=json.dumps(input_data),
                       headers={'Content-Type': 'application/json'})
 
+        input_data = {'package_list': []}
+        self.app.post('/api/v1/selective_ingest',
+                      data=json.dumps(input_data),
+                      headers={'Content-Type': 'application/json'})
+
+        input_data = {'package_list': [], 'select_ingest': []}
+        self.app.post('/api/v1/selective_ingest',
+                      data=json.dumps(input_data),
+                      headers={'Content-Type': 'application/json'})
+
 
 if __name__ == '__main__':
     unittest.main()
