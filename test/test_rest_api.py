@@ -23,6 +23,11 @@ class RestApiTestCase(unittest.TestCase):
         logger.info(response)
         assert response.status_code == 200
 
+    def test_liveness(self):
+        response = self.app.get('/api/v1/liveness')
+        logger.info(response)
+        assert response.status_code == 200
+
 
 if __name__ == '__main__':
     unittest.main()
