@@ -59,16 +59,10 @@ class RestApiTestCase(unittest.TestCase):
         """Add test for ingest to graph API."""
         input_data = []
         response = self.app.post('/api/v1/ingest_to_graph',
-                                 data=input_data,
+                                 data=json.dumps(input_data),
                                  headers={'Content-Type': 'application/json'})
         logger.info(response)
-        # assert response.status_code == 200
-        data = json.loads(response.get_data())
-        logger.info(data)
-        assert 'count_imported_EPVs' in data
-        assert 'epv' in data
-        assert 'message' in data
-        assert data['message'] == 'Nothing to be synced to Graph!'
+        assert response.status_code == 200
 
 
 if __name__ == '__main__':
