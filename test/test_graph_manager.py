@@ -47,3 +47,4 @@ if __name__ == '__main__':
     test_execute_invalid_query()
     test_return_json_response_data()
     test_is_index_created()
+    test_is_schema_defined()
