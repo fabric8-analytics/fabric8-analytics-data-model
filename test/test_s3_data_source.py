@@ -37,7 +37,13 @@ def test_list_files():
                                 access_key=access_key,
                                 secret_key=secret_key)
 
+    # use custom bucket name
     files = s3dataSource.list_files(bucket_name=config.AWS_PKG_BUCKET)
+    assert files
+    assert len(files) > 0
+
+    # use default bucket name
+    files = s3dataSource.list_files()
     assert files
     assert len(files) > 0
 
