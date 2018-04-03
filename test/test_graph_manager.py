@@ -19,7 +19,7 @@ def test_execute_invalid_query():
 
 
 def test_return_json_response_data():
-    """Test valid respone is returned from graph db."""
+    """Test valid response is returned from graph db."""
     query = "g.V().count()"
     status, data = g.execute(query)
     logger.info([status, data])
