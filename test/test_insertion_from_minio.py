@@ -126,4 +126,5 @@ def test_insertion_not_exists():
 
 if __name__ == '__main__':
     test_insertion()
+    test_insertion_not_exists()
     test_create_minio_bucket()
