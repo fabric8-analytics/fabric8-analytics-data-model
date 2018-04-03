@@ -11,6 +11,20 @@ def test_parse_int_or_none_for_integer_input():
     assert -1 == data_importer.parse_int_or_none(-1)
 
 
+def test_parse_int_or_none_for_integer_input_overflows():
+    """Test the function parse_int_or_none() for integer inputs."""
+    # positive values overflow checks
+    assert 65535 == data_importer.parse_int_or_none(65535)
+    assert 65536 == data_importer.parse_int_or_none(65536)
+    assert 2147483647 == data_importer.parse_int_or_none(2147483647)
+    assert 2147483648 == data_importer.parse_int_or_none(2147483648)
+    # negative values overflow checks
+    assert -65535 == data_importer.parse_int_or_none(-65535)
+    assert -65536 == data_importer.parse_int_or_none(-65536)
+    assert -2147483647 == data_importer.parse_int_or_none(-2147483647)
+    assert -2147483648 == data_importer.parse_int_or_none(-2147483648)
+
+
 def test_parse_int_or_none_for_float_input():
     """Test the function parse_int_or_none() for float inputs."""
     assert 0 == data_importer.parse_int_or_none(0.0)
@@ -60,6 +74,7 @@ def test_get_exception_msg():
 
 if __name__ == '__main__':
     test_parse_int_or_none_for_integer_input()
+    test_parse_int_or_none_for_integer_input_overflow()
     test_parse_int_or_none_for_float_input()
     test_parse_int_or_none_for_string_input()
     test_parse_int_or_none_for_unicode_string_input()

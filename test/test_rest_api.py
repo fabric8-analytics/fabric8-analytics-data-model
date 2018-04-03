@@ -34,7 +34,7 @@ class RestApiTestCase(unittest.TestCase):
         assert response.status_code == 200
 
     def test_pending(self):
-        """Add test for pelding graph sync API."""
+        """Add test for pending graph sync API."""
         response = self.app.get('/api/v1/pending')
         logger.info(response)
         assert response.status_code == 200

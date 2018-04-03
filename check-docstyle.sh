@@ -1,4 +1,5 @@
 directories="src test"
+separate_files="sanitycheck.py"
 pass=0
 fail=0
 
@@ -51,6 +52,14 @@ do
     check_files "$files"
 done
 
+
+echo
+echo "----------------------------------------------------"
+echo "Checking documentation strings in the following files"
+echo $separate_files
+echo "----------------------------------------------------"
+
+check_files "$separate_files"
 
 
 if [ $fail -eq 0 ]

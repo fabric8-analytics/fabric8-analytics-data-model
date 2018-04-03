@@ -323,7 +323,7 @@ class GraphPopulator(object):
                 # 'recent' is list of {'number':n, 'published_at':p} including the latest
                 for release in releases.get('recent', []):
                     rel_published = release.get('published_at', '')
-                    parsed_dt = parse_datetime(rel_published).timetuple()if rel_published else ''
+                    parsed_dt = parse_datetime(rel_published).timetuple() if rel_published else ''
                     timestamp = time.mktime(parsed_dt) if parsed_dt else ''
 
                     prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
