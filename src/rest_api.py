@@ -5,23 +5,34 @@ from flask import Flask, request, redirect, make_response
 from flask_cors import CORS
 import json
 import sys
-import codecs
-import urllib
 import data_importer
 from graph_manager import BayesianGraph
+from graph_populator import GraphPopulator
 from raven.contrib.flask import Sentry
 import config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
+from flask import Blueprint, current_app
+
+
+api_v1 = Blueprint('api_v1', __name__, url_prefix='/api/v1')
 
 # Python2.x: Make default encoding as UTF-8
 if sys.version_info.major == 2:
     reload(sys)
     sys.setdefaultencoding('UTF8')
 
-app = Flask(config.APP_NAME)
-app.config.from_object('config')
-CORS(app)
+
+def create_app():
+    """Create Flask app object."""
+    new_app = Flask(config.APP_NAME)
+    new_app.config.from_object('config')
+    CORS(new_app)
+    new_app.register_blueprint(api_v1)
+    return new_app
+
+
+app = create_app()
 app.wsgi_app = ProxyFix(app.wsgi_app)
 sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
 
@@ -39,23 +50,23 @@ except Exception:
     raise RuntimeError("Failed to initialized graph schema")
 
 
-@app.route('/api/v1/readiness')
+@api_v1.route('/api/v1/readiness')
 def readiness():
     """Generate response for the GET request to /api/v1/readiness."""
     return flask.jsonify({}), 200
 
 
-@app.route('/api/v1/liveness')
+@api_v1.route('/api/v1/liveness')
 def liveness():
     """Generate response for the GET request to /api/v1/liveness."""
     # TODO Check graph database connection
     return flask.jsonify({}), 200
 
 
-@app.route('/api/v1/pending')
+@api_v1.route('/api/v1/pending')
 def pending():
     """Get request to enlist all the EPVs which are not yet synced to Graph."""
-    app.logger.info("/api/v1/pending - %s" % dict(request.args))
+    current_app.logger.info("/api/v1/pending - %s" % dict(request.args))
     ecosystem_name = request.args.get('ecosystem', None)
     package_name = request.args.get('package', None)
     version_id = request.args.get('version', None)
@@ -64,17 +75,17 @@ def pending():
 
     params = {"ecosystem": ecosystem_name, "package": package_name, "version": version_id,
               "limit": limit, "offset": offset}
-    app.logger.info("params - %s" % params)
+    current_app.logger.info("params - %s" % params)
 
     pending_list = data_importer.PostgresHandler().fetch_pending_epvs(**params)
 
     return flask.jsonify(pending_list), 200
 
 
-@app.route('/api/v1/sync_all')
+@api_v1.route('/api/v1/sync_all')
 def sync_all():
     """Generate response for the GET request to /api/v1/sync_all."""
-    app.logger.info("/api/v1/sync_all - %s" % dict(request.args))
+    current_app.logger.info("/api/v1/sync_all - %s" % dict(request.args))
     ecosystem_name = request.args.get('ecosystem', None)
     package_name = request.args.get('package', None)
     version_id = request.args.get('version', None)
@@ -82,7 +93,7 @@ def sync_all():
     offset = request.args.get('offset', None)
     params = {"ecosystem": ecosystem_name, "package": package_name, "version": version_id,
               "limit": limit, "offset": offset}
-    app.logger.info("params - %s" % params)
+    current_app.logger.info("params - %s" % params)
 
     data = data_importer.PostgresHandler().fetch_pending_epvs(**params)
 
@@ -102,11 +113,11 @@ def sync_all():
         return flask.jsonify(response), 500
 
 
-@app.route('/api/v1/ingest_to_graph', methods=['POST'])
+@api_v1.route('/api/v1/ingest_to_graph', methods=['POST'])
 def ingest_to_graph():
     """Import e/p/v data and generate response for the POST request to /api/v1/ingest_to_graph."""
     input_json = request.get_json()
-    app.logger.info("Ingesting the given list of EPVs - " + json.dumps(input_json))
+    current_app.logger.info("Ingesting the given list of EPVs - " + json.dumps(input_json))
 
     expected_keys = set(['ecosystem', 'name', 'version'])
     for epv in input_json:
@@ -126,7 +137,7 @@ def ingest_to_graph():
         return flask.jsonify(response)
 
 
-@app.route('/api/v1/selective_ingest', methods=['POST'])
+@api_v1.route('/api/v1/selective_ingest', methods=['POST'])
 def selective_ingest():
     """Import e/p/v data and generate response for the POST request to /api/v1/selective."""
     input_json = request.get_json()
@@ -140,7 +151,7 @@ def selective_ingest():
             response = {'message': 'Invalid keys found in input: ' + ','.join(epv.keys())}
             return flask.jsonify(response), 400
 
-    app.logger.info("Selective Ingestion with payload - " + json.dumps(input_json))
+    current_app.logger.info("Selective Ingestion with payload - " + json.dumps(input_json))
 
     report = data_importer.import_epv_from_s3_http(list_epv=input_json.get('package_list'),
                                                    select_doc=input_json.get('select_ingest', None))
@@ -148,13 +159,91 @@ def selective_ingest():
                 'epv': input_json,
                 'count_imported_EPVs': report.get('count_imported_EPVs')}
 
-    app.logger.info(response)
+    current_app.logger.info(response)
 
     # TODO the previous code can raise a runtime exception, does not we need to handle that?
     if report.get('status') is not 'Success':
         return flask.jsonify(response), 500
     else:
         return flask.jsonify(response)
+
+
+@api_v1.route('/api/v1/vertex/<string:ecosystem>/<string:package>/<string:version>/properties',
+              methods=['PUT', 'DELETE'])
+def handle_properties(ecosystem, package, version):
+    """
+    Handle (update/delete) properties associated with given EPV.
+
+    Update replaces properties with the same name.
+
+    Expects JSON payload in following format:
+    {
+        "properties": [
+            {
+                "name": "cve_ids",
+                "value": "CVE-3005-0001:10"
+            }
+        ]
+    }
+
+    "value" can be omitted in DELETE requests.
+
+    :param ecosystem: str, ecosystem
+    :param package: str, package name
+    :param version: str, package version
+    :return: 200 on success, 400 on failure
+    """
+    input_json = request.get_json()
+    properties = input_json.get('properties')
+
+    error = flask.jsonify({'error': 'invalid input'})
+    if not properties:
+        return error, 400
+
+    input_json = {k: GraphPopulator.sanitize_text_for_query(str(v)) for k, v in input_json.items()}
+
+    if request.method == 'PUT':
+        if [x for x in properties if not x.get('name') or x.get('value') is None]:
+            return error, 400
+
+    log_msg = '[{m}] Updating properties for {e}/{p}/{v} with payload {b}'
+    current_app.logger.info(log_msg.format(m=request.method, e=ecosystem, p=package,
+                                           v=version, b=input_json))
+
+    query_statement = "g.V()" \
+                      ".has('pecosystem','{ecosystem}')" \
+                      ".has('pname','{pkg_name}')" \
+                      ".has('version','{version}')".format(ecosystem=ecosystem,
+                                                           pkg_name=package,
+                                                           version=version)
+    statement = ''
+
+    if request.method in ('DELETE', 'PUT'):
+        # build "delete" part of the statement
+        drop_str = ""
+        for prop in properties:
+            drop_str += query_statement
+            drop_str += ".properties('{property}').drop().iterate();".format(property=prop['name'])
+        statement += drop_str
+
+    if request.method == 'PUT':
+        # build "add" part of the statement
+        add_str = ""
+        for prop in properties:
+            add_str += ".property('{property}','{value}')".format(
+                property=prop['name'], value=prop['value']
+            )
+        statement += query_statement + add_str + ';'
+
+    current_app.logger.info('Gremlin statement: {s}'.format(s=statement))
+    success, response_json = BayesianGraph.execute(statement)
+    if not success:
+        current_app.logger.error("Failed to update properties for {e}/{p}/{v}".format(
+            e=ecosystem, p=package, v=version)
+        )
+        return flask.jsonify(response_json), 400
+
+    return flask.jsonify(response_json), 200
 
 
 if __name__ == "__main__":
