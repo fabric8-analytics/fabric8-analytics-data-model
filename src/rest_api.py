@@ -238,6 +238,9 @@ def handle_properties(ecosystem, package, version):
     current_app.logger.info('Gremlin statement: {s}'.format(s=statement))
     success, response_json = BayesianGraph.execute(statement)
     if not success:
+        current_app.logger.error("Failed to update properties for {e}/{p}/{v}".format(
+            e=ecosystem, p=package, v=version)
+        )
         return flask.jsonify(response_json), 400
 
     return flask.jsonify(response_json), 200
