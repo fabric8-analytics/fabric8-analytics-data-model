@@ -23,33 +23,6 @@ if sys.version_info.major == 2:
     sys.setdefaultencoding('UTF8')
 
 
-def create_app():
-    """Create Flask app object."""
-    new_app = Flask(config.APP_NAME)
-    new_app.config.from_object('config')
-    CORS(new_app)
-    new_app.register_blueprint(api_v1)
-    return new_app
-
-
-app = create_app()
-app.wsgi_app = ProxyFix(app.wsgi_app)
-sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
-
-# Check whether schema is created or not
-# populate schema if not already done
-try:
-    status, json_result = BayesianGraph.populate_schema()
-    if status:
-        app.logger.info("Ready to serve requests")
-    else:
-        app.logger.error(json_result)
-        raise RuntimeError("Failed to setup graph schema")
-except Exception:
-    sentry.captureException()
-    raise RuntimeError("Failed to initialized graph schema")
-
-
 @api_v1.route('/api/v1/readiness')
 def readiness():
     """Generate response for the GET request to /api/v1/readiness."""
@@ -244,6 +217,33 @@ def handle_properties(ecosystem, package, version):
         return flask.jsonify(response_json), 400
 
     return flask.jsonify(response_json), 200
+
+
+def create_app():
+    """Create Flask app object."""
+    new_app = Flask(config.APP_NAME)
+    new_app.config.from_object('config')
+    CORS(new_app)
+    new_app.register_blueprint(api_v1)
+    return new_app
+
+
+app = create_app()
+app.wsgi_app = ProxyFix(app.wsgi_app)
+sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
+
+# Check whether schema is created or not
+# populate schema if not already done
+try:
+    status, json_result = BayesianGraph.populate_schema()
+    if status:
+        app.logger.info("Ready to serve requests")
+    else:
+        app.logger.error(json_result)
+        raise RuntimeError("Failed to setup graph schema")
+except Exception:
+    sentry.captureException()
+    raise RuntimeError("Failed to initialized graph schema")
 
 
 if __name__ == "__main__":
