@@ -15,7 +15,7 @@ import logging
 from flask import Blueprint, current_app
 
 
-api_v1 = Blueprint('api_v1', __name__, url_prefix='/api/v1')
+api_v1 = Blueprint('api_v1', __name__)
 
 # Python2.x: Make default encoding as UTF-8
 if sys.version_info.major == 2:
