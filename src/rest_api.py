@@ -1,5 +1,6 @@
 """Declaration of the custom REST API to graph DB."""
 
+import os
 import flask
 from flask import Flask, request, redirect, make_response
 from flask_cors import CORS
@@ -228,7 +229,22 @@ def create_app():
     return new_app
 
 
+def setup_logging(flask_app):
+    """Perform the setup of logging for this application."""
+    if not flask_app.debug:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter(
+            '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'))
+        log_level = os.environ.get('FLASK_LOGGING_LEVEL', logging.getLevelName(logging.WARNING))
+        handler.setLevel(log_level)
+
+        flask_app.logger.addHandler(handler)
+        flask_app.config['LOGGER_HANDLER_POLICY'] = 'never'
+        flask_app.logger.setLevel(logging.DEBUG)
+
+
 app = create_app()
+setup_logging(app)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
 
