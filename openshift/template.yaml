@@ -88,8 +88,10 @@ objects:
             protocol: TCP
           resources:
             requests:
+              cpu: ${CPU_REQUEST}
               memory: ${MEMORY_REQUEST}
             limits:
+              cpu: ${CPU_LIMIT}
               memory: ${MEMORY_LIMIT}
           readinessProbe:
             httpGet:
@@ -143,6 +145,16 @@ parameters:
   name: MEMORY_REQUEST
   required: true
   value: "512Mi"
+
+- description: CPU_LIMIT
+  name: CPU_LIMIT
+  required: true
+  value: "300m"
+
+- description: CPU_REQUEST
+  name: CPU_REQUEST
+  required: true
+  value: "100m"
 
 - description: Docker registry where the image is
   displayName: Docker registry
