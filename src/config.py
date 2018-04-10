@@ -3,7 +3,7 @@
 import os
 
 TESTING = False
-DEBUG = True
+DEBUG = os.environ.get("FLASK_DEBUG", "false").lower() in ("1", "true")
 LOGFILE_PATH = os.environ.get("LOGFILE_PATH", "/tmp/error.log")
 
 # URL of Gremlin server
