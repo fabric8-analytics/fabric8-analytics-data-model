@@ -199,7 +199,7 @@ class GraphPopulator(object):
         """Construct the query to retrieve detailed information of given package."""
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
-        pkg_name_tokens = re.split('\W+', pkg_name)
+        pkg_name_tokens = re.split(r'\W+', pkg_name)
         prp_package = ""
         drop_prop = ""
         drop_props = []
