@@ -4,6 +4,7 @@ import logging
 import config
 import json
 from flask import url_for
+import rest_api
 
 
 logger = logging.getLogger(config.APP_NAME)
