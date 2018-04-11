@@ -72,6 +72,12 @@ def test_get_exception_msg():
     assert data_importer._get_exception_msg("", e2) == ": hello world!"
 
 
+def test_import_epv_http():
+    """Test the function import_epv_http()."""
+    with pytest.raises(RuntimeError) as e:
+        import_epv_http(None, [])
+
+
 if __name__ == '__main__':
     test_parse_int_or_none_for_integer_input()
     test_parse_int_or_none_for_integer_input_overflow()
@@ -80,3 +86,4 @@ if __name__ == '__main__':
     test_parse_int_or_none_for_unicode_string_input()
     test_parse_int_or_none_for_invalid_input()
     test_get_exception_msg()
+    test_import_epv_http()
