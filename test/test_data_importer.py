@@ -75,7 +75,7 @@ def test_get_exception_msg():
 def test_import_epv_http():
     """Test the function import_epv_http()."""
     with pytest.raises(RuntimeError) as e:
-        import_epv_http(None, [])
+        data_importer.import_epv_http(None, [])
 
 
 if __name__ == '__main__':
