@@ -78,7 +78,7 @@ class GraphPopulator(object):
         # Add Description if not blank
         if description:
             prp_version += "ver.property('description','{description}');".format(
-                description=re.sub('[^A-Za-z0-9_\\\/\'":. ]', '', description)
+                description=re.sub(r'[^A-Za-z0-9_\\/\'":. ]', '', description)
             )
         # Get Code Metrics Details
         if 'code_metrics' in input_json.get('analyses', {}):
