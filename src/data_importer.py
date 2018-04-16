@@ -296,11 +296,13 @@ class PostgresHandler(object):
 
     def _generate_fetch_query(self, ecosystem, package, version, limit, offset):
         query = """
-                    SELECT e.name AS ename, p.name AS pname, v.identifier AS versionid
-                    FROM versions v
+                    SELECT DISTINCT e.name AS ename, p.name AS pname, v.identifier AS versionid
+                    FROM analyses a
+                         JOIN versions v ON a.version_id = v.id
                          JOIN packages p ON v.package_id = p.id
                          JOIN ecosystems e ON p.ecosystem_id = e.id
                     WHERE v.synced2graph = FALSE
+                         AND a.finished_at IS NOT NULL
                     """
 
         if ecosystem:
@@ -332,11 +334,13 @@ class PostgresHandler(object):
 
     def _generate_count_query(self, ecosystem, package, version):
         query = """
-                    SELECT COUNT(*) as CNT
-                    FROM versions v
+                    SELECT COUNT(DISTINCT(e.name, p.name, v.identifier)) as CNT
+                    FROM analyses a
+                         JOIN versions v ON a.version_id = v.id
                          JOIN packages p ON v.package_id = p.id
                          JOIN ecosystems e ON p.ecosystem_id = e.id
                     WHERE v.synced2graph = FALSE
+                         AND a.finished_at IS NOT NULL
                     """
 
         if ecosystem:
