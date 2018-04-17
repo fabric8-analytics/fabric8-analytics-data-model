@@ -213,6 +213,6 @@ oc process -f data-model-importer-openshift-template.yaml -v AWS_BUCKET=<value> 
 ./check-docstyle.sh
 ```
 
-The first script checks the indentation, line lengths, variable names, whitespace around operators etc. The second
-script checks all documentation strings - its presense and format. Please fix any warnings and errors reported by these
+The first script checks the indentation, line lengths, variable names, white space around operators etc. The second
+script checks all documentation strings - its presence and format. Please fix any warnings and errors reported by these
 scripts.
