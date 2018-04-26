@@ -200,6 +200,8 @@ oc process -f data-model-importer-openshift-template.yaml -v AWS_BUCKET=<value> 
 
 ### Footnotes
 
+#### Coding standards
+
 - Local setup instructions and files can be found at `local-setup` directory, in case anyone wants local DynamoDB support. Note that, the container images used in the backup directory are not the same that are used to host the project in OpenShift. This directory should be removed once the local development support for DynamoDB makes its way in the current master branch.
 
 - For any queries related to building of container images on registry.centos.org, or if some modifications are required in the Dockerfiles, then the CentOS Container Pipeline team can be contacted on the `container-build` channel under CentOS on Mattermost.
@@ -216,3 +218,17 @@ oc process -f data-model-importer-openshift-template.yaml -v AWS_BUCKET=<value> 
 The first script checks the indentation, line lengths, variable names, white space around operators etc. The second
 script checks all documentation strings - its presence and format. Please fix any warnings and errors reported by these
 scripts.
+
+#### Code complexity measurement
+
+The scripts `measure-cyclomatic-complexity.sh` and `measure-maintainability-index.sh` are used to measure code complexity. These scripts can be run w/o any arguments:
+
+```
+./measure-cyclomatic-complexity.sh
+./measure-maintainability-index.sh
+```
+
+The first script measures cyclomatic complexity of all Python sources found in the repository. Please see [this table](https://radon.readthedocs.io/en/latest/commandline.html#the-cc-command) for further explanation how to comprehend the results.
+
+The second script measures maintainability index of all Python sources found in the repository. Please see [the following link](https://radon.readthedocs.io/en/latest/commandline.html#the-mi-command) with explanation of this measurement.
+

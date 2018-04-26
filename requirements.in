@@ -14,4 +14,4 @@ six
 raven[flask]
 pytest-mock
 pytest-flask
-
+radon
