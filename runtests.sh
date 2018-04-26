@@ -81,12 +81,12 @@ sleep 20
 echo "*****************************************"
 echo "*** Cyclomatic complexity measurement ***"
 echo "*****************************************"
-radon cc -s -a -i venv .
+radon cc -s -a -i venv src
 
 echo "*****************************************"
 echo "*** Maintainability Index measurement ***"
 echo "*****************************************"
-radon mi -s -i venv .
+radon mi -s -i venv src
 
 echo "*****************************************"
 echo "*** Unit tests ***"
