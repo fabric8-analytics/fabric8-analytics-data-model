@@ -11,6 +11,7 @@ logger = logging.getLogger(config.APP_NAME)
 
 def test_sanitize_text_for_query():
     """Test GraphPopulator._sanitize_text_for_query()."""
+    # TODO: reduce cyclomatic complexity
     f = GraphPopulator.sanitize_text_for_query
     assert 'pkg' == f('pkg')
     assert 'desc' == f('desc\n')
@@ -39,6 +40,7 @@ def test_sanitize_text_for_query():
 
 def test_sanitize_text_for_query_for_unicode_input():
     """Test GraphPopulator._sanitize_text_for_query() for Unicode input string."""
+    # TODO: reduce cyclomatic complexity
     f = GraphPopulator.sanitize_text_for_query
     assert 'pkg' == f(u'pkg')
     assert 'desc' == f(u'desc\n')
@@ -77,6 +79,7 @@ def test_correct_license_splitting():
 
 def test_construct_version_query():
     """Test the GraphPopulator.construct_version_query() class method."""
+    # TODO: reduce cyclomatic complexity
     input_json = {
         "version": "0.4.59",
         "package": "access_points",

@@ -48,6 +48,7 @@ class GraphPopulator(object):
     @classmethod
     def construct_version_query(cls, input_json):
         """Construct the query to retrieve detailed information of given version of a package."""
+        # TODO: reduce cyclomatic complexity
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
         version = cls.sanitize_text_for_query(input_json.get('version'))
@@ -197,6 +198,7 @@ class GraphPopulator(object):
     @classmethod
     def construct_package_query(cls, input_json):
         """Construct the query to retrieve detailed information of given package."""
+        # TODO: reduce cyclomatic complexity
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
         pkg_name_tokens = re.split(r'\W+', pkg_name)
