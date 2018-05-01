@@ -167,6 +167,7 @@ def handle_properties(ecosystem, package, version):
     :param version: str, package version
     :return: 200 on success, 400 on failure
     """
+    # TODO: reduce cyclomatic complexity
     input_json = request.get_json()
     properties = input_json.get('properties')
 

@@ -58,6 +58,7 @@ def _get_exception_msg(prefix, e):
 
 
 def _import_keys_from_s3_http(data_source, epv_list):
+    # TODO: reduce cyclomatic complexity
     logger.debug("Begin import...")
     report = {'status': 'Success', 'message': 'The import finished successfully!'}
     count_imported_EPVs = 0
@@ -160,6 +161,7 @@ def _log_report_msg(import_type, report):
 
 def import_epv_http(data_source, list_epv, select_doc=None):
     """Import the ecostystem+package+version triple from S3 database using selected data source."""
+    # TODO: reduce cyclomatic complexity
     if select_doc is None or len(select_doc) == 0:
         select_doc = []
 
