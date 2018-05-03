@@ -1,0 +1,30 @@
+FROM prod.registry.devshift.net/osio-prod/base/fabric8-analytics-data-model:latest
+LABEL maintainer "Devtools <devtools@redhat.com>"
+LABEL author "Devtools <devtools@redhat.com>"
+
+# --------------------------------------------------------------------------------------------------------------
+# Note: Need to remove cron job support for now as we are hitting user-permission issues when run on openshift
+# --------------------------------------------------------------------------------------------------------------
+# On centos, 'cron' is not available out-of-the-box.
+# Reference: http://stackoverflow.com/questions/21802223/how-to-install-crontab-on-centos
+# RUN yum install -y cronie
+
+# Add data_importer_crontab file in the cron directory and give exec rights
+# ADD scripts/data_importer_crontab /etc/cron.d/data_importer_crontab
+# RUN chmod 0644 /etc/cron.d/data_importer_crontab
+
+# Create the log file to be able to run tail
+# RUN touch /var/log/cron.log
+
+# Note: cron daemon ( crond ) will be invoked from within entry point
+# --------------------------------------------------------------------------------------------------------------
+
+# install python packages
+COPY ./requirements.txt /
+RUN pip install -r requirements.txt && rm requirements.txt
+
+COPY ./src /src
+
+ADD scripts/entrypoint.sh /bin/entrypoint.sh
+
+ENTRYPOINT ["/bin/entrypoint.sh"]
