@@ -1,5 +1,7 @@
 #!/bin/bash -ex
 
+REGISTRY="push.registry.devshift.net"
+
 load_jenkins_vars() {
     if [ -e "jenkins-env" ]; then
         cat jenkins-env \
@@ -7,6 +9,15 @@ load_jenkins_vars() {
           | sed 's/^/export /g' \
           > ~/.jenkins-env
         source ~/.jenkins-env
+    fi
+}
+
+docker_login() {
+    if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
+        docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${REGISTRY}
+    else
+        echo "Could not login, missing credentials for the registry"
+        exit 1
     fi
 }
 
@@ -32,30 +43,26 @@ tag_push() {
 push_image() {
     local image_name
     local image_repository
-    local short_commit 
-    local push_registry
+    local short_commit
     image_name=$(make get-image-name)
     image_repository=$(make get-image-repository)
     short_commit=$(git rev-parse --short=7 HEAD)
-    push_registry="push.registry.devshift.net"
 
-    # login first
-    if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
-        docker login -u ${DEVSHIFT_USERNAME} -p ${DEVSHIFT_PASSWORD} ${push_registry}
+    if [ "$TARGET" = "rhel" ]; then
+        IMAGE_URL="${REGISTRY}/osio-prod/${image_repository}"
     else
-        echo "Could not login, missing credentials for the registry"
-        exit 1
+        IMAGE_URL="${REGISTRY}/${image_repository}"
     fi
 
     if [ -n "${ghprbPullId}" ]; then
         # PR build
         pr_id="SNAPSHOT-PR-${ghprbPullId}"
-        tag_push ${push_registry}/${image_repository}:${pr_id} ${image_name}
-        tag_push ${push_registry}/${image_repository}:${pr_id}-${short_commit} ${image_name}
+        tag_push ${IMAGE_URL}:${pr_id} ${image_name}
+        tag_push ${IMAGE_URL}:${pr_id}-${short_commit} ${image_name}
     else
         # master branch build
-        tag_push ${push_registry}/${image_repository}:latest ${image_name}
-        tag_push ${push_registry}/${image_repository}:${short_commit} ${image_name}
+        tag_push ${IMAGE_URL}:latest ${image_name}
+        tag_push ${IMAGE_URL}:${short_commit} ${image_name}
     fi
 
     echo 'CICO: Image pushed, ready to update deployed app'
