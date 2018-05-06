@@ -91,7 +91,11 @@ def test_construct_version_query():
     q = GraphPopulator.construct_version_query(input_json)
     logger.info(q)
 
-    assert q is ''
+    assert "access_points" in q
+    assert "0.4.59" in q
+    assert "pypi" in q
+    assert "addVertex" in q
+    assert "drop()" not in q
 
     input_json = {
         "version": "0.4.59",

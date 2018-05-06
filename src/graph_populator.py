@@ -191,7 +191,7 @@ class GraphPopulator(object):
                             p="','".join(drop_props)
                          )
 
-        str_version = drop_prop + str_version + prp_version if prp_version else ''
+        str_version = drop_prop + str_version + (prp_version if prp_version else '')
 
         return str_version
 
