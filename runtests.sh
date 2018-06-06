@@ -1,12 +1,10 @@
 #!/usr/bin/bash -ex
 
-DOCKER_CMD="docker-compose -f docker-compose.dm-test.yml"
+DOCKER_CMD="docker-compose -f docker-compose-tests.yml"
 
 gc() {
   retval=$?
-  pushd fabric8-analytics-deployment/
   $DOCKER_CMD down -v || :
-  popd
   exit $retval
 }
 
@@ -15,15 +13,10 @@ trap gc EXIT SIGINT
 # Run local instances: dynamodb, gremlin, gremlin-http, worker-ingestion, pgsql
 function start_services {
     echo "Start Gremlin HTTP and Ingestion Workers ..."
-
-    pushd fabric8-analytics-deployment/
-
     $DOCKER_CMD down
     $DOCKER_CMD up -d gremlin-http
     sleep 5
     $DOCKER_CMD up -d worker-ingestion
-    popd
-
 }
 
 function setup_virtualenv {
@@ -45,22 +38,6 @@ function destroy_virtualenv {
     echo "Remove Virtualenv ..."
     rm -rf env-test/
 }
-
-echo "Setup fabric8-analytics-deployment... "
-
-if [ -d fabric8-analytics-deployment ]
-then
-    echo "...already exists"
-else
-    export GIT_SSL_NO_VERIFY=true
-    git clone https://github.com/fabric8-analytics/fabric8-analytics-deployment.git
-    pushd fabric8-analytics-deployment
-
-    # remove data-model-importer dependency from worker because we are testing DM importer here
-    sed '/     - data-model-importer/d' docker-compose.yml > docker-compose.dm-test.yml
-    popd
-    echo "...done"
-fi
 
 echo JAVA_OPTIONS value: $JAVA_OPTIONS
 
