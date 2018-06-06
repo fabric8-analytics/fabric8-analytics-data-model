@@ -82,7 +82,7 @@ Sample2
 URL: /api/v1/ingest_to_graph
 ```
 Description: Import epv data and generate response for the POST request to /api/v1/ingest_to_graph. Unlike sync_all, 
-			 it takes the list of epv from the user and then gets the data from S3 and populate to the graph and mark it as synched in RDS.
+             it takes the list of epv from the user and then gets the data from S3 and populate to the graph and mark it as synched in RDS.
 Method: POST
 Input: 
 [
