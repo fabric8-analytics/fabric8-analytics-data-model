@@ -20,8 +20,179 @@ DYNAMODB_CLIENT_CREDENTIALS_CLASS_NAME=com.amazonaws.auth.DefaultAWSCredentialsP
 AWS_ACCESS_KEY_ID=<dynamodb-access-key-id>
 AWS_SECRET_ACCESS_KEY=<dynamodb-secret-access-key>
 ```
+## API Informtion
+URL: /api/v1/readiness
+```
+Description: Generates response for the GET request to /api/v1/readiness. To check if the  service is ready.
+Method: GET
+Input:  -None-
+Output:  {} 
+```
+URL: /api/v1/liveness
+```
+Description: Generate response for the GET request to /api/v1/liveness. To check if the service is up and running.
+Method: GET
+Input:  -None-
+Output:  {}
+```
+URL: /api/v1/pending
+```
+Description: Get request to enlist all the EPVs which are not yet synced to Graph. Gets the pending list from RDS.
+Method: GET
+Input:  Request Params (options) ->  ecosystem, package, version, limit, offset
+Output: 
+{ "pending_list":[{
+                     "ecosystem": "maven",
+                     "package": "org.json:json",
+                     "version":  "20180130"
+                   }
+                 ],
+  "all_counts" : 1
+}
+```
+URL: /api/v1/sync_all
+```
+Description: Generate response for the GET request to /api/v1/sync_all. Get the pending list from RDS and 
+             get the data from S3 and populate in graph and mark the epv as synched in RDS.
+Method: GET
+Input:  Request Params (opitons) ->  ecosystem, package, version, limit, offset
+Output: 
+Sample1
+{
+  "epv": [], 
+  "message": "Nothing to be synced to Graph!", 
+  "count_imported_EPVs": 0
+}
 
-
+Sample2
+{
+  "epv": [
+            {
+              "ecosystem": "maven",
+              "package": "org.json:json",
+              "version":  "20180130"
+            }
+         ], 
+  "message": "The import finished successfully!", 
+  "count_imported_EPVs": 1
+}
+```
+URL: /api/v1/ingest_to_graph
+```
+Description: Import epv data and generate response for the POST request to /api/v1/ingest_to_graph. Unlike sync_all, 
+			 it takes the list of epv from the user and then gets the data from S3 and populate to the graph and mark it as synched in RDS.
+Method: POST
+Input: 
+[
+  {
+    "ecosystem": "pypi",
+    "name": "access_points",
+    "version": "0.4.59"
+  }
+]
+Output: 
+Sample1
+{
+  "count_imported_EPVs": 1,
+  "epv": [
+           {
+             "ecosystem": "pypi",
+             "name": "access_points",
+             "version": "0.4.59"
+           }
+         ],
+  "message": "The import finished successfully!"
+}
+Sample2
+{
+  "epv": [], 
+  "message": "Nothing to be synced to Graph!", 
+  "count_imported_EPVs": 0
+}
+```
+URL: /api/v1/selective_ingest
+```
+Description: Import epv data and generate response for the POST request to /api/v1/selective. Its similar to ingest_to_graph, with a difference,
+             that in this, the user also provides a list which indicates which packages to synch from the list of package list provided.
+Method: POST
+Input: 
+sample1
+{
+    "package_list": [
+                      {
+                        "version": "0.4.59",
+                        "name": "access_points",
+                        "ecosystem": "pypi"
+                       }
+                    ],
+    "select_ingest": []
+}
+sample2
+{
+    "package_list": [],
+    "select_ingest": []
+}
+sample3
+{
+    "package_list": [{}],
+    "select_ingest": [{}]
+}
+Output: 
+sample1
+{
+  "epv": {
+            "select_ingest": [], 
+            "package_list": [
+                              {
+                                "ecosystem": "pypi", 
+                                "version": "0.4.59", 
+                                "name": "access_points"
+                              }
+                            ]
+         }, 
+  "message": "The import finished successfully!", 
+  "count_imported_EPVs": 1
+}
+sample2
+{
+  "message": "No Packages provided. Nothing to be ingested",
+}
+sample3
+{
+  "message": "Invalid keys found in input:"
+}
+```
+URL: /api/v1/vertex/<string:ecosystem>/<string:package>/<string:version>/properties
+```
+Sample URL: /api/v1/vertex/maven/net.iharder:base64/2.3.9/properties
+Description: Handle delete properties associated with given EPV. Search for the record via the given values from the graph
+             and then perform a delete operation on it.
+Method: DELETE
+Input:  
+{ "properties": [
+                  {
+                    "name": "cve_ids"
+                  }
+                ]
+}
+Output:  {}
+```
+URL: /api/v1/vertex/<string:ecosystem>/<string:package>/<string:version>/properties
+```
+Sample URL: /api/v1/vertex/maven/net.iharder:base64/2.3.9/properties
+Description: Handle update properties associated with given EPV. Search for the record via the given values from the graph
+             and then update the entry with the new value provided.
+Method: PUT
+Input: 
+{ "properties": [
+                  {
+                    "name": "cve_ids",
+                    "value": "CVE-3005-0001:10"
+                   }
+                ]
+}
+Output:  {}
+```
 ## How to test and develop locally?
 ```
 cd local-setup
