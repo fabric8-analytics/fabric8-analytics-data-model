@@ -22,13 +22,14 @@ DYNAMODB_CLIENT_CREDENTIALS_CLASS_NAME=com.amazonaws.auth.DefaultAWSCredentialsP
 AWS_ACCESS_KEY_ID=<dynamodb-access-key-id>
 AWS_SECRET_ACCESS_KEY=<dynamodb-secret-access-key>
 ```
-## API Informtion
+## API Information
 URL: /api/v1/readiness
 ```
 Description: Generates response for the GET request to /api/v1/readiness. To check if the  service is ready.
 Method: GET
 Input:  -None-
 Output:  {} 
+HTTP Status Code: 200 success
 ```
 URL: /api/v1/liveness
 ```
@@ -36,12 +37,13 @@ Description: Generate response for the GET request to /api/v1/liveness. To check
 Method: GET
 Input:  -None-
 Output:  {}
+HTTP Status Code: 200 success
 ```
 URL: /api/v1/pending
 ```
 Description: Get request to enlist all the EPVs which are not yet synced to Graph. Gets the pending list from RDS.
 Method: GET
-Input:  Request Params (options) ->  ecosystem, package, version, limit, offset
+Input:  Request (Query) Params ->  ecosystem, package, version, limit, offset
 Output: 
 { "pending_list":[{
                      "ecosystem": "maven",
@@ -51,13 +53,14 @@ Output:
                  ],
   "all_counts" : 1
 }
+HTTP Status Code: 200 success
 ```
 URL: /api/v1/sync_all
 ```
 Description: Generate response for the GET request to /api/v1/sync_all. Get the pending list from RDS and 
              get the data from S3 and populate in graph and mark the epv as synched in RDS.
 Method: GET
-Input:  Request Params (opitons) ->  ecosystem, package, version, limit, offset
+Input:  Request (Query) Params ->  ecosystem, package, version, limit, offset
 Output: 
 Sample1
 {
@@ -78,6 +81,8 @@ Sample2
   "message": "The import finished successfully!", 
   "count_imported_EPVs": 1
 }
+HTTP Status Code: 200 success
+                  500 in case of exception or when sync is not successful.
 ```
 URL: /api/v1/ingest_to_graph
 ```
@@ -111,6 +116,9 @@ Sample2
   "message": "Nothing to be synced to Graph!", 
   "count_imported_EPVs": 0
 }
+HTTP Status Code: 200 success
+                  400 when the input keys are invalid
+                  500 in case of exception or when ingest is not successful.
 ```
 URL: /api/v1/selective_ingest
 ```
@@ -163,6 +171,9 @@ sample3
 {
   "message": "Invalid keys found in input:"
 }
+HTTP Status Code: 200 success
+                  400 when the input keys are invalid or when no packages are in input
+                  500 in case of exception or when ingest is not successful
 ```
 URL: /api/v1/vertex/<string:ecosystem>/<string:package>/<string:version>/properties
 ```
@@ -178,6 +189,8 @@ Input:
                 ]
 }
 Output:  {}
+HTTP Status Code: 200 success
+                  400 when operation fails or encounters error/exception
 ```
 URL: /api/v1/vertex/<string:ecosystem>/<string:package>/<string:version>/properties
 ```
@@ -194,6 +207,8 @@ Input:
                 ]
 }
 Output:  {}
+HTTP Status Code: 200 success
+                  400 when operation fails or encounters error/exception
 ```
 ## How to test and develop locally?
 ```
