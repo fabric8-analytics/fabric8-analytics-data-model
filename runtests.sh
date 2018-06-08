@@ -1,5 +1,7 @@
 #!/usr/bin/bash -ex
 
+COVERAGE_THRESHOLD=90
+
 DOCKER_CMD="docker-compose -f docker-compose-tests.yml"
 
 gc() {
@@ -72,7 +74,7 @@ echo "Check for sanity of the connections..."
 
 if python sanitycheck.py
 then
-    py.test --cov=src/ --cov-report term-missing -vv -s test/
+    py.test --cov=src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
 else
     echo "Sanity checks failed"
 fi
