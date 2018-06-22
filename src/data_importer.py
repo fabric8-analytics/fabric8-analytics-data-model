@@ -254,6 +254,7 @@ def import_epv_from_s3_http(list_epv, select_doc=None):
 
 
 def create_graph_nodes(list_epv):
+    """Create blank graph nodes given an EPV."""
     count_blank_epvs_created = 0
     success_epvs = []
     failure_epvs = []
