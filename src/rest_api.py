@@ -113,8 +113,7 @@ def ingest_to_graph():
 
 @api_v1.route('/api/v1/create_nodes', methods=['POST'])
 def create_nodes():
-    """Create e/p/v graph node and generate response for the POST request to
-    /api/v1/create_nodes."""
+    """Create e/p/v graph node and generate response for the POST request to/api/v1/create_nodes."""
     input_json = request.get_json()
     if not input_json:
         return flask.jsonify(message="No EPVs provided. Please provide valid list of EPVs"), 400

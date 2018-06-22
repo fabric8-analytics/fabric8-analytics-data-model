@@ -15,6 +15,7 @@ class GraphPopulator(object):
 
     @classmethod
     def construct_graph_nodes(cls, epv):
+        """Create query string to create empty EPV nodes."""
         ecosystem = epv.get('ecosystem')
         pkg_name = epv.get('name')
         version = epv.get('version')
