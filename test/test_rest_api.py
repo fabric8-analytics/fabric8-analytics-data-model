@@ -180,3 +180,52 @@ def test_handle_properties_delete(client, mocker):
         ".drop()" \
         ".iterate();"
     gremlin_mock.assert_called_once_with(expected_statement)
+
+
+def test_create_blank_nodes_invalid(client):
+    """Add test for create blank nodes API with wrong input."""
+    url = url_for('api_v1.create_nodes')
+    input_data = [{
+        "ecosystem": "maven",
+        "name": "pkg-1",
+        "source_repo": "redhat-maven"
+    }]
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    data = json.loads(response.get_data())
+    logger.info(data)
+    assert response.status_code == 400
+    assert 'Invalid keys found in input:' in data['message']
+
+
+def test_create_blank_nodes_empty(client):
+    """Add test for create blank nodes API with an empty list input."""
+    url = url_for('api_v1.create_nodes')
+    input_data = []
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    data = json.loads(response.get_data())
+    logger.info(data)
+    assert response.status_code == 400
+    assert 'No EPVs provided. Please provide valid list of EPVs' in data['message']
+
+
+def test_create_blank_nodes_valid(client):
+    """Add test for create blank nodes API with wrong input."""
+    url = url_for('api_v1.create_nodes')
+    input_data = [
+      {
+        "ecosystem": "maven",
+        "name": "pkg-1",
+        "version": "1.0.0",
+        "source_repo": "redhat-maven"
+      }]
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    data = json.loads(response.get_data())
+    logger.info(data)
+    assert response.status_code == 200
+    assert data['epv_nodes_created'] == 1
