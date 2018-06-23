@@ -41,7 +41,9 @@ class GraphPopulator(object):
                       )
             # Add version node properties
             if source_repo:
-                ver_str += "ver.property('source_repo','{source_repo}');"
+                ver_str += "ver.property('source_repo','{source_repo}');".format(
+                    source_repo=source_repo
+                )
 
             # Query to create an edge between Package Node to Version Node
             edge_str = "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
