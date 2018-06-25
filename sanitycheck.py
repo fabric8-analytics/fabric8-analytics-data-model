@@ -6,7 +6,9 @@ import sys
 import logging
 import config
 
+logging.basicConfig()
 logger = logging.getLogger(config.APP_NAME)
+logger.setLevel(logging.DEBUG)
 
 
 MAX_DELAY = 20 * 60  # 20 minutes
@@ -54,4 +56,6 @@ def main():
 
 
 if __name__ == "__main__":
+    logger.info("Starting sanitycheck")
     main()
+    logger.info("Ending sanitycheck")

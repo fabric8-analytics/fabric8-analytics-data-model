@@ -2,6 +2,15 @@
 
 COVERAGE_THRESHOLD=90
 
+export TERM=xterm
+TERM=${TERM:-xterm}
+
+# set up terminal colors
+NORMAL=$(tput sgr0)
+RED=$(tput bold && tput setaf 1)
+GREEN=$(tput bold && tput setaf 2)
+YELLOW=$(tput bold && tput setaf 3)
+
 DOCKER_CMD="docker-compose -f docker-compose-tests.yml"
 
 gc() {
@@ -23,7 +32,16 @@ function start_services {
 
 function setup_virtualenv {
     echo "Create Virtualenv for Python deps ..."
+
     virtualenv --python /usr/bin/python2.7 env-test
+
+    if [ $? -ne 0 ]
+    then
+        printf "%sPython virtual environment can't be initialized%s" "${RED}" "${NORMAL}"
+        exit 1
+    fi
+    printf "%sPython virtual environment initialized%s\n" "${YELLOW}" "${NORMAL}"
+
     source env-test/bin/activate
 
     pip install -U pip
@@ -41,7 +59,7 @@ function destroy_virtualenv {
     rm -rf env-test/
 }
 
-echo JAVA_OPTIONS value: $JAVA_OPTIONS
+echo JAVA_OPTIONS value: "$JAVA_OPTIONS"
 
 start_services
 
@@ -49,7 +67,8 @@ setup_virtualenv
 
 source env-test/bin/activate
 
-export PYTHONPATH=`pwd`/src
+PYTHONPATH=$(pwd)/src
+export PYTHONPATH
 
 export BAYESIAN_PGBOUNCER_SERVICE_HOST="localhost"
 
@@ -78,6 +97,7 @@ then
 else
     echo "Sanity checks failed"
 fi
+printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
 
 deactivate
 
