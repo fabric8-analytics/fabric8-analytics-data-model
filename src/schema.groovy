@@ -526,6 +526,21 @@
             manual_tagging_required = mgmt.makePropertyKey('manual_tagging_required').dataType(Boolean.class).make();
         }
 
+        // # for Repository Node
+        repo_url = mgmt.getPropertyKey('repo_url');
+        if(repo_url == null) {
+            repo_url = mgmt.makePropertyKey('repo_url').dataType(String.class).make();
+        }
+        repo_user = mgmt.getPropertyKey('repo_user');
+        if(repo_user == null) {
+            repo_user = mgmt.makePropertyKey('repo_user').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        // # for 3rd party ingestion
+        source_repo = mgmt.getPropertyKey('source_repo');
+        if(source_repo == null) {
+            source_repo = mgmt.makePropertyKey('source_repo').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
 
         // # for indexes
         if(null == mgmt.getGraphIndex('CVEidIndex')) {
@@ -560,6 +575,9 @@
             mgmt.buildIndex('CategoryNameIndex', Vertex.class).addKey(ctname).unique().buildCompositeIndex();
         }
 
+        if(null == mgmt.getGraphIndex('RepoURLIndex')) {
+            mgmt.buildIndex('RepoURLIndex', Vertex.class).addKey(repo_url).unique().buildCompositeIndex();
+        }
 
         List<String> allKeys = [
                 'ecosystem',
@@ -634,7 +652,9 @@
                 'user_tags',
                 'tags_count',
                 'category_deps_count',
-                'category_runtime'
+                'category_runtime',
+                'source_repo',
+                'repo_user'
         ]
 
         allKeys.each { k ->

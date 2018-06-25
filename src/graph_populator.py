@@ -14,6 +14,50 @@ class GraphPopulator(object):
     """Class containing classmethods used to construct queries to the graph database."""
 
     @classmethod
+    def construct_graph_nodes(cls, epv):
+        """Create query string to create empty EPV nodes."""
+        ecosystem = epv.get('ecosystem')
+        pkg_name = epv.get('name')
+        version = epv.get('version')
+        source_repo = epv.get('source_repo', '')
+        if ecosystem and pkg_name and version:
+            # Query to Create Package Node
+            pkg_str = "pkg = g.V().has('ecosystem','{ecosystem}').has('name', '{pkg_name}')." \
+                      "tryNext().orElseGet{{graph.addVertex('ecosystem', '{ecosystem}', " \
+                      "'name', '{pkg_name}', 'vertex_label', 'Package')}};" \
+                      "pkg.property('last_updated', {last_updated});".format(
+                            ecosystem=ecosystem, pkg_name=pkg_name,
+                            last_updated=str(time.time())
+                      )
+
+            # Query to Create Version Node
+            ver_str = "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', " \
+                      "'{pkg_name}').has('version', '{version}').tryNext().orElseGet{{" \
+                      "graph.addVertex('pecosystem','{ecosystem}', 'pname','{pkg_name}', " \
+                      "'version', '{version}', 'vertex_label', 'Version')}};" \
+                      "ver.property('last_updated',{last_updated});".format(
+                            ecosystem=ecosystem, pkg_name=pkg_name, version=version,
+                            last_updated=str(time.time())
+                      )
+            # Add version node properties
+            if source_repo:
+                ver_str += "ver.property('source_repo','{source_repo}');".format(
+                    source_repo=source_repo
+                )
+
+            # Query to create an edge between Package Node to Version Node
+            edge_str = "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
+                       "'{pkg_name}').has('version','{version}').in(" \
+                       "'has_version').tryNext()" \
+                       ".orElseGet{{pkg.addEdge('has_version', ver)}};".format(
+                            ecosystem=ecosystem, pkg_name=pkg_name, version=version
+                       )
+
+            return pkg_str + ver_str + edge_str
+        else:
+            return None
+
+    @classmethod
     def sanitize_text_for_query(cls, text):
         """Sanitize text so it can used in queries.
 
@@ -286,7 +330,7 @@ class GraphPopulator(object):
             libio_dependents_projects = details.get('dependents', {}).get('count', -1)
             libio_dependents_repos = details.get('dependent_repositories', {}).get('count', -1)
             releases = details.get('releases', {})
-            libio_total_releases = releases.get('count', -1)
+            libio_total_releases = int(releases.get('count', -1))
             libio_latest_version = libio_latest_published_at = ''
             if libio_total_releases > 0:
                 if v2:

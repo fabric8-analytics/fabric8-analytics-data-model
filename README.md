@@ -120,6 +120,48 @@ HTTP Status Code: 200 success
                   400 when the input keys are invalid
                   500 in case of exception or when ingest is not successful.
 ```
+URL: /api/v1/create_nodes
+```
+Description: Graph nodes and properties are created during ingestion, but at
+             times, there might be jobs that just want to publish properties without going
+             through entire time-consuming ingestion pipeline. This endpoint helps create a
+             package and version node in graphs with no properties. This will enable to
+             add more properties to these nodes by other offline jobs that need not necessary go
+             via ingestion route.
+Method: POST
+Input:
+[
+  {
+    "ecosystem": "maven",
+    "name": "pkg-1",
+    "version": "1.0.0",
+    "source_repo": "redhat-maven"
+  },{
+    "ecosystem": "maven",
+    "name": "pkg-2",
+    "version": "1.1.0"
+  },
+  {
+    "ecosystem": "maven",
+    "name": "pkg-3",
+    "version": "1.2.0",
+    "source_repo": "maven-central"
+  }
+]
+Output:
+{
+    "blank_epvs_created": 2,
+    "success_list": ["pkg-1", "pkg-2"],
+    "failure_list": [{
+        "pkg-3": "Some real time exeption message"
+    }]
+}
+HTTP Status Code: 200 success
+                  400 when the input keys are invalid or when no packages are in input
+                  500 in case of exception
+
+
+```
 URL: /api/v1/selective_ingest
 ```
 Description: Import epv data and generate response for the POST request to /api/v1/selective. Its similar to ingest_to_graph, with a difference,

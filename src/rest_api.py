@@ -111,6 +111,30 @@ def ingest_to_graph():
         return flask.jsonify(response)
 
 
+@api_v1.route('/api/v1/create_nodes', methods=['POST'])
+def create_nodes():
+    """Create e/p/v graph node and generate response for the POST request to/api/v1/create_nodes."""
+    input_json = request.get_json()
+    if not input_json:
+        return flask.jsonify(message="No EPVs provided. Please provide valid list of EPVs"), 400
+
+    expected_keys = set(['ecosystem', 'name', 'version'])
+    for epv in input_json:
+        # We expect alteast Ecosystem, Package and Version as a payload
+        if not expected_keys.issubset(set(epv.keys())):
+            response = {'message': 'Invalid keys found in input: ' + ','.join(epv.keys())}
+            return flask.jsonify(response), 400
+
+    current_app.logger.info("Creating the nodes for EPVs - " + json.dumps(input_json))
+    report = data_importer.create_graph_nodes(list_epv=input_json)
+    current_app.logger.info(report)
+
+    if report.get('status') is not 'Success':
+        return flask.jsonify(report), 500
+    else:
+        return flask.jsonify(report)
+
+
 @api_v1.route('/api/v1/selective_ingest', methods=['POST'])
 def selective_ingest():
     """Import e/p/v data and generate response for the POST request to /api/v1/selective."""

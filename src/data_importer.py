@@ -117,14 +117,14 @@ def _import_keys_from_s3_http(data_source, epv_list):
 
                         # update first key with graph synced tag
                         logger.info("Mark as synced in RDS %s" % last_imported_EPV)
-                        if not config.AWS_S3_IS_LOCAL:
+                        if not config.AWS_S3_IS_LOCAL:  # pragma: no cover
                             PostgresHandler().mark_epv_synced(
                                 obj.get('ecosystem'),
                                 obj.get('package'),
                                 obj.get('version')
                             )
 
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error(e)
                 msg = _get_exception_msg("The import failed", e)
                 report['status'] = 'Failure'
@@ -154,7 +154,7 @@ def _log_report_msg(import_type, report):
 
     if report.get('status') is 'Success':
         logger.debug(msg)
-    else:
+    else:  # pragma: no cover
         # TODO: retry??
         logger.error(msg)
 
@@ -174,7 +174,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
             epv_name = epv.get('name', None)
             epv_version = epv.get('version', '')
 
-            if not epv_ecosystem or not epv_name:
+            if not epv_ecosystem or not epv_name:  # pragma: no cover
                 # this must be logged
                 logger.info("Skipping %s" % epv)
                 continue
@@ -214,7 +214,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
         # Log the report
         _log_report_msg("import_epv()", report)
 
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         msg = _get_exception_msg("import_epv() failed with error", e)
         raise RuntimeError(msg)
     return report
@@ -232,6 +232,46 @@ def import_epv_from_s3_http(list_epv, select_doc=None):
                                         access_key=access_key,
                                         secret_key=secret_key),
                            list_epv, select_doc)
+
+
+def create_graph_nodes(list_epv):
+    """Create blank graph nodes given an EPV."""
+    count_blank_epvs_created = 0
+    success_epvs = []
+    failure_epvs = []
+
+    for item in list_epv:
+        str_gremlin = GraphPopulator.construct_graph_nodes(item)
+        epv = item.get('ecosystem') + ":" + item.get('name') + ":" + item.get('version')
+
+        if str_gremlin:
+            payload = {'gremlin': str_gremlin}
+            print(json.dumps(payload))
+            try:
+                result = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload),
+                                       timeout=30)
+                resp = result.json()
+                print(json.dumps(resp))
+
+                if resp['status']['code'] == 200:
+                    count_blank_epvs_created += 1
+                    success_epvs.append(epv)
+            except Exception as e:  # pragma: no cover
+                logger.error(e)
+                failure_json = {epv: e}
+                failure_epvs.append(failure_json)
+
+    status = "Success"
+    if count_blank_epvs_created == 0:
+        status = "Failure"
+
+    response = {
+        "epv_nodes_created": count_blank_epvs_created,
+        "success_list": success_epvs,
+        "failure_list": failure_epvs,
+        "status": status
+    }
+    return response
 
 
 class PostgresHandler(object):
