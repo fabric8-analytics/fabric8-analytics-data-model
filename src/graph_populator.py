@@ -97,6 +97,7 @@ class GraphPopulator(object):
         ecosystem = input_json.get('ecosystem')
         version = cls.sanitize_text_for_query(input_json.get('version'))
         description = ''
+        source_repo = input_json.get('source_repo, 'None)
 
         details_data = input_json.get('analyses', {}).get('metadata', {}).get('details', [])
         if len(details_data) > 0:
@@ -125,6 +126,11 @@ class GraphPopulator(object):
             prp_version += "ver.property('description','{description}');".format(
                 description=re.sub(r'[^A-Za-z0-9_\\/\'":. ]', '', description)
             )
+        # Add Source Repo if not blank
+        if source_repo:
+                ver_str += "ver.property('source_repo','{source_repo}');".format(
+                    source_repo=source_repo
+                )
         # Get Code Metrics Details
         if 'code_metrics' in input_json.get('analyses', {}):
             count = 0
