@@ -173,6 +173,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
             epv_ecosystem = epv.get('ecosystem', None)
             epv_name = epv.get('name', None)
             epv_version = epv.get('version', '')
+            epv_source = epv.get('source_repo', 'maven')
 
             if not epv_ecosystem or not epv_name:  # pragma: no cover
                 # this must be logged
@@ -180,7 +181,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
                 continue
 
             # Get Package level keys
-            package_prefix = version_prefix = epv_ecosystem + "/" + epv_name + "/"
+            package_prefix = version_prefix = epv_source + "/" + epv_name + "/"
 
             pkg_list_keys = data_source.list_files(bucket_name=config.AWS_PKG_BUCKET,
                                                    prefix=package_prefix)
@@ -188,7 +189,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
             ver_list_keys = []
             if epv_version:
                 # Get EPV level keys
-                version_prefix = epv_ecosystem + "/" + epv_name + "/" + epv_version
+                version_prefix = epv_source + "/" + epv_name + "/" + epv_version
                 ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET,
                                                             prefix=version_prefix + "/"))
 
