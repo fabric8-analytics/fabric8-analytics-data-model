@@ -245,6 +245,29 @@ def handle_properties(ecosystem, package, version):
     return flask.jsonify(response_json), 200
 
 
+@api_v1.route('/api/v1/third_party_ingestion', methods=['POST'])
+def ingest_third_party_graph():
+    """Import e/p/v data and generate response for the POST request to /api/v1/third_party_ingestion."""
+    input_json = request.get_json()
+    current_app.logger.info("Ingesting third party list of EPVs - " + json.dumps(input_json))
+
+    expected_keys = set(['ecosystem', 'name', 'version'])
+    for epv in input_json:
+        if expected_keys != set(epv.keys()):
+            response = {'message': 'Invalid keys found in input: ' + ','.join(epv.keys())}
+            return flask.jsonify(response), 400
+
+    report = data_importer.ingest_into_graph(list_epv=input_json)
+    response = {'message': report.get('message'),
+                'epv': input_json,
+                'count_imported_EPVs': report.get('count_imported_EPVs')}
+    print(response)
+    # TODO the previous code can raise a runtime exception, does not we need to handle that?
+    if report.get('status') is not 'Success':
+        return flask.jsonify(response), 500
+    else:
+        return flask.jsonify(response)
+
 def create_app():
     """Create Flask app object."""
     new_app = Flask(config.APP_NAME)
