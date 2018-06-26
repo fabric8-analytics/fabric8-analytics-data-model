@@ -56,8 +56,27 @@ def _get_exception_msg(prefix, e):
     logger.error("Traceback for latest failure in import call: %s" % tb)
     return msg
 
+def ingest_into_graph(list_epv):
+    # Create Gremlin Query
+    
+    str_gremlin = GraphPopulator.create_query_string(obj)
 
-def _import_keys_from_s3_http(data_source, epv_list):
+    if str_gremlin:
+        # Fire Gremlin HTTP query now
+        epv_full = pkg_ecosystem + ":" + pkg_name + ":" + pkg_version
+        logger.info("Ingestion initialized for EPV - %s" % epv_full)
+        epv.append(epv_full)
+        payload = {'gremlin': str_gremlin}
+        response = requests.post(config.GREMLIN_SERVER_URL_REST,
+                                 data=json.dumps(payload), timeout=30)
+        resp = response.json()
+
+        if resp['status']['code'] == 200:
+            count_imported_EPVs += 1
+            last_imported_EPV = (obj.get('ecosystem') + ":" + obj.get('package') +
+                                 ":" + obj.get('version'))
+    
+def  _import_keys_from_s3_http(data_source, epv_list):
     # TODO: reduce cyclomatic complexity
     logger.debug("Begin import...")
     report = {'status': 'Success', 'message': 'The import finished successfully!'}
