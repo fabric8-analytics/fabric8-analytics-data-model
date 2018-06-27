@@ -72,8 +72,13 @@ def _import_keys_from_s3_http(data_source, epv_list):
             pkg_ecosystem = contents.get('ecosystem')
             pkg_name = contents.get('package')
             pkg_version = contents.get('version') or ''
+            pkg_source = contents.get('source_repo', 'maven')
 
-            obj = {'ecosystem': pkg_ecosystem, 'package': pkg_name, 'version': pkg_version}
+            obj = {
+                'ecosystem': pkg_ecosystem,
+                'package': pkg_name,
+                'version': pkg_version,
+                'source_repo': pkg_source}
 
             try:
                 # Check other Version level information and add it to common object
@@ -202,7 +207,8 @@ def import_epv_http(data_source, list_epv, select_doc=None):
             # store s3 object paths for this epv
             pkg_data = {'package': epv_name, 'version': epv_version, 'ecosystem': epv_ecosystem,
                         'ver_key_prefix': version_prefix, 'ver_list_keys': ver_list_keys,
-                        'pkg_key_prefix': package_prefix, 'pkg_list_keys': pkg_list_keys
+                        'pkg_key_prefix': package_prefix, 'pkg_list_keys': pkg_list_keys,
+                        'source_repo': epv_source
                         }
 
             object_paths = {package_prefix: pkg_data}

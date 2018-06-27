@@ -128,9 +128,9 @@ class GraphPopulator(object):
             )
         # Add Source Repo if not blank
         if source_repo:
-                ver_str += "ver.property('source_repo','{source_repo}');".format(
-                    source_repo=source_repo
-                )
+            prp_version += "ver.property('source_repo','{source_repo}');".format(
+                source_repo=source_repo
+            )
         # Get Code Metrics Details
         if 'code_metrics' in input_json.get('analyses', {}):
             count = 0

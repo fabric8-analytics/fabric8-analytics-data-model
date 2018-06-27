@@ -136,7 +136,7 @@ def create_nodes():
 
 @api_v1.route('/api/v1/selective_ingest', methods=['POST'])
 def selective_ingest():
-    """Import e/p/v data and generate response for the POST request to /api/v1/selective."""
+    """Import e/p/v data and generate response for the POST request to /api/v1/selective_ingest."""
     input_json = request.get_json()
 
     if input_json.get('package_list') is None or len(input_json.get('package_list')) == 0:
