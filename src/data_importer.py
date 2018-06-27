@@ -72,7 +72,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
             pkg_ecosystem = contents.get('ecosystem')
             pkg_name = contents.get('package')
             pkg_version = contents.get('version') or ''
-            pkg_source = contents.get('source_repo', 'maven')
+            pkg_source = contents.get('source_repo', pkg_ecosystem)
 
             obj = {
                 'ecosystem': pkg_ecosystem,
@@ -178,7 +178,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
             epv_ecosystem = epv.get('ecosystem', None)
             epv_name = epv.get('name', None)
             epv_version = epv.get('version', '')
-            epv_source = epv.get('source_repo', 'maven')
+            epv_source = epv.get('source_repo', epv_ecosystem)
 
             if not epv_ecosystem or not epv_name:  # pragma: no cover
                 # this must be logged
