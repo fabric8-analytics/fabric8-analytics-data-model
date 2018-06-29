@@ -92,10 +92,9 @@ def ingest_to_graph():
     """Import e/p/v data and generate response for the POST request to /api/v1/ingest_to_graph."""
     input_json = request.get_json()
     current_app.logger.info("Ingesting the given list of EPVs - " + json.dumps(input_json))
-
     expected_keys = set(['ecosystem', 'name', 'version'])
     for epv in input_json:
-        if expected_keys != set(epv.keys()):
+        if not expected_keys.issubset(set(epv.keys())):
             response = {'message': 'Invalid keys found in input: ' + ','.join(epv.keys())}
             return flask.jsonify(response), 400
 
@@ -137,7 +136,7 @@ def create_nodes():
 
 @api_v1.route('/api/v1/selective_ingest', methods=['POST'])
 def selective_ingest():
-    """Import e/p/v data and generate response for the POST request to /api/v1/selective."""
+    """Import e/p/v data and generate response for the POST request to /api/v1/selective_ingest."""
     input_json = request.get_json()
 
     if input_json.get('package_list') is None or len(input_json.get('package_list')) == 0:

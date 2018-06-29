@@ -4,6 +4,7 @@ import logging
 import config
 import json
 from flask import url_for
+from mock import patch
 
 
 logger = logging.getLogger(config.APP_NAME)
@@ -71,6 +72,66 @@ def test_ingest_to_graph(client):
     assert data['message'] == 'Nothing to be synced to Graph!'
 
 
+def test_ingest_to_graph_source(client):
+    """Add test for ingest to graph API with source_repo in payload."""
+    input_data = [
+        {
+            "ecosystem": "maven",
+            "name": "commons-collections:commons-collections",
+            "version": "3.2.1",
+            "source_repo": "redhat_maven"
+        }
+    ]
+    url = url_for('api_v1.ingest_to_graph')
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    assert response.status_code == 200
+    data = json.loads(response.get_data())
+    assert 'count_imported_EPVs' in data
+    assert 'epv' in data
+    assert 'message' in data
+    assert data['message'] == 'Nothing to be synced to Graph!'
+
+
+def test_ingest_to_graph_valid(client):
+    """Add test for ingest to graph API when some key is missing."""
+    input_data = [
+        {
+            "ecosystem": "maven",
+            "name": "commons-collections:commons-collections",
+            "source_repo": "redhat_maven"
+        }
+    ]
+    url = url_for('api_v1.ingest_to_graph')
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    assert response.status_code == 400
+    data = json.loads(response.get_data())
+    epv_keys = input_data[0].keys()
+    assert data['message'] == 'Invalid keys found in input: ' + ','.join(epv_keys)
+
+
+@patch("rest_api.data_importer.import_epv_from_s3_http")
+def test_ingest_to_graph_report(mocker, client):
+    """Add test for ingest to graph API when report status is Failure."""
+    input_data = [
+        {
+            "ecosystem": "maven",
+            "name": "commons-collections:commons-collections",
+            "version": "3.2.1",
+            "source_repo": "redhat_maven"
+        }
+    ]
+    mocker.return_value = {"status": "Failure"}
+    url = url_for('api_v1.ingest_to_graph')
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    assert response.status_code == 500
+
+
 def test_selective_ingest_empty(client):
     """Add test for selective ingest API with empty inputs."""
     input_data = {}
@@ -126,6 +187,7 @@ def test_selective_ingest_valid(client):
                           "ecosystem": "pypi"
                           }],
         'select_ingest': []}
+
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
@@ -133,6 +195,27 @@ def test_selective_ingest_valid(client):
     logger.info(data)
     assert response.status_code == 200
     assert 'The import finished successfully!' in data['message']
+
+
+def test_selective_ingest_valid_source(client):
+    """Add test for selective ingest API with source_repo."""
+    url = url_for('api_v1.selective_ingest')
+
+    input_data = {
+        'package_list': [{"version": "3.2.1",
+                          "name": "commons-collections:commons-collections",
+                          "ecosystem": "maven",
+                          "source_repo": "redhat_maven"
+                          }],
+        'select_ingest': []}
+
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    data = json.loads(response.get_data())
+    logger.info(data)
+    assert response.status_code == 200
+    assert 'Nothing to be synced to Graph!' in data['message']
 
 
 def test_handle_properties_put(client, mocker):
@@ -229,3 +312,22 @@ def test_create_blank_nodes_valid(client):
     logger.info(data)
     assert response.status_code == 200
     assert data['epv_nodes_created'] == 1
+
+
+@patch("rest_api.data_importer.create_graph_nodes")
+def test_create_blank_nodes_report_status(mocker, client):
+    """Add test to create blank nodes API when report status is Failure."""
+    input_data = [
+        {
+            "ecosystem": "maven",
+            "name": "commons-collections:commons-collections",
+            "version": "3.2.1",
+            "source_repo": "redhat_maven"
+        }
+    ]
+    mocker.return_value = {"status": "Failure"}
+    url = url_for('api_v1.create_nodes')
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    assert response.status_code == 500

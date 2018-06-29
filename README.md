@@ -164,7 +164,7 @@ HTTP Status Code: 200 success
 ```
 URL: /api/v1/selective_ingest
 ```
-Description: Import epv data and generate response for the POST request to /api/v1/selective. Its similar to ingest_to_graph, with a difference,
+Description: Import epv data and generate response for the POST request to /api/v1/selective_ingest. Its similar to ingest_to_graph, with a difference,
              that in this, the user also provides a list which indicates which packages to synch from the list of package list provided.
 Method: POST
 Input: 
