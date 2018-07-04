@@ -5,7 +5,7 @@ import pytest
 from rest_api import create_app
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def app():
     """Return Flask app object."""
     return create_app()
