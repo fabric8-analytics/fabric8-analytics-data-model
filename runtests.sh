@@ -15,6 +15,7 @@ DOCKER_CMD="docker-compose -f docker-compose-tests.yml"
 
 gc() {
   retval=$?
+  [[ $retval -ne 0 ]] && $DOCKER_CMD logs gremlin-http || :
   $DOCKER_CMD down -v || :
   exit $retval
 }
