@@ -150,8 +150,6 @@ services:
       - DEBUG_GRAPH_METRICS=0
     ports:
       - "8181:8182"
-    depends_on:
-      - dynamodb
     mem_limit: 2G
     container_name: bayesian-gremlin-http
     depends_on:
