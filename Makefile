@@ -1,11 +1,12 @@
-REGISTRY?=registry.devshift.net
-REPOSITORY?=bayesian/data-model-importer
+REGISTRY?=quay.io
 DEFAULT_TAG=latest
 
 ifeq ($(TARGET), rhel)
     DOCKERFILE := Dockerfile.data-model.rhel
+	REPOSITORY := rhel-bayesian-data-model-importer
 else
     DOCKERFILE := Dockerfile.data-model
+	REPOSITORY := bayesian-data-model-importer
 endif
 
 .PHONY: all docker-build fast-docker-build test get-image-name get-image-repository
@@ -26,4 +27,3 @@ get-image-name:
 
 get-image-repository:
 	@echo $(REPOSITORY)
-

@@ -1,4 +1,4 @@
-FROM prod.registry.devshift.net/osio-prod/base/fabric8-analytics-data-model:latest
+FROM quay.io/openshiftio/rhel-base-fabric8-analytics-data-model:latest
 LABEL maintainer "Devtools <devtools@redhat.com>"
 LABEL author "Devtools <devtools@redhat.com>"
 
