@@ -1,20 +1,27 @@
 #!/bin/bash -ex
 
-REGISTRY="push.registry.devshift.net"
+REGISTRY="quay.io"
 
 load_jenkins_vars() {
-    if [ -e "jenkins-env" ]; then
-        <jenkins-env \
-          grep -E "(DEVSHIFT_TAG_LEN|DEVSHIFT_USERNAME|DEVSHIFT_PASSWORD|JENKINS_URL|GIT_BRANCH|GIT_COMMIT|BUILD_NUMBER|ghprbSourceBranch|ghprbActualCommit|BUILD_URL|ghprbPullId)=" \
-          | sed 's/^/export /g' \
-          > ~/.jenkins-env
-        source ~/.jenkins-env
+    if [ -e "jenkins-env.json" ]; then
+        eval "$(./env-toolkit load -f jenkins-env.json \
+                DEVSHIFT_TAG_LEN \
+                QUAY_USERNAME \
+                QUAY_PASSWORD \
+                JENKINS_URL \
+                GIT_BRANCH \
+                GIT_COMMIT \
+                BUILD_NUMBER \
+                ghprbSourceBranch \
+                ghprbActualCommit \
+                BUILD_URL \
+                ghprbPullId)"
     fi
 }
 
 docker_login() {
-    if [ -n "${DEVSHIFT_USERNAME}" -a -n "${DEVSHIFT_PASSWORD}" ]; then
-        docker login -u "${DEVSHIFT_USERNAME}" -p "${DEVSHIFT_PASSWORD}" "${REGISTRY}"
+    if [ -n "${QUAY_USERNAME}" -a -n "${QUAY_PASSWORD}" ]; then
+        docker login -u "${QUAY_USERNAME}" -p "${QUAY_PASSWORD}" "${REGISTRY}"
     else
         echo "Could not login, missing credentials for the registry"
         exit 1
@@ -44,14 +51,15 @@ push_image() {
     local image_name
     local image_repository
     local short_commit
+
     image_name=$(make get-image-name)
     image_repository=$(make get-image-repository)
     short_commit=$(git rev-parse --short=7 HEAD)
 
     if [ "$TARGET" = "rhel" ]; then
-        IMAGE_URL="${REGISTRY}/osio-prod/${image_repository}"
+        IMAGE_URL="${REGISTRY}/openshiftio/rhel-bayesian-data-model-importer"
     else
-        IMAGE_URL="${REGISTRY}/${image_repository}"
+        IMAGE_URL="${REGISTRY}/openshiftio/bayesian-data-model-importer"
     fi
 
     if [ -n "${ghprbPullId}" ]; then
