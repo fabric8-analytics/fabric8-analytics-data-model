@@ -30,6 +30,14 @@ objects:
   spec:
     selector:
       service: bayesian-data-importer
+    strategy:
+      type: Rolling
+      rollingParams:
+        pre:
+          failurePolicy: Retry
+          execNewPod:
+            containerName: bayesian-data-importer
+            command: ["/populate_schema.py"]
     template:
       metadata:
         labels:
@@ -82,6 +90,8 @@ objects:
                 key: s3-secret-access-key
           - name: FLASK_LOGGING_LEVEL
             value: ${FLASK_LOGGING_LEVEL}
+          - name: SKIP_SCHEMA
+            value: true
           image: "${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${IMAGE_TAG}"
           imagePullPolicy: Always
           name: bayesian-data-importer

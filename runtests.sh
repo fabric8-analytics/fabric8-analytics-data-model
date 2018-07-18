@@ -73,9 +73,6 @@ export PYTHONPATH
 
 export BAYESIAN_PGBOUNCER_SERVICE_HOST="localhost"
 
-# Wait for services to be up
-echo "Wait for some time delay..."
-sleep 20
 
 echo "*****************************************"
 echo "*** Cyclomatic complexity measurement ***"
@@ -94,6 +91,7 @@ echo "Check for sanity of the connections..."
 
 if python sanitycheck.py
 then
+    python populate_schema.py
     py.test --cov=src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
 else
     echo "Sanity checks failed"
