@@ -272,19 +272,6 @@ setup_logging(app)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
 
-# Check whether schema is created or not
-# populate schema if not already done
-try:
-    status, json_result = BayesianGraph.populate_schema()
-    if status:
-        app.logger.info("Ready to serve requests")
-    else:
-        app.logger.error(json_result)
-        raise RuntimeError("Failed to setup graph schema")
-except Exception:
-    sentry.captureException()
-    raise RuntimeError("Failed to initialized graph schema")
-
 
 if __name__ == "__main__":
     app.run()

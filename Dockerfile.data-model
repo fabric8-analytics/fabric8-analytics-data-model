@@ -29,6 +29,7 @@ RUN pip install -r requirements.txt && rm requirements.txt
 COPY ./src /src
 
 ADD scripts/entrypoint.sh /bin/entrypoint.sh
+ADD populate_schema.py /populate_schema.py
 
 ENTRYPOINT ["/bin/entrypoint.sh"]
 
