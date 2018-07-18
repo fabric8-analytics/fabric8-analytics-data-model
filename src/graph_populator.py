@@ -23,8 +23,13 @@ class GraphPopulator(object):
         if ecosystem and pkg_name and version:
             # Query to Create Package Node
             pkg_str = "pkg = g.V().has('ecosystem','{ecosystem}').has('name', '{pkg_name}')." \
-                      "tryNext().orElseGet{{graph.addVertex('ecosystem', '{ecosystem}', " \
-                      "'name', '{pkg_name}', 'vertex_label', 'Package')}};" \
+                      "tryNext().orElseGet{{g.V()." \
+                      "has('vertex_label','Count').choose(has('{ecosystem}_pkg_count')," \
+                      "sack(assign).by('{ecosystem}_pkg_count').sack(sum).by(constant(" \
+                      "1)).property('{ecosystem}_pkg_count',sack())," \
+                      "property('{ecosystem}_pkg_count',1)).iterate();" \
+                      "graph.addVertex('ecosystem', '{ecosystem}', " \
+                      "'name', '{pkg_name}', 'vertex_label', 'Package');}};" \
                       "pkg.property('last_updated', {last_updated});".format(
                             ecosystem=ecosystem, pkg_name=pkg_name,
                             last_updated=str(time.time())
@@ -33,8 +38,12 @@ class GraphPopulator(object):
             # Query to Create Version Node
             ver_str = "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', " \
                       "'{pkg_name}').has('version', '{version}').tryNext().orElseGet{{" \
+                      "g.V().has('vertex_label','Count').choose(has('{ecosystem}_ver_count')," \
+                      "sack(assign).by('{ecosystem}_ver_count').sack(sum).by(constant(" \
+                      "1)).property('{ecosystem}_ver_count',sack())," \
+                      "property('{ecosystem}_ver_count',1)).iterate();" \
                       "graph.addVertex('pecosystem','{ecosystem}', 'pname','{pkg_name}', " \
-                      "'version', '{version}', 'vertex_label', 'Version')}};" \
+                      "'version', '{version}', 'vertex_label', 'Version');}};" \
                       "ver.property('last_updated',{last_updated});".format(
                             ecosystem=ecosystem, pkg_name=pkg_name, version=version,
                             last_updated=str(time.time())
@@ -114,8 +123,12 @@ class GraphPopulator(object):
 
         str_version += "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', '{pkg_name}')." \
                        "has('version', '{version}').tryNext().orElseGet{{" \
+                       "g.V().has('vertex_label','Count').choose(" \
+                       "has('{ecosystem}_ver_count'),sack(assign).by('{ecosystem}_ver_count')." \
+                       "sack(sum).by(constant(1)).property('{ecosystem}_ver_count',sack())," \
+                       "property('{ecosystem}_ver_count',1)).iterate();" \
                        "graph.addVertex('pecosystem','{ecosystem}', 'pname','{pkg_name}', " \
-                       "'version', '{version}', 'vertex_label', 'Version')}};" \
+                       "'version', '{version}', 'vertex_label', 'Version');}};" \
                        "ver.property('last_updated',{last_updated});".format(
                             ecosystem=ecosystem, pkg_name=pkg_name, version=version,
                             last_updated=str(time.time())
@@ -256,8 +269,13 @@ class GraphPopulator(object):
         drop_prop = ""
         drop_props = []
         str_package = "pkg = g.V().has('ecosystem','{ecosystem}').has('name', '{pkg_name}')." \
-                      "tryNext().orElseGet{{graph.addVertex('ecosystem', '{ecosystem}', 'name', " \
-                      "'{pkg_name}', 'vertex_label', 'Package')}};" \
+                      "tryNext().orElseGet{{g.V()." \
+                      "has('vertex_label','Count').choose(has('{ecosystem}_pkg_count')," \
+                      "sack(assign).by('{ecosystem}_pkg_count').sack(sum).by(constant(" \
+                      "1)).property('{ecosystem}_pkg_count',sack())," \
+                      "property('{ecosystem}_pkg_count',1)).iterate();" \
+                      "graph.addVertex('ecosystem', '{ecosystem}', 'name', " \
+                      "'{pkg_name}', 'vertex_label', 'Package'); }};" \
                       "pkg.property('last_updated', {last_updated});".format(
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time())
                       )
@@ -436,8 +454,13 @@ class GraphPopulator(object):
                 if not prp_package:
                     str_gremlin += "pkg = g.V().has('ecosystem','{ecosystem}')." \
                                    "has('name', '{pkg_name}').tryNext().orElseGet{{" \
-                                   "graph.addVertex('ecosystem', '{ecosystem}', 'name', " \
-                                   "'{pkg_name}', 'vertex_label', 'Package')}};" \
+                                   "g.V().has('vertex_label','Count').choose(has('" \
+                                   "{ecosystem}_pkg_count'),sack(assign).by('" \
+                                   "{ecosystem}_pkg_count').sack(sum).by(constant(1))." \
+                                   "property('{ecosystem}_pkg_count',sack()),property(" \
+                                   "'{ecosystem}_pkg_count',1)).iterate();graph.addVertex(" \
+                                   "'ecosystem', '{ecosystem}', 'name', '{pkg_name}', " \
+                                   "'vertex_label', 'Package');}};" \
                                    "pkg.property('last_updated', {last_updated});".format(
                                         ecosystem=ecosystem, pkg_name=pkg_name,
                                         last_updated=str(time.time())
