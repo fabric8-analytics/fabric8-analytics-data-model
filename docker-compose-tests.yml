@@ -1,6 +1,3 @@
-# NOTE: Containers use the generic "coreapi" prefix so they're independent of
-#       the particular project name. Project specific images are always built
-#       locally when using the docker-compose file.
 version: "2"
 services:
   broker:
@@ -24,7 +21,7 @@ services:
       POSTGRESQL_DATABASE: "coreapi"
     container_name: coreapi-postgres
   pgbouncer:
-    image: registry.devshift.net/bayesian/coreapi-pgbouncer
+    image: quay.io/openshiftio/bayesian-coreapi-pgbouncer
     container_name: coreapi-pgbouncer
     depends_on:
      - postgres
@@ -37,7 +34,7 @@ services:
       POSTGRESQL_INITIAL_DATABASE: postgres
 
   worker-api: &worker
-    image: registry.devshift.net/bayesian/cucos-worker
+    image: quay.io/openshiftio/bayesian-cucos-worker
     restart: always
     depends_on:
      - worker-db-migrations
@@ -104,7 +101,7 @@ services:
       WORKER_ADMINISTRATION_REGION: ingestion
 
   worker-db-migrations:
-    image: registry.devshift.net/bayesian/cucos-worker
+    image: quay.io/openshiftio/bayesian-cucos-worker
     restart: on-failure
     container_name: coreapi-worker-db-migrations
     depends_on:
@@ -135,22 +132,20 @@ services:
       MINIO_SECRET_KEY: ZmvMwngonaDK5ymlCd6ptaalDdJsCn3aSSxASPaZ
 
   dynamodb:
-    image: hilverd/dynamodb
+    image: cnadiminti/dynamodb-local
     ports:
       - "8000:8000"
       - "4567:4567"
-    mem_limit: 2G
     container_name: dynamodb
 
   gremlin-http:
-    image: registry.devshift.net/bayesian/gremlin
+    image: quay.io/openshiftio/bayesian-gremlin
     entrypoint: /bin/entrypoint-local.sh
     environment:
       - REST=1
       - DEBUG_GRAPH_METRICS=0
     ports:
       - "8181:8182"
-    mem_limit: 2G
     container_name: bayesian-gremlin-http
     depends_on:
       - dynamodb
