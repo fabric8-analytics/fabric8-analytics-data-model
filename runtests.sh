@@ -15,7 +15,17 @@ DOCKER_CMD="docker-compose -f docker-compose-tests.yml"
 
 gc() {
   retval=$?
-  [[ $retval -ne 0 ]] && $DOCKER_CMD logs gremlin-http || :
+
+  if [[ $retval -ne 0 ]]; then
+    docker ps -a
+    echo '============ dynamodb logs ============'
+    $DOCKER_CMD logs dynamodb || :
+    echo
+    echo
+    echo '============ gremlin logs ============'
+    $DOCKER_CMD logs gremlin-http || :
+  fi
+
   $DOCKER_CMD down -v || :
   exit $retval
 }
