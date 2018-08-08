@@ -54,6 +54,7 @@ def test_read_json_file():
                                 secret_key=secret_key)
     with pytest.raises(Exception):
         data = s3dataSource.read_json_file("foo")
+    assert data
 
 
 if __name__ == '__main__':
