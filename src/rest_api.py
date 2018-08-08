@@ -2,7 +2,7 @@
 
 import os
 import flask
-from flask import Flask, request, redirect, make_response
+from flask import Flask, request
 from flask_cors import CORS
 import json
 import sys
