@@ -11,9 +11,9 @@ class AbstractDataSource(object):
         """Get the name of data source."""
 
     @abc.abstractmethod
-    def list_files(self, prefix=None):
+    def list_files(self, _prefix=None):
         """List all the files in the source directory."""
 
     @abc.abstractmethod
-    def read_json_file(self, filename):
+    def read_json_file(self, _filename):
         """Read JSON file from the data source."""

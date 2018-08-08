@@ -11,7 +11,6 @@ from minio import Minio
 from minio.error import ResponseError, BucketAlreadyOwnedByYou, BucketAlreadyExists
 from data_importer import import_epv_from_s3_http
 from graph_manager import BayesianGraph
-import pytest
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)

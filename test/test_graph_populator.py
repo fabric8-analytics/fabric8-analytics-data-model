@@ -2,7 +2,6 @@
 
 from graph_populator import GraphPopulator
 import pytest
-import json
 import logging
 import config
 

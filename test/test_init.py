@@ -1,7 +1,6 @@
 """Tests for the __init__ script."""
 
 import __init__
-import pytest
 
 
 def test_logger():

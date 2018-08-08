@@ -1,7 +1,6 @@
 """Tests for the data_importer module (to be done)."""
 
 import data_importer
-import pytest
 
 
 def test_parse_int_or_none_for_integer_input():
