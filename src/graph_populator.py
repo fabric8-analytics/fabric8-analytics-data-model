@@ -6,6 +6,8 @@ import time
 from dateutil.parser import parse as parse_datetime
 from six import string_types
 import config
+from utils import get_current_version
+from datetime import datetime
 
 logger = logging.getLogger(config.APP_NAME)
 
@@ -279,10 +281,16 @@ class GraphPopulator(object):
                       "pkg.property('last_updated', {last_updated});".format(
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time())
                       )
+        cur_latest_ver, cur_libio_latest_ver = get_current_version(ecosystem, pkg_name)
+        cur_date = (datetime.utcnow()).strftime('%Y%m%d')
+        last_updated_flag = 'false'
 
         latest_version = cls.sanitize_text_for_query(input_json.get('latest_version'))
         if latest_version:
             prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
+            if latest_version != cur_latest_ver:
+                prp_package += "pkg.property('latest_version_last_updated', '{}');".format(cur_date)
+                last_updated_flag = 'true'
 
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):
@@ -364,6 +372,9 @@ class GraphPopulator(object):
                 else:
                     libio_latest_published_at = releases.get('latest', {}).get('published_at', '')
                     libio_latest_version = releases.get('latest', {}).get('version', '')
+
+                if libio_latest_version != cur_libio_latest_ver and last_updated_flag != 'true':
+                    prp_package += "pkg.property('latest_version_last_updated', '{}');".format(cur_date)
 
             if libio_latest_published_at:
                 t = libio_latest_published_at
