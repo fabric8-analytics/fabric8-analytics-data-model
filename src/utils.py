@@ -66,5 +66,11 @@ def get_current_version(eco, pkg):
     }
     gremlin_response = execute_gremlin_dsl(payload)
     result_data = get_response_data(gremlin_response, [{0: 0}])
-    return result_data[0]['properties']['latest_version'][0]['value'],\
-        result_data[0]['properties']['libio_latest_version'][0]['value']
+
+    if not result_data:
+        return -1, -1
+    latest_ver = result_data[0].get('properties', {}).get('latest_version', [''])[0].get('value')
+    libio_ver = result_data[0].get('properties', {}).get('libio_latest_version', [''])[0]\
+        .get('value')
+
+    return latest_ver, libio_ver
