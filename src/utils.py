@@ -26,11 +26,12 @@ import config
 
 logger = logging.getLogger(config.APP_NAME)
 
-#GREMLIN_SERVER_URL_REST = "http://{host}:{port}".format(
+# GREMLIN_SERVER_URL_REST = "http://{host}:{port}".format(
 #    host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
 #    port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
 
-GREMLIN_SERVER_URL_REST = "http://bayesian-gremlin-http-miteshpatel-greenfield-test.dev.rdu2c.fabric8.io/"
+GREMLIN_SERVER_URL_REST = "http:" + \
+                    "//bayesian-gremlin-http-miteshpatel-greenfield-test.dev.rdu2c.fabric8.io/"
 
 
 def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),

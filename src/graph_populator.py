@@ -374,7 +374,8 @@ class GraphPopulator(object):
                     libio_latest_version = releases.get('latest', {}).get('version', '')
 
                 if libio_latest_version != cur_libio_latest_ver and last_updated_flag != 'true':
-                    prp_package += "pkg.property('latest_version_last_updated', '{}');".format(cur_date)
+                    prp_package += "pkg.property('latest_version_last_updated', '{}');"\
+                        .format(cur_date)
 
             if libio_latest_published_at:
                 t = libio_latest_published_at
