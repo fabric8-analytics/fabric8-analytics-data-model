@@ -6,6 +6,7 @@ import requests
 import json
 import logging
 import config
+import os
 
 logger = logging.getLogger(config.APP_NAME)
 
