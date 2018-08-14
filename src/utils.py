@@ -10,10 +10,6 @@ import os
 
 logger = logging.getLogger(config.APP_NAME)
 
-GREMLIN_SERVER_URL_REST = "http://{host}:{port}".format(
-    host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
-    port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
-
 
 def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),
                       session=None):
@@ -37,7 +33,7 @@ def get_response_data(json_response, data_default):
 def execute_gremlin_dsl(payloads):
     """Execute the gremlin query and return the response."""
     try:
-        resp = get_session_retry().post(GREMLIN_SERVER_URL_REST, data=json.dumps(payloads))
+        resp = get_session_retry().post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payloads))
         if resp.status_code == 200:
             json_response = resp.json()
 
@@ -47,8 +43,8 @@ def execute_gremlin_dsl(payloads):
                 response.status_code))
             return None
 
-    except Exception:
-        logger.error(traceback.format_exc())
+    except Exception as e:
+        logger.error(e)
         return None
 
 
