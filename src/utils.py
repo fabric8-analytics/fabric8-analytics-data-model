@@ -9,12 +9,9 @@ import config
 
 logger = logging.getLogger(config.APP_NAME)
 
-# GREMLIN_SERVER_URL_REST = "http://{host}:{port}".format(
-#    host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
-#    port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
-
-GREMLIN_SERVER_URL_REST = "http:" + \
-                    "//bayesian-gremlin-http-miteshpatel-greenfield-test.dev.rdu2c.fabric8.io/"
+GREMLIN_SERVER_URL_REST = "http://{host}:{port}".format(
+    host=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_HOST", "localhost"),
+    port=os.environ.get("BAYESIAN_GREMLIN_HTTP_SERVICE_PORT", "8182"))
 
 
 def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),
@@ -56,7 +53,7 @@ def execute_gremlin_dsl(payloads):
 
 def get_current_version(eco, pkg):
     """To fetch the latest version and libio latest version."""
-    query_str = "g.V()has('ecosystem', eco).has('name',pkg)"
+    query_str = "g.V().has('ecosystem', eco).has('name',pkg).valueMap()"
     payload = {
         'gremlin': query_str,
         'bindings': {
@@ -69,8 +66,7 @@ def get_current_version(eco, pkg):
 
     if not result_data:
         return -1, -1
-    latest_ver = result_data[0].get('properties', {}).get('latest_version', [''])[0].get('value')
-    libio_ver = result_data[0].get('properties', {}).get('libio_latest_version', [''])[0]\
-        .get('value')
+    latest_ver = result_data[0].get('latest_version', [''])[0]
+    libio_ver = result_data[0].get('libio_latest_version', [''])[0]
 
     return latest_ver, libio_ver
