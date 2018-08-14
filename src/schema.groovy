@@ -597,6 +597,7 @@
                 'pname',
                 'pecosystem',
                 'version',
+                'latest_version_last_updated',
                 //'description',
                 'shipped_as_downstream',
                 //'licenses',
