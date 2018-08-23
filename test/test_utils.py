@@ -79,4 +79,3 @@ if __name__ == '__main__':
     test_get_current_version()
     test_execute_gremlin_dsl()
     test_execute_gremlin_dsl2()
-
