@@ -70,7 +70,6 @@ def test_execute_gremlin_dsl2(mocker):
         }
     }
     out = execute_gremlin_dsl(payload)
-    print("TESTCOMMENT")
     print(out)
     assert out is None
 
