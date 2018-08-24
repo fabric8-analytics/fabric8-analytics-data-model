@@ -39,7 +39,7 @@ def execute_gremlin_dsl(payloads):
             return json_response
         else:
             logger.error("HTTP error {}. Error retrieving Gremlin data.".format(
-                response.status_code))
+                resp.status_code))
             return None
 
     except Exception as e:
