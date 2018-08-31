@@ -6,8 +6,10 @@ import requests
 import json
 import logging
 import config
+import datetime
+import time
 
-logger = logging.getLogger(config.APP_NAME)
+logger = logging.getLogger(__name__)
 
 
 def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),
@@ -66,3 +68,26 @@ def get_current_version(eco, pkg):
     libio_ver = result_data[0].get('libio_latest_version', [''])[0]
 
     return latest_ver, libio_ver
+
+
+def get_timestamp():
+    """Get UNIX timestamp for `utcnow()`."""
+    return int(time.mktime(datetime.datetime.utcnow().timetuple()))
+
+
+def call_gremlin(json_payload):
+    """Call Gremlin with given payload.
+
+    And return exactly what Gremlin has to say.
+    Raise ValueError on non-200 status code.
+    """
+    url = config.GREMLIN_SERVER_URL_REST
+    payload_str = json.dumps(json_payload)
+    logger.debug('Calling Gremlin at {url} with payload {p}'.format(url=url, p=payload_str))
+    response = requests.post(url, data=payload_str)
+    if response.status_code != 200:
+        logger.error('Gremlin call failed ({st}): {resp}'.format(
+            st=response.status_code, resp=str(response.content)
+        ))
+        raise ValueError('Graph error: {e}'.format(e=str(response.content)))
+    return response.json()

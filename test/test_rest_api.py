@@ -5,7 +5,9 @@ import config
 import json
 from flask import url_for
 from mock import patch
-
+from test_cve import (
+    valid_put_input, invalid_put_input, valid_delete_input, invalid_delete_input
+)
 
 logger = logging.getLogger(config.APP_NAME)
 
@@ -331,3 +333,92 @@ def test_create_blank_nodes_report_status(mocker, client):
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
     assert response.status_code == 500
+
+
+@patch("rest_api.CVEPut.process")
+def test_cves_put(mocker, client):
+    """Test PUT /api/v1/cves."""
+    mocker.return_value = {}
+    url = url_for('api_v1.cves_put_delete')
+    response = client.put(
+        url,
+        data=json.dumps(valid_put_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    assert response.json == {}
+    assert response.status_code == 200
+
+
+@patch("rest_api.CVEPut.process")
+def test_cves_put_invalid_input(mocker, client):
+    """Test PUT /api/v1/cves with invalid input."""
+    mocker.return_value = {}
+    url = url_for('api_v1.cves_put_delete')
+    response = client.put(
+        url,
+        data=json.dumps(invalid_put_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    assert 'error' in response.json
+    assert response.status_code == 400
+
+
+@patch("rest_api.CVEDelete.process")
+def test_cves_delete(mocker, client):
+    """Test DELETE /api/v1/cves."""
+    mocker.return_value = {}
+    url = url_for('api_v1.cves_put_delete')
+    response = client.delete(
+        url,
+        data=json.dumps(valid_delete_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    assert response.json == {}
+    assert response.status_code == 200
+
+
+@patch("rest_api.CVEDelete.process")
+def test_cves_delete_invalid_input(mocker, client):
+    """Test DELETE /api/v1/cves with invalid input."""
+    mocker.return_value = {}
+    url = url_for('api_v1.cves_put_delete')
+    response = client.delete(
+        url,
+        data=json.dumps(invalid_delete_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    assert 'error' in response.json
+    assert response.status_code == 400
+
+
+@patch("rest_api.CVEGet.get")
+def test_cves_get_e(mocker, client):
+    """Test GET /api/v1/cves/<ecosystem>."""
+    mocker.return_value = {'count': 1, 'cve_ids': ['CVE-2018-0001']}
+    url = url_for('api_v1.cves_get', ecosystem='pypi')
+    response = client.get(
+        url
+    )
+    assert response.status_code == 200
+
+
+@patch("rest_api.CVEGet.get")
+def test_cves_get_ep(mocker, client):
+    """Test GET /api/v1/cves/<ecosystem>/<name>."""
+    mocker.return_value = {'count': 1, 'cve_ids': ['CVE-2018-0001']}
+    url = url_for('api_v1.cves_get', ecosystem='pypi', name='numpy')
+    response = client.get(
+        url
+    )
+    assert response.status_code == 200
+
+
+@patch("rest_api.CVEGet.get")
+def test_cves_get_epv(mocker, client):
+    """Test GET /api/v1/cves/<ecosystem>/<name>."""
+    mocker.return_value = {'count': 1, 'cve_ids': ['CVE-2018-0001']}
+    url = url_for('api_v1.cves_get', ecosystem='pypi', name='numpy', version='11.0')
+    response = client.get(
+        url
+    )
+    assert response.status_code == 200

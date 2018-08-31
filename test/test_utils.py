@@ -1,9 +1,12 @@
 """Tests for the graph_populator module."""
 
-from utils import get_current_version, execute_gremlin_dsl
+import pytest
+import datetime
+from utils import get_current_version, execute_gremlin_dsl, get_timestamp, call_gremlin
 import logging
 import config
 from mock import patch
+from conftest import RequestsMockResponse
 
 logger = logging.getLogger(config.APP_NAME)
 
@@ -72,6 +75,28 @@ def test_execute_gremlin_dsl2(mocker):
     out = execute_gremlin_dsl(payload)
     print(out)
     assert out is None
+
+
+def test_get_timestamp():
+    """Test utils.get_timestamp()."""
+    timestamp = get_timestamp()
+    result = datetime.datetime.utcfromtimestamp(timestamp)
+    assert result <= datetime.datetime.utcnow()
+
+
+@patch("utils.requests.post")
+def test_gremlin_call(mocker):
+    """Test utils.call_gremlin()."""
+    mocker.return_value = RequestsMockResponse({}, 200)
+    assert call_gremlin({'dummy': 'payload'}) == {}
+
+
+@patch("utils.requests.post")
+def test_bad_gremlin_call(mocker):
+    """Test utils.call_gremlin()."""
+    mocker.return_value = RequestsMockResponse({}, 500)
+    with pytest.raises(ValueError):
+        call_gremlin({'dummy': 'payload'})
 
 
 if __name__ == '__main__':
