@@ -178,7 +178,7 @@ parameters:
   displayName: Docker image
   required: true
   name: DOCKER_IMAGE
-  value: "bayesian/data-model-importer"
+  value: "bayesian-data-model-importer"
 
 - description: Image tag
   displayName: Image tag
