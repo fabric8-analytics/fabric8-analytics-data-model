@@ -9,7 +9,7 @@ import sys
 import data_importer
 from graph_manager import BayesianGraph
 from graph_populator import GraphPopulator
-from cve import CVEPut, CVEDelete, CVEGet
+from cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion
 from raven.contrib.flask import Sentry
 import config
 from werkzeug.contrib.fixers import ProxyFix
@@ -282,6 +282,30 @@ def cves_get(ecosystem, name=None, version=None):
     except ValueError as e:
         return flask.jsonify({'error': str(e)}), 500
     return flask.jsonify(result), 200
+
+
+@api_v1.route('/api/v1/cvedb-version', methods=['GET'])
+def cvedb_version_get():
+    """Get CVEDB version."""
+    try:
+        version = CVEDBVersion().get()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify({'version': version}), 200
+
+
+@api_v1.route('/api/v1/cvedb-version', methods=['PUT'])
+def cvedb_version_put():
+    """Create or replace CVEDB version."""
+    payload = request.get_json(silent=True)
+
+    if not payload or 'version' not in payload:
+        return flask.jsonify({'error': 'invalid input'}), 400
+    try:
+        version = CVEDBVersion().put(payload)
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify({'version': version}), 200
 
 
 def create_app():

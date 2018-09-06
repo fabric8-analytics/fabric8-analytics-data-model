@@ -195,6 +195,11 @@
              cve_id = mgmt.makePropertyKey('cve_id').dataType(String.class).make();
         }
 
+        cvedb_version = mgmt.getPropertyKey('cvedb_version');
+        if(cvedb_version == null ) {
+             cvedb_version = mgmt.makePropertyKey('cvedb_version').dataType(String.class).make();
+        }
+
         cvss = mgmt.getPropertyKey('cvss');
         if(cvss == null) {
             cvss = mgmt.makePropertyKey('cvss').dataType(Float.class).make();
@@ -615,6 +620,7 @@
                 'license_count',
                 'email',
                 'cve_id',
+                'cvedb_version',
                 //'summary',
                 //'access_authentication',
                 //'access_complexity',

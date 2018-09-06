@@ -413,12 +413,47 @@ def test_cves_get_ep(mocker, client):
     assert response.status_code == 200
 
 
-@patch("rest_api.CVEGet.get")
-def test_cves_get_epv(mocker, client):
-    """Test GET /api/v1/cves/<ecosystem>/<name>."""
-    mocker.return_value = {'count': 1, 'cve_ids': ['CVE-2018-0001']}
-    url = url_for('api_v1.cves_get', ecosystem='pypi', name='numpy', version='11.0')
+@patch("cve.call_gremlin")
+def test_cvedb_version_get(mocker, client):
+    """Test GET /api/v1/cvedb-version."""
+    mocker.return_value = {'result': {'data': ['9f4d54dd1a21584a40596c05d60ab00974953047']}}
+    url = url_for('api_v1.cvedb_version_get')
     response = client.get(
         url
     )
     assert response.status_code == 200
+    resp = response.json
+    assert len(resp) == 1
+    assert 'version' in resp
+    assert resp['version'] == '9f4d54dd1a21584a40596c05d60ab00974953047'
+
+
+@patch("cve.call_gremlin")
+def test_cvedb_version_put(mocker, client):
+    """Test PUT /api/v1/cvedb-version."""
+    mocker.return_value = {'result': {'data': ['9f4d54dd1a21584a40596c05d60ab00974953047']}}
+    url = url_for('api_v1.cvedb_version_put')
+    response = client.put(
+        url,
+        data=json.dumps({'version': '9f4d54dd1a21584a40596c05d60ab00974953047'}),
+        headers={'Content-Type': 'application/json'}
+    )
+    assert response.status_code == 200
+    resp = response.json
+    assert len(resp) == 1
+    assert 'version' in resp
+    assert resp['version'] == '9f4d54dd1a21584a40596c05d60ab00974953047'
+
+
+def test_cvedb_version_put_invalid_input(client):
+    """Test PUT /api/v1/cvedb-version."""
+    url = url_for('api_v1.cvedb_version_put')
+    response = client.put(
+        url,
+        data=json.dumps({'invalid': '9f4d54dd1a21584a40596c05d60ab00974953047'}),
+        headers={'Content-Type': 'application/json'}
+    )
+    assert response.status_code == 400
+    resp = response.json
+    assert len(resp) == 1
+    assert 'error' in resp

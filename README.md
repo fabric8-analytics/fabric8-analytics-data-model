@@ -310,6 +310,33 @@ HTTP Status Code: 200 success
                   500 gremlin error
 ```
 
+URL: /api/v1/cvedb-version
+```
+Sample URL: /api/v1/cvedb-version
+Description: Create or replace CVEDB version
+Method: PUT
+Input:
+{
+    "version": "9f4d54dd1a21584a40596c05d60ab00974953047"
+}
+Output:
+{
+    "version": "9f4d54dd1a21584a40596c05d60ab00974953047"
+}
+HTTP Status Code: 200 success
+                  400 invalid input
+                  500 gremlin error
+
+Method: GET
+Description: Get CVEDB version
+Output:
+{
+    "version": "9f4d54dd1a21584a40596c05d60ab00974953047"
+}
+HTTP Status Code: 200 success
+                  500 gremlin error
+```
+
 
 ## How to test and develop locally?
 ```

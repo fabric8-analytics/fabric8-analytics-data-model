@@ -170,6 +170,32 @@ class CVEGet(object):
         return payload
 
 
+class CVEDBVersion(object):
+    """Class encapsulating getter/setter methods around 'CVEDBVersion' node."""
+
+    @staticmethod
+    def get():
+        """Get CVEDB version."""
+        json_payload = {
+            'gremlin': cvedb_version_get_script_template,
+        }
+        response = call_gremlin(json_payload)
+        data = response.get('result', {}).get('data', [])
+        return data[0] if data else None
+
+    @staticmethod
+    def put(payload):
+        """Update CVEDB version."""
+        json_payload = {
+            'gremlin': cvedb_version_replace_script_template,
+            'bindings': {
+                'cvedb_version': payload.get('version')
+            }
+        }
+        call_gremlin(json_payload)
+        return payload.get('version')
+
+
 # Gremlin scripts :/
 # TODO: explore https://goblin.readthedocs.io/
 
@@ -229,4 +255,21 @@ g.V().has("pecosystem",ecosystem)\
 .inV()\
 .values("cve_id")\
 .dedup()\
+"""
+
+
+# Update CVEDB version
+cvedb_version_replace_script_template = """\
+g.V().hasLabel('CVEDBVersion')\
+.drop()\
+.iterate();\
+cve_v=g.addV('CVEDBVersion')\
+.property('cvedb_version',cvedb_version)\
+.next();\
+"""
+
+# Get CVEDB version
+cvedb_version_get_script_template = """\
+g.V().hasLabel('CVEDBVersion')\
+.values("cvedb_version")\
 """
