@@ -80,8 +80,8 @@ def test_execute_gremlin_dsl2(mocker):
 def test_get_timestamp():
     """Test utils.get_timestamp()."""
     timestamp = get_timestamp()
-    result = datetime.datetime.utcfromtimestamp(timestamp)
-    assert result <= datetime.datetime.utcnow()
+    result = (datetime.datetime.utcnow()).strftime('%Y%m%d')
+    assert result == timestamp
 
 
 @patch("utils.requests.post")

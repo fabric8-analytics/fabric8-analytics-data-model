@@ -4,7 +4,7 @@ import pytest
 from mock import patch
 
 from cve import (
-    CVEPut, CVEDelete, CVEGet,
+    CVEPut, CVEDelete, CVEGet, CVEGetByDate,
     cve_node_replace_script_template,
     cve_node_delete_script_template
 )
@@ -57,8 +57,8 @@ def test_cve_put_prepare_payload():
     assert bindings['description']
     assert 'cvss_v2' in bindings
     assert bindings['cvss_v2']
-    assert 'timestamp' in bindings
-    assert bindings['timestamp']
+    assert 'modified_date' in bindings
+    assert bindings['modified_date']
 
 
 valid_delete_input = {
@@ -133,6 +133,45 @@ def test_cve_get_epv(mocker):
 
     cve = CVEGet('pypi', 'numpy', '99.0')
     response = cve.get()
+
+    assert response
+    assert 'count' in response
+    assert response['count'] == 0
+    assert 'cve_ids' in response
+    assert len(response['cve_ids']) == 0
+
+
+@patch("cve.call_gremlin")
+def test_cve_get_by_date_valid(mocker):
+    """Test getting CVEs for (ecosystem)."""
+
+    mocker.return_value = {'result': {'data': []}}
+
+    cve = CVEGetByDate('20160911')
+    response = cve.get_bydate()
+
+    assert response
+    assert 'count' in response
+    assert response['count'] == 0
+    assert 'cve_ids' in response
+    assert len(response['cve_ids']) == 0
+
+
+def test_cve_get_by_date_invalid(mocker):
+    """Test getting CVEs for (ecosystem)."""
+
+    with pytest.raises(ValueError):
+        cve = CVEGetByDate('2016-09-11')
+        response = cve.get_bydate()
+
+
+def test_cve_get_by_date_none(mocker):
+    """Test getting CVEs for (ecosystem)."""
+
+    mocker.return_value = {'result': {'data': []}}
+
+    cve = CVEGetByDate(None)
+    response = cve.get_bydate()
 
     assert response
     assert 'count' in response
