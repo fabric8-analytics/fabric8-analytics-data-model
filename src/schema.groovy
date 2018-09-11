@@ -195,6 +195,11 @@
              cve_id = mgmt.makePropertyKey('cve_id').dataType(String.class).make();
         }
 
+        cvedb_version = mgmt.getPropertyKey('cvedb_version');
+        if(cvedb_version == null ) {
+             cvedb_version = mgmt.makePropertyKey('cvedb_version').dataType(String.class).make();
+        }
+
         cvss = mgmt.getPropertyKey('cvss');
         if(cvss == null) {
             cvss = mgmt.makePropertyKey('cvss').dataType(Float.class).make();
@@ -342,6 +347,11 @@
         last_updated = mgmt.getPropertyKey('last_updated');
         if(last_updated == null){
             last_updated = mgmt.makePropertyKey('last_updated').dataType(Double.class).make();
+        }
+
+        modified_date = mgmt.getPropertyKey('modified_date');
+        if(modified_date == null){
+            modified_date = mgmt.makePropertyKey('modified_date').dataType(String.class).make();
         }
 
         // for Black Duck Security
@@ -614,7 +624,8 @@
                 'lname',
                 'license_count',
                 'email',
-                'cve_id',
+                //'cve_id',
+                'cvedb_version',
                 //'summary',
                 //'access_authentication',
                 //'access_complexity',
@@ -625,6 +636,7 @@
                 //'references',
                 'vertex_label',
                 'last_updated',
+                'modified_date',
                 //'base_score',
                 //'exploitability_subscore',
                 //'impact_subscore',

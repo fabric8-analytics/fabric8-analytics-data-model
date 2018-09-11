@@ -94,8 +94,8 @@ class GraphPopulator(object):
         final_declared_licenses = list()
         for dl in license_list:
             dl = cls.sanitize_text_for_query(dl)
-            if dl.startswith(("version", "Version")):
-                final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
+            if dl.startswith(("version", "Version", " version", " Version")):
+                final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl.strip()
             else:
                 final_declared_licenses.append(dl)
         return final_declared_licenses

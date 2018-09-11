@@ -9,6 +9,7 @@ import sys
 import data_importer
 from graph_manager import BayesianGraph
 from graph_populator import GraphPopulator
+from cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion, CVEGetByDate
 from raven.contrib.flask import Sentry
 import config
 from werkzeug.contrib.fixers import ProxyFix
@@ -242,6 +243,81 @@ def handle_properties(ecosystem, package, version):
         return flask.jsonify(response_json), 400
 
     return flask.jsonify(response_json), 200
+
+
+@api_v1.route('/api/v1/cves', methods=['PUT', 'DELETE'])
+def cves_put_delete():
+    """Put or delete CVE nodes.
+
+    Missing EPVs will be created.
+    """
+    payload = request.get_json(silent=True)
+    try:
+        if request.method == 'PUT':
+            cve = CVEPut(payload)
+            print(cve)
+        elif request.method == 'DELETE':
+            cve = CVEDelete(payload)
+        else:
+            # this should never happen
+            return flask.jsonify({'error': 'method not allowed'}), 405
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 400
+
+    try:
+        cve.process()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+
+    return flask.jsonify({}), 200
+
+
+@api_v1.route('/api/v1/cves/<string:ecosystem>', methods=['GET'])
+@api_v1.route('/api/v1/cves/<string:ecosystem>/<string:name>', methods=['GET'])
+@api_v1.route('/api/v1/cves/<string:ecosystem>/<string:name>/<string:version>', methods=['GET'])
+def cves_get(ecosystem, name=None, version=None):
+    """Get list of CVEs for E, EP, or EPV."""
+    cve = CVEGet(ecosystem, name, version)
+    try:
+        result = cve.get()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify(result), 200
+
+
+@api_v1.route('/api/v1/cves/bydate/<string:modified_date>', methods=['GET'])
+def cves_get_bydate(modified_date):
+    """Get CVEs ingested into graph by a date [YYYYMMDD]."""
+    try:
+        cve = CVEGetByDate(modified_date)
+        result = cve.get_bydate()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify(result), 200
+
+
+@api_v1.route('/api/v1/cvedb-version', methods=['GET'])
+def cvedb_version_get():
+    """Get CVEDB version."""
+    try:
+        version = CVEDBVersion().get()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify({'version': version}), 200
+
+
+@api_v1.route('/api/v1/cvedb-version', methods=['PUT'])
+def cvedb_version_put():
+    """Create or replace CVEDB version."""
+    payload = request.get_json(silent=True)
+
+    if not payload or 'version' not in payload:
+        return flask.jsonify({'error': 'invalid input'}), 400
+    try:
+        version = CVEDBVersion().put(payload)
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify({'version': version}), 200
 
 
 def create_app():

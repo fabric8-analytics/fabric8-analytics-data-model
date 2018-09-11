@@ -252,6 +252,92 @@ Output:  {}
 HTTP Status Code: 200 success
                   400 when operation fails or encounters error/exception
 ```
+
+URL: /api/v1/cves
+```
+Sample URL: /api/v1/cves
+Description: Create, replace or delete CVE nodes.
+Method: PUT
+Input:
+{
+    "cve_id": "CVE-2018-0001",
+    "description": "Some description here.",
+    "cvss_v2": "10.0",
+    "ecosystem": "pypi",
+    "affected": [
+        {
+            "name": "numpy",
+            "version": "11.0"
+        },
+        {
+            "name": "numpy",
+            "version": "10.0"
+        }
+    ]
+}
+Output:  {}
+HTTP Status Code: 200 success
+                  400 invalid input
+                  500 gremlin error
+
+Method: DELETE
+Input:
+{
+    "cve_id": "CVE-2018-0001"
+}
+
+Output:  {}
+HTTP Status Code: 200 success
+                  400 invalid input
+                  500 gremlin error
+```
+
+URL: /api/v1/cves/<string:ecosystem>
+URL: /api/v1/cves/<string:ecosystem>/<string:name>
+URL: /api/v1/cves/<string:ecosystem>/<string:name>/<string:version>
+```
+Sample URL: /api/v1/cves/pypi/numpy/11.0
+Description: Get list of CVEs for E, EP, or EPV.
+Method: GET
+Output:
+{
+  "count": 1,
+  "cve_ids": [
+    "CVE-2018-0001"
+  ]
+}
+HTTP Status Code: 200 success
+                  500 gremlin error
+```
+
+URL: /api/v1/cvedb-version
+```
+Sample URL: /api/v1/cvedb-version
+Description: Create or replace CVEDB version
+Method: PUT
+Input:
+{
+    "version": "9f4d54dd1a21584a40596c05d60ab00974953047"
+}
+Output:
+{
+    "version": "9f4d54dd1a21584a40596c05d60ab00974953047"
+}
+HTTP Status Code: 200 success
+                  400 invalid input
+                  500 gremlin error
+
+Method: GET
+Description: Get CVEDB version
+Output:
+{
+    "version": "9f4d54dd1a21584a40596c05d60ab00974953047"
+}
+HTTP Status Code: 200 success
+                  500 gremlin error
+```
+
+
 ## How to test and develop locally?
 ```
 cd local-setup
