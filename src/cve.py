@@ -118,13 +118,14 @@ class CVEDelete(object):
 
 
 class CVEGetByDate(object):
-    """Class encapsulating operations to retrieve CVEs by date or date-range"""
+    """Class encapsulating operations to retrieve CVEs by date or date-range."""
+
     def __init__(self, bydate):
         """Constructor."""
         self._bydate = bydate
 
     def get_bydate(self):
-        """Retrieve CVEs ingested on a given date [YYYYMMDD]"""
+        """Retrieve CVEs ingested on a given date [YYYYMMDD]."""
         if not self._bydate:
             return {'count': 0, 'cve_ids': []}
         try:
@@ -134,6 +135,7 @@ class CVEGetByDate(object):
         return self.get_cves_by_date()
 
     def get_cves_by_date(self):
+        """Call graph and get CVEs by date."""
         script = cve_nodes_by_date_script_template
         bindings = {'modified_date': self._bydate}
         return self.get_cves(script, bindings)
@@ -292,7 +294,7 @@ g.V().has("pecosystem",ecosystem)\
 """
 
 # Get CVEs by date
-cve_nodes_by_date_script_template="""\
+cve_nodes_by_date_script_template = """\
 g.V().has('vertex_label','CVE')\
 .has('modified_date', modified_date)\
 .values('cve_id').\
