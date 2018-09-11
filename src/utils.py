@@ -6,7 +6,7 @@ import requests
 import json
 import logging
 import config
-import datetime
+from datetime import datetime
 import time
 
 logger = logging.getLogger(__name__)
@@ -71,8 +71,8 @@ def get_current_version(eco, pkg):
 
 
 def get_timestamp():
-    """Get UNIX timestamp for `utcnow()`."""
-    return int(time.mktime(datetime.datetime.utcnow().timetuple()))
+    """Get YYYYMMDD format timestamp from `utcnow()`."""
+    return (datetime.utcnow()).strftime('%Y%m%d')
 
 
 def call_gremlin(json_payload):
