@@ -10,7 +10,7 @@ import data_importer
 from graph_manager import BayesianGraph
 from graph_populator import GraphPopulator
 from cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion, CVEGetByDate
-# from raven.contrib.flask import Sentry
+from raven.contrib.flask import Sentry
 import config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
@@ -346,7 +346,7 @@ def setup_logging(flask_app):
 app = create_app()
 setup_logging(app)
 app.wsgi_app = ProxyFix(app.wsgi_app)
-# sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
+sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
 
 
 if __name__ == "__main__":
