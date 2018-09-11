@@ -144,7 +144,6 @@ def test_cve_get_epv(mocker):
 @patch("cve.call_gremlin")
 def test_cve_get_by_date_valid(mocker):
     """Test getting CVEs for (ecosystem)."""
-
     mocker.return_value = {'result': {'data': []}}
 
     cve = CVEGetByDate('20160911')
@@ -159,7 +158,6 @@ def test_cve_get_by_date_valid(mocker):
 
 def test_cve_get_by_date_invalid(mocker):
     """Test getting CVEs for (ecosystem)."""
-
     with pytest.raises(ValueError):
         cve = CVEGetByDate('2016-09-11')
         response = cve.get_bydate()
@@ -167,7 +165,6 @@ def test_cve_get_by_date_invalid(mocker):
 
 def test_cve_get_by_date_none(mocker):
     """Test getting CVEs for (ecosystem)."""
-
     mocker.return_value = {'result': {'data': []}}
 
     cve = CVEGetByDate(None)
