@@ -349,6 +349,11 @@
             last_updated = mgmt.makePropertyKey('last_updated').dataType(Double.class).make();
         }
 
+        modified_date = mgmt.getPropertyKey('modified_date');
+        if(modified_date == null){
+            modified_date = mgmt.makePropertyKey('modified_date').dataType(String.class).make();
+        }
+
         // for Black Duck Security
         base_score = mgmt.getPropertyKey('base_score');
         if(base_score == null){
@@ -619,7 +624,7 @@
                 'lname',
                 'license_count',
                 'email',
-                'cve_id',
+                //'cve_id',
                 'cvedb_version',
                 //'summary',
                 //'access_authentication',
@@ -631,6 +636,7 @@
                 //'references',
                 'vertex_label',
                 'last_updated',
+                'modified_date',
                 //'base_score',
                 //'exploitability_subscore',
                 //'impact_subscore',
