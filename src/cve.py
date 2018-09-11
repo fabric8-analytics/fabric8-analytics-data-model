@@ -5,7 +5,8 @@ import logging
 from graph_populator import GraphPopulator
 from graph_manager import BayesianGraph
 from utils import get_timestamp, call_gremlin
-
+from datetime import datetime
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -58,15 +59,17 @@ class CVEPut(object):
     def prepare_payload(self):
         """Prepare payload for Gremlin."""
         query_str = cve_node_replace_script_template
-
+        print(self._cve_dict.get('affected'))
         for epv_dict in self._cve_dict.get('affected'):
+            print(epv_dict)
             edge_str = add_affected_edge_script_template.format(
                 ecosystem=self._cve_dict.get('ecosystem'),
                 name=epv_dict.get('name'),
                 version=epv_dict.get('version')
             )
-            query_str += edge_str
 
+            query_str += edge_str
+        # print(query_str)
         timestamp = get_timestamp()
 
         payload = {
@@ -76,9 +79,10 @@ class CVEPut(object):
                 'description': self._cve_dict.get('description'),
                 'cvss_v2': self._cve_dict.get('cvss_v2'),
                 'ecosystem': self._cve_dict.get('ecosystem'),
-                'timestamp': timestamp
+                'modified_date': timestamp
             }
         }
+        print(json.dumps(payload))
         return payload
 
 
@@ -114,6 +118,40 @@ class CVEDelete(object):
             }
         }
 
+        return payload
+
+
+class CVEGetByDate(object):
+    """Class encapsulating operations to retrieve CVEs by date or date-range"""
+    def __init__(self, bydate):
+        """Constructor."""
+        self._bydate = bydate
+
+    def get_bydate(self):
+        """Retrieve CVEs ingested on a given date [YYYYMMDD]"""
+        if not self._bydate:
+            return {'count': 0, 'cve_ids': []}
+        try:
+            datetime.strptime(self._bydate, '%Y%m%d')
+        except ValueError:
+            raise ValueError('Invalid datetime specified. Please specify in YYYYMMDD format')
+        return self.get_cves_by_date()
+
+    def get_cves_by_date(self):
+        script = cve_nodes_by_date_script_template
+        bindings = {'modified_date': self._bydate}
+        return self.get_cves(script, bindings)
+
+    def get_cves(self, script, bindings):
+        """Call Gremlin and get the CVE information."""
+        json_payload = self.prepare_payload(script, bindings)
+        response = call_gremlin(json_payload)
+        cve_list = response.get('result', {}).get('data', [])
+        return {'count': len(cve_list), 'cve_ids': cve_list}
+
+    def prepare_payload(self, script, bindings):
+        """Prepare payload."""
+        payload = {'gremlin': script, 'bindings': bindings}
         return payload
 
 
@@ -201,49 +239,50 @@ class CVEDBVersion(object):
 
 # add or replace CVE node
 cve_node_replace_script_template = """\
-g.V().has('cve_id',cve_id)\
-.drop()\
-.iterate();\
-cve_v=g.addV('CVE')\
-.property('ecosystem',ecosystem)\
-.property('cve_id',cve_id)\
-.property('description',description)\
-.property('cvss_v2',cvss_v2)\
-.property('timestamp',timestamp)\
-.next();\
+cve_v=g.V().has('cve_id',cve_id).tryNext().orElseGet{\
+g.addV('CVE')\
+.property('vertex_label', 'CVE')\
+.property('cve_id', cve_id)};\
+cve_v.property('ecosystem',ecosystem);\
+cve_v.property('description',description);\
+cve_v.property('cvss_v2',cvss_v2);\
+cve_v.property('modified_date',modified_date);\
+cve_node=cve_v.next();\
 """
 
-# add edge between CVE node and Version node
+# add edge between CVE node and Version node if it does not exist previously
 add_affected_edge_script_template = """\
 version_v=g.V().has('pecosystem','{ecosystem}')\
 .has('pname','{name}')\
+.has('version','{version}');\
+version_v.out('has_cve').has('cve_id', cve_id).tryNext().orElseGet{{\
+g.V().has('pecosystem','{ecosystem}')\
+.has('pname','{name}')\
 .has('version','{version}')\
-.next();\
-version_v.addEdge('has_cve',cve_v);\
+.next().addEdge('has_cve', cve_node)}};\
 """
 
 # delete CVE node
 cve_node_delete_script_template = """\
 g.V().has('cve_id',cve_id)\
-.drop();\
+.drop().iterate();\
 """
 
 # get CVEs for ecosystem
 cve_nodes_for_ecosystem_script_template = """\
-g.V().has("ecosystem",ecosystem)\
-.has("cve_id")\
+g.V().has("vertex_label", "CVE")\
+.has("ecosystem",ecosystem)\
 .values("cve_id")\
-.dedup()\
+.dedup();\
 """
 
 # get CVEs for (ecosystem, name)
 cve_nodes_for_ecosystem_name_script_template = """\
 g.V().has("pecosystem",ecosystem)\
 .has("pname",name)
-.outE("has_cve")\
-.inV()\
+.out("has_cve")\
 .values("cve_id")\
-.dedup()\
+.dedup();\
 """
 
 # get CVEs for (ecosystem, name, version)
@@ -251,25 +290,28 @@ cve_nodes_for_ecosystem_name_version_script_template = """\
 g.V().has("pecosystem",ecosystem)\
 .has("pname",name)
 .has("version",version)
-.outE("has_cve")\
-.inV()\
+.out("has_cve")\
 .values("cve_id")\
-.dedup()\
+.dedup();\
 """
 
+# Get CVEs by date
+cve_nodes_by_date_script_template="""\
+g.V().has('vertex_label','CVE')\
+.has('modified_date', modified_date)\
+.values('cve_id').\
+dedup()\
+"""
 
 # Update CVEDB version
 cvedb_version_replace_script_template = """\
-g.V().hasLabel('CVEDBVersion')\
-.drop()\
-.iterate();\
-cve_v=g.addV('CVEDBVersion')\
-.property('cvedb_version',cvedb_version)\
-.next();\
+cve_v=g.V().has('vertex_label', 'CVEDBVersion').tryNext().orElseGet{\
+graph.addVertex('vertex_label', 'CVEDBVersion')};\
+cve_v.property('cvedb_version', cvedb_version);\
 """
 
 # Get CVEDB version
 cvedb_version_get_script_template = """\
-g.V().hasLabel('CVEDBVersion')\
+g.V().has('vertex_label', 'CVEDBVersion')\
 .values("cvedb_version")\
 """
