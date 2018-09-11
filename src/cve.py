@@ -6,7 +6,6 @@ from graph_populator import GraphPopulator
 from graph_manager import BayesianGraph
 from utils import get_timestamp, call_gremlin
 from datetime import datetime
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -59,9 +58,8 @@ class CVEPut(object):
     def prepare_payload(self):
         """Prepare payload for Gremlin."""
         query_str = cve_node_replace_script_template
-        print(self._cve_dict.get('affected'))
+
         for epv_dict in self._cve_dict.get('affected'):
-            print(epv_dict)
             edge_str = add_affected_edge_script_template.format(
                 ecosystem=self._cve_dict.get('ecosystem'),
                 name=epv_dict.get('name'),
@@ -69,7 +67,6 @@ class CVEPut(object):
             )
 
             query_str += edge_str
-        # print(query_str)
         timestamp = get_timestamp()
 
         payload = {
@@ -82,7 +79,6 @@ class CVEPut(object):
                 'modified_date': timestamp
             }
         }
-        print(json.dumps(payload))
         return payload
 
 
