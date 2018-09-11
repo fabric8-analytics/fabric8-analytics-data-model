@@ -9,8 +9,8 @@ import sys
 import data_importer
 from graph_manager import BayesianGraph
 from graph_populator import GraphPopulator
-from cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion
-from raven.contrib.flask import Sentry
+from cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion, CVEGetByDate
+# from raven.contrib.flask import Sentry
 import config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
@@ -255,6 +255,7 @@ def cves_put_delete():
     try:
         if request.method == 'PUT':
             cve = CVEPut(payload)
+            print(cve)
         elif request.method == 'DELETE':
             cve = CVEDelete(payload)
         else:
@@ -279,6 +280,17 @@ def cves_get(ecosystem, name=None, version=None):
     cve = CVEGet(ecosystem, name, version)
     try:
         result = cve.get()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify(result), 200
+
+
+@api_v1.route('/api/v1/cves/bydate/<string:modified_date>', methods=['GET'])
+def cves_get_bydate(modified_date):
+    """Get CVEs ingested into graph by a date [YYYYMMDD]."""
+    try:
+        cve = CVEGetByDate(modified_date)
+        result = cve.get_bydate()
     except ValueError as e:
         return flask.jsonify({'error': str(e)}), 500
     return flask.jsonify(result), 200
@@ -334,7 +346,7 @@ def setup_logging(flask_app):
 app = create_app()
 setup_logging(app)
 app.wsgi_app = ProxyFix(app.wsgi_app)
-sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
+# sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
 
 
 if __name__ == "__main__":
