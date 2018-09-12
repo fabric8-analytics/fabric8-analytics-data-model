@@ -7,7 +7,6 @@ import json
 import logging
 import config
 from datetime import datetime
-import time
 
 logger = logging.getLogger(__name__)
 
