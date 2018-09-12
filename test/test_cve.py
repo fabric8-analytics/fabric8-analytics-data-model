@@ -156,10 +156,58 @@ def test_cve_get_by_date_valid(mocker):
     assert len(response['cve_ids']) == 0
 
 
+def test_cve_get_by_date_empty_string(mocker):
+    """Test getting CVEs for (ecosystem) with wrong input."""
+    cve = CVEGetByDate('')
+    response = cve.get_bydate()
+    assert response
+    assert 'count' in response
+    assert response['count'] == 0
+    assert 'cve_ids' in response
+    assert len(response['cve_ids']) == 0
+
+
+def test_cve_get_by_date_too_early(mocker):
+    """Test getting CVEs for (ecosystem)."""
+    with pytest.raises(ValueError):
+        cve = CVEGetByDate('1000-01-01')
+        response = cve.get_bydate()
+        assert response is not None
+
+    cve = CVEGetByDate('10000101')
+    response = cve.get_bydate()
+    assert response
+    assert 'count' in response
+    assert response['count'] == 0
+    assert 'cve_ids' in response
+    assert len(response['cve_ids']) == 0
+
+
+def test_cve_get_by_date_too_late(mocker):
+    """Test getting CVEs for (ecosystem)."""
+    with pytest.raises(ValueError):
+        cve = CVEGetByDate('9999-01-01')
+        response = cve.get_bydate()
+        assert response is not None
+
+    cve = CVEGetByDate('99990101')
+    response = cve.get_bydate()
+    assert response
+    assert 'count' in response
+    assert response['count'] == 0
+    assert 'cve_ids' in response
+    assert len(response['cve_ids']) == 0
+
+
 def test_cve_get_by_date_invalid(mocker):
     """Test getting CVEs for (ecosystem)."""
     with pytest.raises(ValueError):
         cve = CVEGetByDate('2016-09-11')
+        response = cve.get_bydate()
+        assert response is not None
+
+    with pytest.raises(ValueError):
+        cve = CVEGetByDate('11-09-2016')
         response = cve.get_bydate()
         assert response is not None
 
