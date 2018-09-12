@@ -161,6 +161,7 @@ def test_cve_get_by_date_invalid(mocker):
     with pytest.raises(ValueError):
         cve = CVEGetByDate('2016-09-11')
         response = cve.get_bydate()
+        assert response is not None
 
 
 def test_cve_get_by_date_none(mocker):
