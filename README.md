@@ -293,7 +293,9 @@ HTTP Status Code: 200 success
 ```
 
 URL: /api/v1/cves/<string:ecosystem>
+
 URL: /api/v1/cves/<string:ecosystem>/<string:name>
+
 URL: /api/v1/cves/<string:ecosystem>/<string:name>/<string:version>
 ```
 Sample URL: /api/v1/cves/pypi/numpy/11.0
@@ -308,6 +310,22 @@ Output:
 }
 HTTP Status Code: 200 success
                   500 gremlin error
+```
+
+URL: /api/v1/cves/bydate/<YYYYMMDD>
+```
+Sample URL: /api/v1/cves/bydate/20180124
+Description: Get list of CVEs ingested on that particular date.
+Method: GET
+Output:
+{
+  "count": 1,
+  "cve_ids": [
+    "CVE-2018-0001"
+  ]
+}
+HTTP Status Code: 200 success
+                  500 invalid input or gremlin error
 ```
 
 URL: /api/v1/cvedb-version
