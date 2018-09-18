@@ -15,6 +15,7 @@ import config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
 from flask import Blueprint, current_app
+from fabric8a_auth.auth import login_required
 
 
 api_v1 = Blueprint('api_v1', __name__)

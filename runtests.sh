@@ -57,6 +57,7 @@ function setup_virtualenv {
 
     pip install -U pip
     pip install -r requirements.txt
+    pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-auth.git
 
     # Install profiling module
     pip install pytest-profiling
