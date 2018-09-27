@@ -93,7 +93,7 @@ def call_gremlin(json_payload):
 
 
 def prepare_response(gremlin_json):
-    """Prepare response to be sent to user based on Gremlin data"""
+    """Prepare response to be sent to user based on Gremlin data."""
     cve_list = []
     resp = gremlin_json.get('result', {}).get('data', [])
     for cve in resp:
