@@ -4,7 +4,7 @@ import logging
 
 from graph_populator import GraphPopulator
 from graph_manager import BayesianGraph
-from utils import get_timestamp, call_gremlin
+from utils import get_timestamp, call_gremlin, prepare_response
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -127,7 +127,7 @@ class CVEGetByDate(object):
     def get_bydate(self):
         """Retrieve CVEs ingested on a given date [YYYYMMDD]."""
         if not self._bydate:
-            return {'count': 0, 'cve_ids': []}
+            return {'count': 0, 'cve_list': []}
         try:
             datetime.strptime(self._bydate, '%Y%m%d')
         except ValueError:
@@ -144,8 +144,8 @@ class CVEGetByDate(object):
         """Call Gremlin and get the CVE information."""
         json_payload = self.prepare_payload(script, bindings)
         response = call_gremlin(json_payload)
-        cve_list = response.get('result', {}).get('data', [])
-        return {'count': len(cve_list), 'cve_ids': cve_list}
+        cve_list = prepare_response(response)
+        return cve_list
 
     def prepare_payload(self, script, bindings):
         """Prepare payload."""
@@ -193,8 +193,8 @@ class CVEGet(object):
         """Call Gremlin and get the CVE information."""
         json_payload = self.prepare_payload(script, bindings)
         response = call_gremlin(json_payload)
-        cve_list = response.get('result', {}).get('data', [])
-        return {'count': len(cve_list), 'cve_ids': cve_list}
+        cve_list = prepare_response(response)
+        return cve_list
 
     def prepare_payload(self, script, bindings):
         """Prepare payload."""
@@ -241,10 +241,12 @@ cve_v=g.V().has('cve_id',cve_id).tryNext().orElseGet{\
 g.addV('CVE')\
 .property('vertex_label', 'CVE')\
 .property('cve_id', cve_id)};\
-cve_v.property('ecosystem',ecosystem);\
-cve_v.property('description',description);\
-cve_v.property('cvss_v2',cvss_v2);\
-cve_v.property('modified_date',modified_date);\
+cve_v.property('ecosystem', ecosystem);\
+cve_v.property('description', description);\
+cve_v.property('cvss_v2', cvss_v2);\
+cve_v.property('status', status);\
+cve_v.property('fixed_in', fixed_in);\
+cve_v.property('modified_date', modified_date);\
 cve_node=cve_v.next();\
 """
 
@@ -269,17 +271,18 @@ g.V().has('cve_id',cve_id)\
 # get CVEs for ecosystem
 cve_nodes_for_ecosystem_script_template = """\
 g.V().has("vertex_label", "CVE")\
-.has("ecosystem",ecosystem)\
-.values("cve_id")\
+.has("ecosystem", ecosystem).as('cve')\
+.in().as('epv')\
+.select('cve','epv').by(valueMap())\
 .dedup();\
 """
 
 # get CVEs for (ecosystem, name)
 cve_nodes_for_ecosystem_name_script_template = """\
 g.V().has("pecosystem",ecosystem)\
-.has("pname",name)
-.out("has_cve")\
-.values("cve_id")\
+.has("pname",name).as('epv')\
+.out("has_cve").as('cve')\
+.select('cve','epv').by(valueMap())\
 .dedup();\
 """
 
@@ -287,17 +290,18 @@ g.V().has("pecosystem",ecosystem)\
 cve_nodes_for_ecosystem_name_version_script_template = """\
 g.V().has("pecosystem",ecosystem)\
 .has("pname",name)
-.has("version",version)
-.out("has_cve")\
-.values("cve_id")\
+.has("version",version).as('epv')
+.out("has_cve").as('cve')\
+.select('cve','epv').by(valueMap())\
 .dedup();\
 """
 
 # Get CVEs by date
 cve_nodes_by_date_script_template = """\
 g.V().has('vertex_label','CVE')\
-.has('modified_date', modified_date)\
-.values('cve_id').\
+.has('modified_date', modified_date).as('cve')\
+.in('has_cve').as('epv')\
+.select('cve','epv').by(valueMap())\
 dedup()\
 """
 
