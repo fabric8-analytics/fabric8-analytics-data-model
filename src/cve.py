@@ -193,8 +193,8 @@ class CVEGet(object):
         """Call Gremlin and get the CVE information."""
         json_payload = self.prepare_payload(script, bindings)
         response = call_gremlin(json_payload)
-        cve_list = prepare_response(response)
-        return cve_list
+        cve_list = response.get('result', {}).get('data', [])
+        return {'count': len(cve_list), 'cve_ids': cve_list}
 
     def prepare_payload(self, script, bindings):
         """Prepare payload."""
@@ -271,18 +271,17 @@ g.V().has('cve_id',cve_id)\
 # get CVEs for ecosystem
 cve_nodes_for_ecosystem_script_template = """\
 g.V().has("vertex_label", "CVE")\
-.has("ecosystem", ecosystem).as('cve')\
-.in().as('epv')\
-.select('cve','epv').by(valueMap())\
+.has("ecosystem",ecosystem)\
+.values("cve_id")\
 .dedup();\
 """
 
 # get CVEs for (ecosystem, name)
 cve_nodes_for_ecosystem_name_script_template = """\
 g.V().has("pecosystem",ecosystem)\
-.has("pname",name).as('epv')\
-.out("has_cve").as('cve')\
-.select('cve','epv').by(valueMap())\
+.has("pname",name)
+.out("has_cve")\
+.values("cve_id")\
 .dedup();\
 """
 
@@ -290,9 +289,9 @@ g.V().has("pecosystem",ecosystem)\
 cve_nodes_for_ecosystem_name_version_script_template = """\
 g.V().has("pecosystem",ecosystem)\
 .has("pname",name)
-.has("version",version).as('epv')
-.out("has_cve").as('cve')\
-.select('cve','epv').by(valueMap())\
+.has("version",version)
+.out("has_cve")\
+.values("cve_id")\
 .dedup();\
 """
 

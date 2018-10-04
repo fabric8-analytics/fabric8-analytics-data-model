@@ -303,17 +303,10 @@ Description: Get list of CVEs for E, EP, or EPV.
 Method: GET
 Output:
 {
-	"cve_list": [{
-		"name": "numpy",
-		"description": "Some description here updated just now.",
-		"version": "11.0",
-		"status": null,
-		"fixed_in": null,
-		"cvss": "10.0",
-		"cve_id": "CVE-2018-0001",
-		"ecosystem": "pypi"
-	}],
-	"count": 1
+	"count": 1,
+    "cve_ids": [
+        "CVE-2018-0001"
+    ]
 }
 HTTP Status Code: 200 success
                   500 gremlin error

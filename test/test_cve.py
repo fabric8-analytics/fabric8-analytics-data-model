@@ -118,32 +118,34 @@ def test_cve_delete_prepare_payload():
 @patch("cve.call_gremlin")
 def test_cve_get_e(mocker):
     """Test getting CVEs for (ecosystem)."""
-    mocker.return_value = mocker_input
+    mocker.return_value = {'result': {'data': ['CVE-2018-0001']}}
 
-    cve = CVEGet('maven', None, None)
+    cve = CVEGet('pypi', None, None)
     response = cve.get()
 
     assert response
-    assert 'cve_list' in response
-    assert len(response['cve_list']) == 1
-    assert response['cve_list'][0]['cve_id'] == 'CVE-2018-0001'
-    assert 'ecosystem' in response['cve_list'][0]
+    assert 'count' in response
+    assert response['count'] == 1
+    assert 'cve_ids' in response
+    assert len(response['cve_ids']) == 1
+    assert response['cve_ids'][0] == 'CVE-2018-0001'
 
 
 @patch("cve.call_gremlin")
 def test_cve_get_ep(mocker):
     """Test getting CVEs for (ecosystem,name)."""
-    mocker.return_value = mocker_input
+    mocker.return_value = {'result': {'data': ['CVE-2018-0001', 'CVE-2018-0002']}}
 
-    cve = CVEGet('maven', 'io.vertx:vertx-core', None)
+    cve = CVEGet('pypi', 'numpy', None)
     response = cve.get()
 
     assert response
-    assert 'cve_list' in response
-    assert len(response['cve_list']) == 1
-    assert response['cve_list'][0]['cve_id'] == 'CVE-2018-0001'
-    assert 'ecosystem' in response['cve_list'][0]
-    assert 'name' in response['cve_list'][0]
+    assert 'count' in response
+    assert response['count'] == 2
+    assert 'cve_ids' in response
+    assert len(response['cve_ids']) == 2
+    assert response['cve_ids'][0] in ('CVE-2018-0001', 'CVE-2018-0002')
+    assert response['cve_ids'][1] in ('CVE-2018-0001', 'CVE-2018-0002')
 
 
 @patch("cve.call_gremlin")
@@ -157,8 +159,8 @@ def test_cve_get_epv(mocker):
     assert response
     assert 'count' in response
     assert response['count'] == 0
-    assert 'cve_list' in response
-    assert len(response['cve_list']) == 0
+    assert 'cve_ids' in response
+    assert len(response['cve_ids']) == 0
 
 
 @patch("cve.call_gremlin")
@@ -177,7 +179,7 @@ def test_cve_get_by_date_valid(mocker):
     assert 'version' in response['cve_list'][0]
 
 
-def test_cve_get_by_date_empty_string(mocker):
+def test_cve_get_by_date_empty_string():
     """Test getting CVEs for (ecosystem) with wrong input."""
     cve = CVEGetByDate('')
     response = cve.get_bydate()
@@ -188,7 +190,7 @@ def test_cve_get_by_date_empty_string(mocker):
     assert len(response['cve_list']) == 0
 
 
-def test_cve_get_by_date_too_early(mocker):
+def test_cve_get_by_date_too_early():
     """Test getting CVEs for (ecosystem)."""
     with pytest.raises(ValueError):
         cve = CVEGetByDate('1000-01-01')
@@ -204,7 +206,7 @@ def test_cve_get_by_date_too_early(mocker):
     assert len(response['cve_list']) == 0
 
 
-def test_cve_get_by_date_too_late(mocker):
+def test_cve_get_by_date_too_late():
     """Test getting CVEs for (ecosystem)."""
     with pytest.raises(ValueError):
         cve = CVEGetByDate('9999-01-01')
@@ -220,7 +222,7 @@ def test_cve_get_by_date_too_late(mocker):
     assert len(response['cve_list']) == 0
 
 
-def test_cve_get_by_date_invalid(mocker):
+def test_cve_get_by_date_invalid():
     """Test getting CVEs for (ecosystem)."""
     with pytest.raises(ValueError):
         cve = CVEGetByDate('2016-09-11')
