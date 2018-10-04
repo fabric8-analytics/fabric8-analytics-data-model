@@ -303,7 +303,7 @@ Description: Get list of CVEs for E, EP, or EPV.
 Method: GET
 Output:
 {
-	"count": 1,
+    "count": 1,
     "cve_ids": [
         "CVE-2018-0001"
     ]
