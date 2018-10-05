@@ -303,10 +303,10 @@ Description: Get list of CVEs for E, EP, or EPV.
 Method: GET
 Output:
 {
-  "count": 1,
-  "cve_ids": [
-    "CVE-2018-0001"
-  ]
+    "count": 1,
+    "cve_ids": [
+        "CVE-2018-0001"
+    ]
 }
 HTTP Status Code: 200 success
                   500 gremlin error
@@ -319,10 +319,26 @@ Description: Get list of CVEs ingested on that particular date.
 Method: GET
 Output:
 {
-  "count": 1,
-  "cve_ids": [
-    "CVE-2018-0001"
-  ]
+	"cve_list": [{
+		"name": "numpy",
+		"description": "Some description here updated just now.",
+		"version": "11.0",
+		"status": null,
+		"fixed_in": null,
+		"cvss": "10.0",
+		"cve_id": "CVE-2018-0001",
+		"ecosystem": "pypi"
+	}, {
+		"name": "io.vertx:vertx-core",
+		"description": "Some description here updated just now.",
+		"version": "3.4.1",
+		"status": null,
+		"fixed_in": "3.4.2",
+		"cvss": "10.0",
+		"cve_id": "CVE-2018-0002",
+		"ecosystem": "maven"
+	}],
+	"count": 2
 }
 HTTP Status Code: 200 success
                   500 invalid input or gremlin error
