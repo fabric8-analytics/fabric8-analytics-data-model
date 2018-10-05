@@ -24,3 +24,5 @@ coverage.xml
 *.mo
 *.pot
 
+# Config
+*config.py
