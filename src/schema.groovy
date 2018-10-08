@@ -205,6 +205,16 @@
             cvss = mgmt.makePropertyKey('cvss').dataType(Float.class).make();
         }
 
+        nvd_status = mgmt.getPropertyKey('nvd_status');
+        if(nvd_status == null){
+            nvd_status = mgmt.makePropertyKey('nvd_status').dataType(String.class).make();
+        }
+
+        fixed_in = mgmt.getPropertyKey('fixed_in');
+        if(fixed_in == null){
+            fixed_in = mgmt.makePropertyKey('fixed_in').dataType(String.class).make();
+        }
+
         summary = mgmt.getPropertyKey('summary');
         if(summary == null) {
             summary = mgmt.makePropertyKey('summary').dataType(String.class).make();
@@ -625,6 +635,8 @@
                 'license_count',
                 'email',
                 //'cve_id',
+                //'fixed_in',
+                //'nvd_status',
                 'cvedb_version',
                 //'summary',
                 //'access_authentication',
