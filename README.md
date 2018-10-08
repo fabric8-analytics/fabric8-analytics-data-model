@@ -264,6 +264,8 @@ Input:
     "description": "Some description here.",
     "cvss_v2": "10.0",
     "ecosystem": "pypi",
+    "nvd_status": "Awaiting Analyses",
+    "fixed_in": "unknown",
     "affected": [
         {
             "name": "numpy",
