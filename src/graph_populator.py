@@ -115,7 +115,7 @@ class GraphPopulator(object):
             description = details_data[0].get('description', '')
             description = cls.sanitize_text_for_query(description)
 
-        go_detected_license = []
+        licenses = []
         drop_props = []
         str_version = prp_version = drop_prop = ""
         # Check if license and cve analyses succeeded. Then we refresh the property
@@ -187,8 +187,6 @@ class GraphPopulator(object):
                                      .get('sure_licenses', [])
             licenses = [cls.sanitize_text_for_query(l) for l in licenses]
             prp_version += " ".join(["ver.property('licenses', '{}');".format(l) for l in licenses])
-            if ecosystem == "go":
-                go_detected_license = licenses
 
         # Add CVE property if it exists
         if 'security_issues' in input_json.get('analyses', {}):
@@ -234,9 +232,10 @@ class GraphPopulator(object):
                         declared_licenses = [x.strip() for x in no_newlines.split(",")]
                     else:  # default behavior
                         # split by comma
-                        declared_licenses = [x.strip() for x in declared_str.split(",")]
-                elif ecosystem == "go" and go_detected_license:
-                    declared_licenses = go_detected_license
+                        declared_licenses = [x.strip()
+                                             for x in declared_str.split(",")]
+                elif ecosystem == "go" and licenses:
+                    declared_licenses = licenses
                 declared_licenses = cls.correct_license_splitting(
                     declared_licenses)
 

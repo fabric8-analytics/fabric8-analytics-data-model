@@ -1,0 +1,23 @@
+{
+  "analyses": [
+    "dependency_snapshot",
+    "source_licenses",
+    "digests",
+    "metadata"
+  ],
+  "audit": null,
+  "dependents_count": -1,
+  "ecosystem": "go",
+  "finished_at": "2017-12-09T15:48:16.863677",
+  "id": 4805873,
+  "latest_version": null,
+  "package": "github.com/gorilla/mux",
+  "package_info": {
+    "dependents_count": -1,
+    "relative_usage": "not used"
+  },
+  "release": "go:github.com/gorilla/mux:c572efe4294d5a0e354e01f2ddaa8b1f0c3cb3dd",
+  "started_at": "2017-12-05T07:12:25.534562",
+  "subtasks": null,
+  "version": "c572efe4294d5a0e354e01f2ddaa8b1f0c3cb3dd"
+}
