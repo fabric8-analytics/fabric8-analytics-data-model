@@ -76,7 +76,9 @@ class CVEPut(object):
                 'description': self._cve_dict.get('description'),
                 'cvss_v2': self._cve_dict.get('cvss_v2'),
                 'ecosystem': self._cve_dict.get('ecosystem'),
-                'modified_date': timestamp
+                'modified_date': timestamp,
+                'nvd_status': self._cve_dict.get('nvd_status'),
+                'fixed_in': self._cve_dict.get('fixed_in')
             }
         }
         return payload
@@ -244,7 +246,7 @@ g.addV('CVE')\
 cve_v.property('ecosystem', ecosystem);\
 cve_v.property('description', description);\
 cve_v.property('cvss_v2', cvss_v2);\
-cve_v.property('status', status);\
+cve_v.property('nvd_status', nvd_status);\
 cve_v.property('fixed_in', fixed_in);\
 cve_v.property('modified_date', modified_date);\
 cve_node=cve_v.next();\
