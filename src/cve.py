@@ -76,9 +76,12 @@ class CVEPut(object):
                 'description': self._cve_dict.get('description'),
                 'cvss_v2': self._cve_dict.get('cvss_v2'),
                 'ecosystem': self._cve_dict.get('ecosystem'),
-                'modified_date': timestamp
+                'modified_date': timestamp,
+                'nvd_status': self._cve_dict.get('nvd_status', 'unknown'),
+                'fixed_in': self._cve_dict.get('fixed_in', 'unknown')
             }
         }
+
         return payload
 
 
@@ -238,16 +241,15 @@ class CVEDBVersion(object):
 # add or replace CVE node
 cve_node_replace_script_template = """\
 cve_v=g.V().has('cve_id',cve_id).tryNext().orElseGet{\
-g.addV('CVE')\
-.property('vertex_label', 'CVE')\
-.property('cve_id', cve_id)};\
+graph.addVertex(label, 'CVE',\
+'vertex_label', 'CVE',\
+'cve_id', cve_id)};\
 cve_v.property('ecosystem', ecosystem);\
 cve_v.property('description', description);\
 cve_v.property('cvss_v2', cvss_v2);\
-cve_v.property('status', status);\
+cve_v.property('nvd_status', nvd_status);\
 cve_v.property('fixed_in', fixed_in);\
 cve_v.property('modified_date', modified_date);\
-cve_node=cve_v.next();\
 """
 
 # add edge between CVE node and Version node if it does not exist previously
@@ -259,7 +261,7 @@ version_v.out('has_cve').has('cve_id', cve_id).tryNext().orElseGet{{\
 g.V().has('pecosystem','{ecosystem}')\
 .has('pname','{name}')\
 .has('version','{version}')\
-.next().addEdge('has_cve', cve_node)}};\
+.next().addEdge('has_cve', cve_v)}};\
 """
 
 # delete CVE node

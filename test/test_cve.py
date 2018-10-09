@@ -39,7 +39,7 @@ mocker_input = {
                     "ecosystem": ["maven"],
                     "cve_id": ["CVE-2018-0001"],
                     "cvss_v2": ["10.0"],
-                    "status": ["Awaiting Analyses"],
+                    "nvd_status": ["Awaiting Analyses"],
                     "description": ["Some description here updated just now."],
                     "modified_date": ["20180911"]
                 },
