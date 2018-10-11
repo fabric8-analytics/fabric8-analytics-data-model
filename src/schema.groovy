@@ -212,7 +212,7 @@
 
         fixed_in = mgmt.getPropertyKey('fixed_in');
         if(fixed_in == null){
-            fixed_in = mgmt.makePropertyKey('fixed_in').dataType(String.class).make();
+            fixed_in = mgmt.makePropertyKey('fixed_in').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
         summary = mgmt.getPropertyKey('summary');
@@ -636,7 +636,7 @@
                 'email',
                 //'cve_id',
                 //'fixed_in',
-                //'nvd_status',
+                'nvd_status',
                 'cvedb_version',
                 //'summary',
                 //'access_authentication',
