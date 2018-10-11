@@ -133,6 +133,11 @@
             cvss_scores =  mgmt.makePropertyKey('cvss_scores').dataType(Float.class).cardinality(Cardinality.SET).make();
         }
 
+        cvss_v2 = mgmt.getPropertyKey('cvss_v2');
+        if(cvss_v2 == null) {
+            cvss_v2 =  mgmt.makePropertyKey('cvss_v2').dataType(Float.class).cardinality(Cardinality.SET).make();
+        }
+
         // for code metrics
 
         cm_loc = mgmt.getPropertyKey('cm_loc');
