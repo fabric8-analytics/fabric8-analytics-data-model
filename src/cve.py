@@ -69,17 +69,25 @@ class CVEPut(object):
             query_str += edge_str
         timestamp = get_timestamp()
 
+        bindings = {
+            'cve_id': self._cve_dict.get('cve_id'),
+            'description': self._cve_dict.get('description'),
+            'cvss_v2': self._cve_dict.get('cvss_v2'),
+            'ecosystem': self._cve_dict.get('ecosystem'),
+            'modified_date': timestamp
+        }
+
+        if self._cve_dict.get('nvd_status'):
+            query_str += cve_node_replace_script_template_nvd_status
+            bindings['nvd_status'] = self._cve_dict.get('nvd_status')
+
+        if self._cve_dict.get('fixed_in'):
+            for ver in self._cve_dict.get('fixed_in'):
+                query_str += "cve_v.property('fixed_in', '" + ver + "');"
+
         payload = {
             'gremlin': query_str,
-            'bindings': {
-                'cve_id': self._cve_dict.get('cve_id'),
-                'description': self._cve_dict.get('description'),
-                'cvss_v2': self._cve_dict.get('cvss_v2'),
-                'ecosystem': self._cve_dict.get('ecosystem'),
-                'modified_date': timestamp,
-                'nvd_status': self._cve_dict.get('nvd_status', 'unknown'),
-                'fixed_in': self._cve_dict.get('fixed_in', 'unknown')
-            }
+            'bindings': bindings
         }
 
         return payload
@@ -247,9 +255,12 @@ graph.addVertex(label, 'CVE',\
 cve_v.property('ecosystem', ecosystem);\
 cve_v.property('description', description);\
 cve_v.property('cvss_v2', cvss_v2);\
-cve_v.property('nvd_status', nvd_status);\
-cve_v.property('fixed_in', fixed_in);\
 cve_v.property('modified_date', modified_date);\
+"""
+
+# add or replace additional non-mandatory properties for CVE node
+cve_node_replace_script_template_nvd_status = """\
+cve_v.property('nvd_status', nvd_status);\
 """
 
 # add edge between CVE node and Version node if it does not exist previously
