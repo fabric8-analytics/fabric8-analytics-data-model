@@ -25,6 +25,7 @@ class CVEPut(object):
             assert 'cve_id' in self._cve_dict
             assert 'description' in self._cve_dict
             assert 'cvss_v2' in self._cve_dict
+            assert type(self._cve_dict.get('cvss_v2')) == float
             assert 'affected' in self._cve_dict
             assert 'ecosystem' in self._cve_dict
             for epv_dict in self._cve_dict.get('affected'):
@@ -59,14 +60,6 @@ class CVEPut(object):
         """Prepare payload for Gremlin."""
         query_str = cve_node_replace_script_template
 
-        for epv_dict in self._cve_dict.get('affected'):
-            edge_str = add_affected_edge_script_template.format(
-                ecosystem=self._cve_dict.get('ecosystem'),
-                name=epv_dict.get('name'),
-                version=epv_dict.get('version')
-            )
-
-            query_str += edge_str
         timestamp = get_timestamp()
 
         bindings = {
@@ -84,6 +77,13 @@ class CVEPut(object):
         if self._cve_dict.get('fixed_in'):
             for ver in self._cve_dict.get('fixed_in'):
                 query_str += "cve_v.property('fixed_in', '" + ver + "');"
+
+        for epv_dict in self._cve_dict.get('affected'):
+            edge_str = add_affected_edge_script_template.format(
+                ecosystem=self._cve_dict.get('ecosystem'), name=epv_dict.get('name'),
+                version=epv_dict.get('version'))
+
+            query_str += edge_str
 
         payload = {
             'gremlin': query_str,
@@ -161,6 +161,7 @@ class CVEGetByDate(object):
     def prepare_payload(self, script, bindings):
         """Prepare payload."""
         payload = {'gremlin': script, 'bindings': bindings}
+
         return payload
 
 
@@ -254,7 +255,7 @@ graph.addVertex(label, 'CVE',\
 'cve_id', cve_id)};\
 cve_v.property('ecosystem', ecosystem);\
 cve_v.property('description', description);\
-cve_v.property('cvss_v2', cvss_v2);\
+cve_v.property('cvss', cvss_v2);\
 cve_v.property('modified_date', modified_date);\
 """
 
