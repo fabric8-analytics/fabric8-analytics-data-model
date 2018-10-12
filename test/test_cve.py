@@ -13,7 +13,7 @@ from cve import (
 valid_put_input = {
     'cve_id': 'CVE-2018-0001',
     'description': 'Some description.',
-    'cvss_v2': '10.0',
+    'cvss_v2': 10.0,
     'ecosystem': 'pypi',
     'affected': [
         {
@@ -38,7 +38,7 @@ mocker_input = {
                 "cve": {
                     "ecosystem": ["maven"],
                     "cve_id": ["CVE-2018-0001"],
-                    "cvss_v2": ["10.0"],
+                    "cvss": [10.0],
                     "nvd_status": ["Awaiting Analyses"],
                     "description": ["Some description here updated just now."],
                     "modified_date": ["20180911"]
