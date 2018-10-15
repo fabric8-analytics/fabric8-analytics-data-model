@@ -205,6 +205,16 @@
             cvss = mgmt.makePropertyKey('cvss').dataType(Float.class).make();
         }
 
+        cvss_v2 = mgmt.getPropertyKey('cvss_v2');
+        if(cvss_v2 == null) {
+            cvss_v2 = mgmt.makePropertyKey('cvss_v2').dataType(Float.class).make();
+        }
+
+        cvss_v3 = mgmt.getPropertyKey('cvss_v3');
+        if(cvss_v3 == null) {
+            cvss_v3 = mgmt.makePropertyKey('cvss_v3').dataType(Float.class).make();
+        }
+
         nvd_status = mgmt.getPropertyKey('nvd_status');
         if(nvd_status == null){
             nvd_status = mgmt.makePropertyKey('nvd_status').dataType(String.class).make();
