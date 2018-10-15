@@ -255,7 +255,7 @@ graph.addVertex(label, 'CVE',\
 'cve_id', cve_id)};\
 cve_v.property('ecosystem', ecosystem);\
 cve_v.property('description', description);\
-cve_v.property('cvss', cvss_v2);\
+cve_v.property('cvss_v2', cvss_v2);\
 cve_v.property('modified_date', modified_date);\
 """
 
