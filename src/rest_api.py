@@ -19,6 +19,7 @@ from flask import Blueprint, current_app
 
 api_v1 = Blueprint('api_v1', __name__)
 
+# TODO: https://github.com/fabric8-analytics/fabric8-analytics-data-model/issues/196
 # Python2.x: Make default encoding as UTF-8
 if sys.version_info.major == 2:
     reload(sys)
