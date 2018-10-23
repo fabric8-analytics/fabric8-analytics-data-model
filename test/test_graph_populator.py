@@ -10,7 +10,6 @@ logger = logging.getLogger(config.APP_NAME)
 
 def test_sanitize_text_for_query():
     """Test GraphPopulator._sanitize_text_for_query()."""
-    # TODO: reduce cyclomatic complexity
     f = GraphPopulator.sanitize_text_for_query
     assert 'pkg' == f('pkg')
     assert 'desc' == f('desc\n')
@@ -21,6 +20,11 @@ def test_sanitize_text_for_query():
     assert 'ASL 2.0' == f('ASL\n"2.0"')
     assert '[ok]' == f('["ok\']')
     assert 'ok' == f("'ok'")
+
+
+def test_sanitize_text_for_query_whitespace_characters():
+    """Test GraphPopulator._sanitize_text_for_query(), input is whitespace characters."""
+    f = GraphPopulator.sanitize_text_for_query
     assert '' == f(None)
     assert '' == f('')
     assert '' == f(' ')
@@ -29,6 +33,11 @@ def test_sanitize_text_for_query():
     assert '' == f(' \n ')
     assert '' == f('\n\n')
     assert '' == f('\t')
+
+
+def test_sanitize_text_for_query_exception_handling():
+    """Test GraphPopulator._sanitize_text_for_query()."""
+    f = GraphPopulator.sanitize_text_for_query
     with pytest.raises(ValueError):
         f(100)
     with pytest.raises(ValueError):
