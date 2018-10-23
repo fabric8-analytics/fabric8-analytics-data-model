@@ -89,9 +89,8 @@ def test_correct_license_splitting():
     assert f(l2) == ['Apache License, Version2', 'GPL, Version 2.1']
 
 
-def test_construct_version_query():
+def test_construct_version_query_1():
     """Test the GraphPopulator.construct_version_query() class method."""
-    # TODO: reduce cyclomatic complexity
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
@@ -109,6 +108,9 @@ def test_construct_version_query():
     assert "addVertex" in q
     assert "drop()" not in q
 
+
+def test_construct_version_query_2():
+    """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
@@ -148,6 +150,9 @@ def test_construct_version_query():
     assert "0.4.59" in q
     assert "pypi" in q
 
+
+def test_construct_version_query_3():
+    """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
@@ -166,6 +171,9 @@ def test_construct_version_query():
     assert "0.4.59" in q
     assert "pypi" in q
 
+
+def test_construct_version_query_4():
+    """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
