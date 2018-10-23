@@ -10,7 +10,6 @@ logger = logging.getLogger(config.APP_NAME)
 
 def test_sanitize_text_for_query():
     """Test GraphPopulator._sanitize_text_for_query()."""
-    # TODO: reduce cyclomatic complexity
     f = GraphPopulator.sanitize_text_for_query
     assert 'pkg' == f('pkg')
     assert 'desc' == f('desc\n')
@@ -21,6 +20,11 @@ def test_sanitize_text_for_query():
     assert 'ASL 2.0' == f('ASL\n"2.0"')
     assert '[ok]' == f('["ok\']')
     assert 'ok' == f("'ok'")
+
+
+def test_sanitize_text_for_query_whitespace_characters():
+    """Test GraphPopulator._sanitize_text_for_query(), input is whitespace characters."""
+    f = GraphPopulator.sanitize_text_for_query
     assert '' == f(None)
     assert '' == f('')
     assert '' == f(' ')
@@ -29,6 +33,11 @@ def test_sanitize_text_for_query():
     assert '' == f(' \n ')
     assert '' == f('\n\n')
     assert '' == f('\t')
+
+
+def test_sanitize_text_for_query_exception_handling():
+    """Test GraphPopulator._sanitize_text_for_query()."""
+    f = GraphPopulator.sanitize_text_for_query
     with pytest.raises(ValueError):
         f(100)
     with pytest.raises(ValueError):
@@ -39,7 +48,6 @@ def test_sanitize_text_for_query():
 
 def test_sanitize_text_for_query_for_unicode_input():
     """Test GraphPopulator._sanitize_text_for_query() for Unicode input string."""
-    # TODO: reduce cyclomatic complexity
     f = GraphPopulator.sanitize_text_for_query
     assert 'pkg' == f(u'pkg')
     assert 'desc' == f(u'desc\n')
@@ -50,6 +58,11 @@ def test_sanitize_text_for_query_for_unicode_input():
     assert 'ASL 2.0' == f(u'ASL\n"2.0"')
     assert '[ok]' == f(u'["ok\']')
     assert 'ok' == f(u"'ok'")
+
+
+def test_sanitize_text_for_query_whitespace_characters_in_unicode():
+    """Test GraphPopulator._sanitize_text_for_query(), input is whitespace characters."""
+    f = GraphPopulator.sanitize_text_for_query
     assert '' == f(u'')
     assert '' == f(u' ')
     assert '' == f(u'\n')
@@ -76,9 +89,8 @@ def test_correct_license_splitting():
     assert f(l2) == ['Apache License, Version2', 'GPL, Version 2.1']
 
 
-def test_construct_version_query():
+def test_construct_version_query_1():
     """Test the GraphPopulator.construct_version_query() class method."""
-    # TODO: reduce cyclomatic complexity
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
@@ -96,6 +108,9 @@ def test_construct_version_query():
     assert "addVertex" in q
     assert "drop()" not in q
 
+
+def test_construct_version_query_2():
+    """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
@@ -135,6 +150,9 @@ def test_construct_version_query():
     assert "0.4.59" in q
     assert "pypi" in q
 
+
+def test_construct_version_query_3():
+    """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
@@ -153,6 +171,9 @@ def test_construct_version_query():
     assert "0.4.59" in q
     assert "pypi" in q
 
+
+def test_construct_version_query_4():
+    """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
