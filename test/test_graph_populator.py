@@ -48,7 +48,6 @@ def test_sanitize_text_for_query_exception_handling():
 
 def test_sanitize_text_for_query_for_unicode_input():
     """Test GraphPopulator._sanitize_text_for_query() for Unicode input string."""
-    # TODO: reduce cyclomatic complexity
     f = GraphPopulator.sanitize_text_for_query
     assert 'pkg' == f(u'pkg')
     assert 'desc' == f(u'desc\n')
@@ -59,6 +58,11 @@ def test_sanitize_text_for_query_for_unicode_input():
     assert 'ASL 2.0' == f(u'ASL\n"2.0"')
     assert '[ok]' == f(u'["ok\']')
     assert 'ok' == f(u"'ok'")
+
+
+def test_sanitize_text_for_query_whitespace_characters_in_unicode():
+    """Test GraphPopulator._sanitize_text_for_query(), input is whitespace characters."""
+    f = GraphPopulator.sanitize_text_for_query
     assert '' == f(u'')
     assert '' == f(u' ')
     assert '' == f(u'\n')
