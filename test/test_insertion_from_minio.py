@@ -68,28 +68,6 @@ def test_create_minio_bucket():
                                 'test/data/S3-data/pypi/access_points/0.4.59/metadata.json')
         minioClient.fput_object(config.AWS_EPV_BUCKET, 'pypi/access_points/0.4.59.json',
                                 'test/data/S3-data/pypi/access_points/0.4.59.json')
-        prefix_dest = 'go/github.com/gorilla/mux/c572efe4294d5a0e354e01f2ddaa8b1f0c3cb3dd'
-        prefix_src = 'test/data/S3-data/'
-        minioClient.fput_object(
-            config.AWS_EPV_BUCKET,
-            prefix_dest + '/dependency_snapshot.json',
-            prefix_src + prefix_dest + '/dependency_snapshot.json')
-        minioClient.fput_object(
-            config.AWS_EPV_BUCKET,
-            prefix_dest + '/digests.json',
-            prefix_src + prefix_dest + '/digests.json')
-        minioClient.fput_object(
-            config.AWS_EPV_BUCKET,
-            prefix_dest + '/metadata.json',
-            prefix_src + prefix_dest + '/metadata.json')
-        minioClient.fput_object(
-            config.AWS_EPV_BUCKET,
-            prefix_dest + '.json',
-            prefix_src + prefix_dest + '.json')
-        minioClient.fput_object(
-            config.AWS_EPV_BUCKET,
-            prefix_dest + '/source_licenses.json',
-            prefix_src + prefix_dest + '/source_licenses.json')
     except ResponseError as err:
         logger.error(err)
 
@@ -112,30 +90,6 @@ def test_insertion():
         assert report['status'] == "Success"
         # TODO Need to enable this test with new changes
         # assert report["epv"] == ["pypi:access_points:0.4.59"]
-        assert report["count_imported_EPVs"] == 1
-    except Exception:
-        # TODO this is probably bad approach how to handle/ignore exceptions
-        # see https://github.com/openshiftio/openshift.io/issues/2263
-        tb = traceback.format_exc()
-        logger.error("Traceback for latest failure in import call: %s" % tb)
-
-
-def test_insertion_go():
-    """Test if the stored go e/p/v data can be retrieved back."""
-    list_epv = [
-        {
-            "version": "c572efe4294d5a0e354e01f2ddaa8b1f0c3cb3dd",
-            "name": "github.com/gorilla/mux",
-            "ecosystem": "go"
-        }
-    ]
-    try:
-        report = import_epv_from_s3_http(list_epv)
-        logger.info(report)
-        assert report['status'] == "Success"
-        # TODO Need to enable this test with new changes
-        # assert report["epv"] == [
-        # "go:github.com/gorilla/mux:c572efe4294d5a0e354e01f2ddaa8b1f0c3cb3dd"]
         assert report["count_imported_EPVs"] == 1
     except Exception:
         # TODO this is probably bad approach how to handle/ignore exceptions
@@ -170,6 +124,5 @@ def test_insertion_not_exists():
 
 if __name__ == '__main__':
     test_insertion()
-    test_insertion_go()
     test_insertion_not_exists()
     test_create_minio_bucket()
