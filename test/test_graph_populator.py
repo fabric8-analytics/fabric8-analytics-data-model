@@ -171,6 +171,41 @@ def test_construct_version_query():
     assert "0.4.59" in q
     assert "pypi" in q
 
+    input_json = {
+        "version": "deb579d6e030503f430978ee229008b9bc912d40",
+        "package": "github.com/gorilla/mux",
+        "ecosystem": "go",
+        "analyses": {
+            "source_licenses": {
+                "status": "success",
+                "summary": {
+                    "sure_licenses": [
+                        "BSD-Modified"
+                    ]
+                }
+            },
+            "metadata": {
+                "details": [
+                    {
+                        "code_repository": {
+                            "type": "git",
+                            "url": "https://github.com/gorilla/mux"
+                        },
+                        "dependencies": [],
+                        "ecosystem": "gofedlib",
+                        "name": "github.com/gorilla/mux",
+                        "version": "deb579d6e030503f430978ee229008b9bc912d40"
+                    }
+                ]
+            }
+        }
+    }
+    q = GraphPopulator.construct_version_query(input_json)
+
+    assert "'declared_licenses'" in q
+    assert "'licenses'" in q
+    assert "BSD-Modified" in q
+
 
 def test_construct_package_query():
     """Test the GraphPopulator.construct_package_query() class method."""
