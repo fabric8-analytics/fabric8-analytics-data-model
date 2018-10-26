@@ -131,9 +131,10 @@ class CVEDelete(object):
 class CVEGetByDate(object):
     """Class encapsulating operations to retrieve CVEs by date or date-range."""
 
-    def __init__(self, bydate):
+    def __init__(self, bydate, ecosystem):
         """Constructor."""
         self._bydate = bydate
+        self._ecosystem = ecosystem
 
     def get_bydate(self):
         """Retrieve CVEs ingested on a given date [YYYYMMDD]."""
@@ -143,12 +144,20 @@ class CVEGetByDate(object):
             datetime.strptime(self._bydate, '%Y%m%d')
         except ValueError:
             raise ValueError('Invalid datetime specified. Please specify in YYYYMMDD format')
+        if self._ecosystem:
+            return self.get_cves_by_date_ecosystem()
         return self.get_cves_by_date()
 
     def get_cves_by_date(self):
         """Call graph and get CVEs by date."""
         script = cve_nodes_by_date_script_template
         bindings = {'modified_date': self._bydate}
+        return self.get_cves(script, bindings)
+
+    def get_cves_by_date_ecosystem(self):
+        """Call graph and get CVEs by date and ecosystem"""
+        script = cve_nodes_by_date_ecosystem_script_template
+        bindings = {'modified_date': self._bydate,'ecosystem': self._ecosystem}
         return self.get_cves(script, bindings)
 
     def get_cves(self, script, bindings):
@@ -313,6 +322,16 @@ g.V().has("pecosystem",ecosystem)\
 cve_nodes_by_date_script_template = """\
 g.V().has('vertex_label','CVE')\
 .has('modified_date', modified_date).as('cve')\
+.in('has_cve').as('epv')\
+.select('cve','epv').by(valueMap())\
+dedup()\
+"""
+
+# Get CVEs by date & ecosystem
+cve_nodes_by_date_ecosystem_script_template = """\
+g.V().has('vertex_label','CVE')\
+.has('modified_date', modified_date)\
+.has('ecosystem',ecosystem).as('cve')\
 .in('has_cve').as('epv')\
 .select('cve','epv').by(valueMap())\
 dedup()\
