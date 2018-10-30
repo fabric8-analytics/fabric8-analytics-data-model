@@ -287,10 +287,15 @@ def cves_get(ecosystem, name=None, version=None):
 
 
 @api_v1.route('/api/v1/cves/bydate/<string:modified_date>', methods=['GET'])
-def cves_get_bydate(modified_date):
-    """Get CVEs ingested into graph by a date [YYYYMMDD]."""
+@api_v1.route('/api/v1/cves/bydate/<string:modified_date>/<string:ecosystem>', methods=['GET'])
+def cves_get_bydate(modified_date, ecosystem=None):
+    """
+    Retrieve CVEs ingested on a given date [YYYYMMDD].
+
+    Further filter by ecosystem if provided.
+    """
     try:
-        cve = CVEGetByDate(modified_date)
+        cve = CVEGetByDate(modified_date, ecosystem)
         result = cve.get_bydate()
     except ValueError as e:
         return flask.jsonify({'error': str(e)}), 500
