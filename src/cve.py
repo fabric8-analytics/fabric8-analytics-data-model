@@ -131,7 +131,7 @@ class CVEDelete(object):
 class CVEGetByDate(object):
     """Class encapsulating operations to retrieve CVEs by date or date-range."""
 
-    def __init__(self, bydate, ecosystem):
+    def __init__(self, bydate, ecosystem=None):
         """Constructor."""
         self._bydate = bydate
         self._ecosystem = ecosystem
@@ -155,9 +155,9 @@ class CVEGetByDate(object):
         return self.get_cves(script, bindings)
 
     def get_cves_by_date_ecosystem(self):
-        """Call graph and get CVEs by date and ecosystem"""
+        """Call graph and get CVEs by date and ecosystem."""
         script = cve_nodes_by_date_ecosystem_script_template
-        bindings = {'modified_date': self._bydate,'ecosystem': self._ecosystem}
+        bindings = {'modified_date': self._bydate, 'ecosystem': self._ecosystem}
         return self.get_cves(script, bindings)
 
     def get_cves(self, script, bindings):

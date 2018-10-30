@@ -107,7 +107,7 @@ def prepare_response(gremlin_json):
                 "version": cve.get('epv').get('version', [None])[0],
                 "status": cve.get('cve').get('status', [None])[0],
                 "fixed_in": cve.get('cve').get('fixed_in', [None])[0],
-                "link": "https://nvd.nist.gov/vuln/detail/" +  cve.get('cve').get('cve_id', [''])[0]
+                "link": "https://nvd.nist.gov/vuln/detail/" + cve.get('cve').get('cve_id', [''])[0]
             }
             cve_list.append(cve_dict)
 
