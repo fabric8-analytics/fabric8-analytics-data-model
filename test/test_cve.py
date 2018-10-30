@@ -247,20 +247,3 @@ def test_cve_get_by_date_none(mocker):
     assert response['count'] == 0
     assert 'cve_list' in response
     assert len(response['cve_list']) == 0
-
-
-@patch("cve.call_gremlin")
-def test_get_cves_by_date_ecosystem(mocker):
-    """Test getting CVEs by date and ecosystem."""
-    mocker.return_value = mocker_input
-
-    cve = CVEGetByDate('20180911', 'maven')
-    response = cve.get_bydate()
-
-    assert response
-    assert 'cve_list' in response
-    assert response['cve_list'][0]['cve_id'] == 'CVE-2018-0001'
-    assert 'ecosystem' in response['cve_list'][0]
-    assert response['cve_list'][0]['ecosystem'] == 'maven'
-    assert 'name' in response['cve_list'][0]
-    assert 'version' in response['cve_list'][0]
