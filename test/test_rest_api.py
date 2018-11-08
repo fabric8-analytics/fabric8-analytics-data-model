@@ -17,6 +17,7 @@ def test_readiness(client):
     url = url_for('api_v1.readiness')
     response = client.get(url)
     logger.info(response)
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
 
 
@@ -25,6 +26,7 @@ def test_liveness(client):
     url = url_for('api_v1.liveness')
     response = client.get(url)
     logger.info(response)
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
 
 
@@ -33,6 +35,7 @@ def test_pending(client):
     url = url_for('api_v1.pending')
     response = client.get(url)
     logger.info(response)
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
     data = json.loads(response.get_data())
     logger.info(data)
@@ -45,6 +48,7 @@ def test_sync_all(client):
     url = url_for('api_v1.sync_all')
     response = client.get(url)
     logger.info(response)
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
     data = json.loads(response.get_data())
     logger.info(data)
@@ -62,6 +66,7 @@ def test_ingest_to_graph(client):
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
     logger.info(response)
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
     data = response.get_data()
     logger.info("Returned data")
@@ -88,6 +93,7 @@ def test_ingest_to_graph_source(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
     data = json.loads(response.get_data())
     assert 'count_imported_EPVs' in data
@@ -109,6 +115,7 @@ def test_ingest_to_graph_valid(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
+    # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
     data = json.loads(response.get_data())
     epv_keys = input_data[0].keys()
@@ -143,6 +150,7 @@ def test_selective_ingest_empty(client):
                            headers={'Content-Type': 'application/json'})
     data = json.loads(response.get_data())
     logger.info(data)
+    # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
     assert 'No Packages provided. Nothing to be ingested' == data['message']
 
@@ -152,6 +160,7 @@ def test_selective_ingest_empty(client):
                            headers={'Content-Type': 'application/json'})
     data = json.loads(response.get_data())
     logger.info(data)
+    # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
     assert 'No Packages provided. Nothing to be ingested' == data['message']
 
@@ -161,6 +170,7 @@ def test_selective_ingest_empty(client):
                            headers={'Content-Type': 'application/json'})
     data = json.loads(response.get_data())
     logger.info(data)
+    # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
     assert 'No Packages provided. Nothing to be ingested' == data['message']
 
@@ -176,6 +186,7 @@ def test_selective_ingest_nonempty(client):
                            headers={'Content-Type': 'application/json'})
     data = json.loads(response.get_data())
     logger.info(data)
+    # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
     assert 'Invalid keys found in input:' in data['message']
 
@@ -195,6 +206,7 @@ def test_selective_ingest_valid(client):
                            headers={'Content-Type': 'application/json'})
     data = json.loads(response.get_data())
     logger.info(data)
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
     assert 'The import finished successfully!' in data['message']
 
@@ -216,6 +228,7 @@ def test_selective_ingest_valid_source(client):
                            headers={'Content-Type': 'application/json'})
     data = json.loads(response.get_data())
     logger.info(data)
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
     assert 'Nothing to be synced to Graph!' in data['message']
 
@@ -228,6 +241,7 @@ def test_handle_properties_put(client, mocker):
                   package='net.iharder:base64', version='2.3.9')
     payload = {'properties': [{'name': 'cve_ids', 'value': 'CVE-3005-1234:10'}]}
     response = client.put(url, content_type='application/json', data=json.dumps(payload))
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
 
     expected_statement = \
@@ -254,6 +268,7 @@ def test_handle_properties_delete(client, mocker):
                   package='net.iharder:base64', version='2.3.9')
     payload = {'properties': [{'name': 'cve_ids'}]}
     response = client.delete(url, content_type='application/json', data=json.dumps(payload))
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
 
     expected_statement = \
@@ -280,6 +295,7 @@ def test_create_blank_nodes_invalid(client):
                            headers={'Content-Type': 'application/json'})
     data = json.loads(response.get_data())
     logger.info(data)
+    # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
     assert 'Invalid keys found in input:' in data['message']
 
@@ -293,6 +309,7 @@ def test_create_blank_nodes_empty(client):
                            headers={'Content-Type': 'application/json'})
     data = json.loads(response.get_data())
     logger.info(data)
+    # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
     assert 'No EPVs provided. Please provide valid list of EPVs' in data['message']
 
@@ -312,6 +329,7 @@ def test_create_blank_nodes_valid(client):
                            headers={'Content-Type': 'application/json'})
     data = json.loads(response.get_data())
     logger.info(data)
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
     assert data['epv_nodes_created'] == 1
 
@@ -345,8 +363,9 @@ def test_cves_put(mocker, client):
         data=json.dumps(valid_put_input),
         headers={'Content-Type': 'application/json'}
     )
-    assert response.json == {}
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
+    assert response.json == {}
 
 
 @patch("rest_api.CVEPut.process")
@@ -359,8 +378,9 @@ def test_cves_put_invalid_input(mocker, client):
         data=json.dumps(invalid_put_input),
         headers={'Content-Type': 'application/json'}
     )
-    assert 'error' in response.json
+    # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
+    assert 'error' in response.json
 
 
 @patch("rest_api.CVEDelete.process")
@@ -373,8 +393,9 @@ def test_cves_delete(mocker, client):
         data=json.dumps(valid_delete_input),
         headers={'Content-Type': 'application/json'}
     )
-    assert response.json == {}
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
+    assert response.json == {}
 
 
 @patch("rest_api.CVEDelete.process")
@@ -387,8 +408,9 @@ def test_cves_delete_invalid_input(mocker, client):
         data=json.dumps(invalid_delete_input),
         headers={'Content-Type': 'application/json'}
     )
-    assert 'error' in response.json
+    # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
+    assert 'error' in response.json
 
 
 @patch("rest_api.CVEGet.get")
@@ -399,6 +421,7 @@ def test_cves_get_e(mocker, client):
     response = client.get(
         url
     )
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
 
 
@@ -410,6 +433,7 @@ def test_cves_get_ep(mocker, client):
     response = client.get(
         url
     )
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
 
 
@@ -421,6 +445,7 @@ def test_cvedb_version_get(mocker, client):
     response = client.get(
         url
     )
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
     resp = response.json
     assert len(resp) == 1
@@ -438,6 +463,7 @@ def test_cvedb_version_put(mocker, client):
         data=json.dumps({'version': '9f4d54dd1a21584a40596c05d60ab00974953047'}),
         headers={'Content-Type': 'application/json'}
     )
+    # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
     resp = response.json
     assert len(resp) == 1
@@ -453,6 +479,7 @@ def test_cvedb_version_put_invalid_input(client):
         data=json.dumps({'invalid': '9f4d54dd1a21584a40596c05d60ab00974953047'}),
         headers={'Content-Type': 'application/json'}
     )
+    # we expect that the HTTP code will be 400/Bad Request with the body containing error key
     assert response.status_code == 400
     resp = response.json
     assert len(resp) == 1
