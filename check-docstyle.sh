@@ -1,7 +1,7 @@
 #!/bin/bash
 
 directories="src test"
-separate_files="sanitycheck.py"
+separate_files="sanitycheck.py populate_schema.py"
 pass=0
 fail=0
 
