@@ -90,25 +90,3 @@ def call_gremlin(json_payload):
         ))
         raise ValueError('Graph error: {e}'.format(e=str(response.content)))
     return response.json()
-
-
-def prepare_response(gremlin_json):
-    """Prepare response to be sent to user based on Gremlin data."""
-    cve_list = []
-    resp = gremlin_json.get('result', {}).get('data', [])
-    for cve in resp:
-        if 'cve' in cve and 'epv' in cve:
-            cve_dict = {
-                "cve_id": cve.get('cve').get('cve_id', [None])[0],
-                "cvss": cve.get('cve').get('cvss_v2', [None])[0],
-                "description": cve.get('cve').get('description', [None])[0],
-                "ecosystem": cve.get('cve').get('ecosystem', [None])[0],
-                "name": cve.get('epv').get('pname', [None])[0],
-                "version": cve.get('epv').get('version', [None])[0],
-                "status": cve.get('cve').get('status', [None])[0],
-                "fixed_in": cve.get('cve').get('fixed_in', [None])[0],
-                "link": "https://nvd.nist.gov/vuln/detail/" + cve.get('cve').get('cve_id', [''])[0]
-            }
-            cve_list.append(cve_dict)
-
-    return {"count": len(cve_list), "cve_list": cve_list}
