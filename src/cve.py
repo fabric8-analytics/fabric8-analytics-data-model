@@ -4,7 +4,7 @@ import logging
 
 from graph_populator import GraphPopulator
 from graph_manager import BayesianGraph
-from utils import get_timestamp, call_gremlin, prepare_response
+from utils import get_timestamp, call_gremlin
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -118,58 +118,14 @@ class CVEDelete(object):
 
     def prepare_payload(self):
         """Prepare payload for Gremlin."""
+        timestamp = get_timestamp()
         payload = {
             'gremlin': cve_node_delete_script_template,
             'bindings': {
-                'cve_id': self._cve_id_dict.get('cve_id')
+                'cve_id': self._cve_id_dict.get('cve_id'),
+                'timestamp': timestamp
             }
         }
-
-        return payload
-
-
-class CVEGetByDate(object):
-    """Class encapsulating operations to retrieve CVEs by date or date-range."""
-
-    def __init__(self, bydate, ecosystem=None):
-        """Constructor."""
-        self._bydate = bydate
-        self._ecosystem = ecosystem
-
-    def get_bydate(self):
-        """Retrieve CVEs ingested on a given date [YYYYMMDD]."""
-        if not self._bydate:
-            return {'count': 0, 'cve_list': []}
-        try:
-            datetime.strptime(self._bydate, '%Y%m%d')
-        except ValueError:
-            raise ValueError('Invalid datetime specified. Please specify in YYYYMMDD format')
-        if self._ecosystem:
-            return self.get_cves_by_date_ecosystem()
-        return self.get_cves_by_date()
-
-    def get_cves_by_date(self):
-        """Call graph and get CVEs by date."""
-        script = cve_nodes_by_date_script_template
-        bindings = {'modified_date': self._bydate}
-        return self.get_cves(script, bindings)
-
-    def get_cves_by_date_ecosystem(self):
-        """Call graph and get CVEs by date and ecosystem."""
-        script = cve_nodes_by_date_ecosystem_script_template
-        bindings = {'modified_date': self._bydate, 'ecosystem': self._ecosystem}
-        return self.get_cves(script, bindings)
-
-    def get_cves(self, script, bindings):
-        """Call Gremlin and get the CVE information."""
-        json_payload = self.prepare_payload(script, bindings)
-        response = call_gremlin(json_payload)
-        cve_list = prepare_response(response)
-        return cve_list
-
-    def prepare_payload(self, script, bindings):
-        """Prepare payload."""
-        payload = {'gremlin': script, 'bindings': bindings}
 
         return payload
 
@@ -288,7 +244,8 @@ g.V().has('pecosystem','{ecosystem}')\
 # delete CVE node
 cve_node_delete_script_template = """\
 g.V().has('cve_id',cve_id)\
-.drop().iterate();\
+.property('modified_date',timestamp)\
+.inE('has_cve').drop().iterate();\
 """
 
 # get CVEs for ecosystem
@@ -316,25 +273,6 @@ g.V().has("pecosystem",ecosystem)\
 .out("has_cve")\
 .values("cve_id")\
 .dedup();\
-"""
-
-# Get CVEs by date
-cve_nodes_by_date_script_template = """\
-g.V().has('vertex_label','CVE')\
-.has('modified_date', modified_date).as('cve')\
-.in('has_cve').as('epv')\
-.select('cve','epv').by(valueMap())\
-dedup()\
-"""
-
-# Get CVEs by date & ecosystem
-cve_nodes_by_date_ecosystem_script_template = """\
-g.V().has('vertex_label','CVE')\
-.has('modified_date', modified_date)\
-.has('ecosystem',ecosystem).as('cve')\
-.in('has_cve').as('epv')\
-.select('cve','epv').by(valueMap())\
-dedup()\
 """
 
 # Update CVEDB version
