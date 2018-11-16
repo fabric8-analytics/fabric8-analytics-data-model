@@ -5,7 +5,6 @@ import logging
 from graph_populator import GraphPopulator
 from graph_manager import BayesianGraph
 from utils import get_timestamp, call_gremlin
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
