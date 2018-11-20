@@ -103,6 +103,7 @@ if python sanitycheck.py
 then
     python populate_schema.py
     py.test --cov=src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
+    codecov --token=3c1d9638-afb6-40e6-85eb-3fb193000d4b
 else
     echo "Sanity checks failed"
 fi
