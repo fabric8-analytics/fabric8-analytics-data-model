@@ -321,6 +321,7 @@ class GraphPopulator(object):
             gh_open_issues_count = str(gh_details.get('open_issues_count', -1))
             gh_subscribers_count = str(gh_details.get('subscribers_count', -1))
             gh_contributors_count = str(gh_details.get('contributors_count', -1))
+            topics = gh_details.get('topics', [])
 
             prp_package += "pkg.property('gh_prs_last_year_opened', {gh_prs_last_year_opened});" \
                            "pkg.property('gh_prs_last_month_opened', {gh_prs_last_month_opened});" \
@@ -352,6 +353,12 @@ class GraphPopulator(object):
                                 gh_subscribers_count=gh_subscribers_count,
                                 gh_contributors_count=gh_contributors_count
                            )
+
+        # Add github topics
+        if topics:
+            drop_props.append('topics')
+            str_package += " ".join(["pkg.property('topics', '{}');".format(t)
+                                     for t in topics if t])
 
         # Add tokens for a package
         if pkg_name_tokens:
