@@ -24,6 +24,7 @@ class GraphPopulator(object):
         source_repo = epv.get('source_repo', '')
         if ecosystem and pkg_name and version:
             # Query to Create Package Node
+            # TODO: refactor into the separate module
             pkg_str = "pkg = g.V().has('ecosystem','{ecosystem}').has('name', '{pkg_name}')." \
                       "tryNext().orElseGet{{g.V()." \
                       "has('vertex_label','Count').choose(has('{ecosystem}_pkg_count')," \
@@ -38,6 +39,7 @@ class GraphPopulator(object):
                       )
 
             # Query to Create Version Node
+            # TODO: refactor into the separate module
             ver_str = "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', " \
                       "'{pkg_name}').has('version', '{version}').tryNext().orElseGet{{" \
                       "g.V().has('vertex_label','Count').choose(has('{ecosystem}_ver_count')," \
@@ -57,6 +59,7 @@ class GraphPopulator(object):
                 )
 
             # Query to create an edge between Package Node to Version Node
+            # TODO: refactor into the separate module
             edge_str = "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
                        "'{pkg_name}').has('version','{version}').in(" \
                        "'has_version').tryNext()" \
@@ -124,6 +127,7 @@ class GraphPopulator(object):
         if 'success' == input_json.get('analyses', {}).get('security_issues', {}).get('status'):
             drop_props.append('cve_ids')
 
+        # TODO: refactor into the separate module
         str_version += "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', '{pkg_name}')." \
                        "has('version', '{version}').tryNext().orElseGet{{" \
                        "g.V().has('vertex_label','Count').choose(" \
@@ -275,6 +279,7 @@ class GraphPopulator(object):
         prp_package = ""
         drop_prop = ""
         drop_props = []
+        # TODO: refactor into the separate module
         str_package = "pkg = g.V().has('ecosystem','{ecosystem}').has('name', '{pkg_name}')." \
                       "tryNext().orElseGet{{g.V()." \
                       "has('vertex_label','Count').choose(has('{ecosystem}_pkg_count')," \
@@ -323,6 +328,7 @@ class GraphPopulator(object):
             gh_contributors_count = str(gh_details.get('contributors_count', -1))
             topics = gh_details.get('topics', [])
 
+            # TODO: refactor into the separate module
             prp_package += "pkg.property('gh_prs_last_year_opened', {gh_prs_last_year_opened});" \
                            "pkg.property('gh_prs_last_month_opened', {gh_prs_last_month_opened});" \
                            "pkg.property('gh_prs_last_year_closed', {gh_prs_last_year_closed});" \
@@ -476,6 +482,7 @@ class GraphPopulator(object):
             if str_gremlin_version:
                 str_gremlin += str_gremlin_version
                 if not prp_package:
+                    # TODO: refactor into the separate module
                     str_gremlin += "pkg = g.V().has('ecosystem','{ecosystem}')." \
                                    "has('name', '{pkg_name}').tryNext().orElseGet{{" \
                                    "g.V().has('vertex_label','Count').choose(has('" \
@@ -489,6 +496,7 @@ class GraphPopulator(object):
                                         ecosystem=ecosystem, pkg_name=pkg_name,
                                         last_updated=str(time.time())
                                    )
+                # TODO: refactor into the separate module
                 str_gremlin += "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
                                "'{pkg_name}').has('version','{version}').in(" \
                                "'has_version').tryNext()" \
