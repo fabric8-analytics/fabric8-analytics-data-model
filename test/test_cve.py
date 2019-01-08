@@ -13,7 +13,7 @@ from cve import (
 valid_put_input = {
     'cve_id': 'CVE-2018-0001',
     'description': 'Some description.',
-    'cvss_v2': 10.0,
+    'cvss_v2': 5.0,
     'ecosystem': 'pypi',
     'affected': [
         {
@@ -62,14 +62,14 @@ def test_cve_put_creation():
         CVEPut(invalid_put_input)
 
 
-def test_cve_put_prepare_payload():
-    """Test CVEPut.prepare_payload()."""
+def test_cve_put_get_qstring_for_cve_node():
+    """Test CVEPut.get_qstring_for_cve_node()."""
     cve = CVEPut(valid_put_input)
-    json_payload = cve.prepare_payload()
 
-    assert 'gremlin' in json_payload
-    assert json_payload['gremlin'].startswith(cve_node_replace_script_template)
+    query_str, bindings_dict = cve.get_qstring_for_cve_node()
+    assert query_str.startswith(cve_node_replace_script_template)
 
+    json_payload = cve.prepare_payload(query_str, bindings_dict)
     assert 'bindings' in json_payload
     bindings = json_payload['bindings']
 
@@ -81,6 +81,14 @@ def test_cve_put_prepare_payload():
     assert bindings['cvss_v2']
     assert 'modified_date' in bindings
     assert bindings['modified_date']
+
+
+def test_cve_put_get_qstrings_for_edges():
+    """Test CVEPut.get_qstrings_for_edges()."""
+    cve = CVEPut(valid_put_input)
+
+    results = cve.get_qstrings_for_edges()
+    assert len(results) == 2  # 2 edges as the CVE affects 2 versions
 
 
 valid_delete_input = {

@@ -1,7 +1,6 @@
 """This module encapsulates CVE related queries."""
 
 import logging
-
 from graph_populator import GraphPopulator
 from graph_manager import BayesianGraph
 from utils import get_timestamp, call_gremlin
@@ -34,11 +33,26 @@ class CVEPut(object):
             raise ValueError('Invalid input')
         return True
 
+    def _get_default_bindings(self):
+        return {
+            'cve_id': self._cve_dict.get('cve_id'),
+            'description': self._cve_dict.get('description'),
+            'cvss_v2': self._cve_dict.get('cvss_v2'),
+            'ecosystem': self._cve_dict.get('ecosystem'),
+            'modified_date': get_timestamp()
+        }
+
     def process(self):
         """Add or replace CVE node in graph."""
+        # Create EPV nodes first
         self.create_pv_nodes()
-        json_payload = self.prepare_payload()
-        call_gremlin(json_payload)
+        # Create CVE node
+        call_gremlin(
+            self.prepare_payload(*self.get_qstring_for_cve_node())
+        )
+        # Connect CVE node with affected EPV nodes
+        for query_str in self.get_qstrings_for_edges():
+            call_gremlin(self.prepare_payload(query_str, self._get_default_bindings()))
 
     def create_pv_nodes(self):
         """Create Package and Version nodes, if needed."""
@@ -55,19 +69,27 @@ class CVEPut(object):
                     e=e, p=p, v=v, r=str(json_response))
                 )
 
-    def prepare_payload(self):
-        """Prepare payload for Gremlin."""
+    def get_qstrings_for_edges(self):
+        """Construct Gremlin scripts that will connect CVE node with EPVs.
+
+        :return: list, list of gremlin scripts
+        """
+        return [
+            add_affected_edge_script_template.format(
+                ecosystem=self._cve_dict.get('ecosystem'),
+                name=x.get('name'),
+                version=x.get('version')
+            ) for x in self._cve_dict.get('affected')
+        ]
+
+    def get_qstring_for_cve_node(self):
+        """Construct Gremlin script that will create a CVE node.
+
+        :return: (str, str), gremlin script and bindings
+        """
         query_str = cve_node_replace_script_template
 
-        timestamp = get_timestamp()
-
-        bindings = {
-            'cve_id': self._cve_dict.get('cve_id'),
-            'description': self._cve_dict.get('description'),
-            'cvss_v2': self._cve_dict.get('cvss_v2'),
-            'ecosystem': self._cve_dict.get('ecosystem'),
-            'modified_date': timestamp
-        }
+        bindings = self._get_default_bindings()
 
         if self._cve_dict.get('nvd_status'):
             query_str += cve_node_replace_script_template_nvd_status
@@ -76,14 +98,10 @@ class CVEPut(object):
         if self._cve_dict.get('fixed_in'):
             for ver in self._cve_dict.get('fixed_in'):
                 query_str += "cve_v.property('fixed_in', '" + ver + "');"
+        return query_str, bindings
 
-        for epv_dict in self._cve_dict.get('affected'):
-            edge_str = add_affected_edge_script_template.format(
-                ecosystem=self._cve_dict.get('ecosystem'), name=epv_dict.get('name'),
-                version=epv_dict.get('version'))
-
-            query_str += edge_str
-
+    def prepare_payload(self, query_str, bindings):
+        """Prepare payload for Gremlin."""
         payload = {
             'gremlin': query_str,
             'bindings': bindings
@@ -230,6 +248,7 @@ cve_v.property('nvd_status', nvd_status);\
 
 # add edge between CVE node and Version node if it does not exist previously
 add_affected_edge_script_template = """\
+cve_v=g.V().has('cve_id',cve_id).next();\
 version_v=g.V().has('pecosystem','{ecosystem}')\
 .has('pname','{name}')\
 .has('version','{version}');\
@@ -258,7 +277,7 @@ g.V().has("vertex_label", "CVE")\
 # get CVEs for (ecosystem, name)
 cve_nodes_for_ecosystem_name_script_template = """\
 g.V().has("pecosystem",ecosystem)\
-.has("pname",name)
+.has("pname",name)\
 .out("has_cve")\
 .values("cve_id")\
 .dedup();\
@@ -267,8 +286,8 @@ g.V().has("pecosystem",ecosystem)\
 # get CVEs for (ecosystem, name, version)
 cve_nodes_for_ecosystem_name_version_script_template = """\
 g.V().has("pecosystem",ecosystem)\
-.has("pname",name)
-.has("version",version)
+.has("pname",name)\
+.has("version",version)\
 .out("has_cve")\
 .values("cve_id")\
 .dedup();\
