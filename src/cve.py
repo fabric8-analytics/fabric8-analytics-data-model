@@ -22,8 +22,9 @@ class CVEPut(object):
             assert self._cve_dict
             assert 'cve_id' in self._cve_dict
             assert 'description' in self._cve_dict
-            assert 'cvss_v2' in self._cve_dict
-            assert type(self._cve_dict.get('cvss_v2')) == float
+            # if CVE is new, the score doesn't have to be available
+            if 'cvss_v2' in self._cve_dict:
+                assert type(self._cve_dict.get('cvss_v2')) == float
             assert 'affected' in self._cve_dict
             assert 'ecosystem' in self._cve_dict
             for epv_dict in self._cve_dict.get('affected'):
@@ -37,7 +38,7 @@ class CVEPut(object):
         return {
             'cve_id': self._cve_dict.get('cve_id'),
             'description': self._cve_dict.get('description'),
-            'cvss_v2': self._cve_dict.get('cvss_v2'),
+            'cvss_v2': self._cve_dict.get('cvss_v2', 10.0),
             'ecosystem': self._cve_dict.get('ecosystem'),
             'modified_date': get_timestamp()
         }
