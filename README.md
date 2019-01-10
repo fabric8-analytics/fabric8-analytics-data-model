@@ -262,7 +262,7 @@ Input:
 {
     "cve_id": "CVE-2018-0001",
     "description": "Some description here.",
-    "cvss_v2": "10.0",
+    "cvss_v2": 10.0,
     "ecosystem": "pypi",
     "nvd_status": "Awaiting Analyses",
     "fixed_in": "unknown",
