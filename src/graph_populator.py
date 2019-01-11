@@ -360,11 +360,11 @@ class GraphPopulator(object):
                                 gh_contributors_count=gh_contributors_count
                            )
 
-        # Add github topics
-        if topics:
-            drop_props.append('topics')
-            str_package += " ".join(["pkg.property('topics', '{}');".format(t)
-                                     for t in topics if t])
+            # Add github topics
+            if topics:
+                drop_props.append('topics')
+                str_package += " ".join(["pkg.property('topics', '{}');".format(t)
+                                         for t in topics if t])
 
         # Add tokens for a package
         if pkg_name_tokens:
