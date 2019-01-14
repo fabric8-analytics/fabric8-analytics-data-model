@@ -58,7 +58,7 @@ HTTP Status Code: 200 success
 URL: /api/v1/sync_all
 ```
 Description: Generate response for the GET request to /api/v1/sync_all. Get the pending list from RDS and 
-             get the data from S3 and populate in graph and mark the epv as synched in RDS.
+             get the data from S3 and populate in graph and mark the epv as synced in RDS.
 Method: GET
 Input:  Request (Query) Params ->  ecosystem, package, version, limit, offset
 Output: 
@@ -87,7 +87,7 @@ HTTP Status Code: 200 success
 URL: /api/v1/ingest_to_graph
 ```
 Description: Import epv data and generate response for the POST request to /api/v1/ingest_to_graph. Unlike sync_all, 
-             it takes the list of epv from the user and then gets the data from S3 and populate to the graph and mark it as synched in RDS.
+             it takes the list of epv from the user and then gets the data from S3 and populate to the graph and mark it as synced in RDS.
 Method: POST
 Input: 
 [
@@ -153,7 +153,7 @@ Output:
     "blank_epvs_created": 2,
     "success_list": ["pkg-1", "pkg-2"],
     "failure_list": [{
-        "pkg-3": "Some real time exeption message"
+        "pkg-3": "Some real time exception message"
     }]
 }
 HTTP Status Code: 200 success
@@ -165,7 +165,7 @@ HTTP Status Code: 200 success
 URL: /api/v1/selective_ingest
 ```
 Description: Import epv data and generate response for the POST request to /api/v1/selective_ingest. Its similar to ingest_to_graph, with a difference,
-             that in this, the user also provides a list which indicates which packages to synch from the list of package list provided.
+             that in this, the user also provides a list which indicates which packages to sync from the list of package list provided.
 Method: POST
 Input: 
 sample1
@@ -610,7 +610,7 @@ Please note that only semantical problems are reported.
 
 #### Check for scripts written in BASH
 
-The script named `check-bashscripts.sh` can be used to check all BASH scripts (in fact: all files with the `.sh` extension) for various possible issues, incompatibilies, and caveats. This script can be run w/o any arguments:
+The script named `check-bashscripts.sh` can be used to check all BASH scripts (in fact: all files with the `.sh` extension) for various possible issues, incompatibilities, and caveats. This script can be run w/o any arguments:
 
 ```
 ./check-bashscripts.sh
