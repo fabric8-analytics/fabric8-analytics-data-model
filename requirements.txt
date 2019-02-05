@@ -25,7 +25,6 @@ flake8==3.6.0             # via flake8-polyfill
 flask-cors==3.0.7
 flask==1.0.2
 funcsigs==1.0.2           # via mock, pytest
-futures==3.2.0            # via s3transfer
 gevent==1.4.0
 greenlet==0.4.15          # via gevent
 gunicorn==19.9.0
@@ -51,7 +50,7 @@ pytest-mock==1.10.0
 pytest==4.1.0
 python-dateutil==2.7.5    # via botocore, minio
 pytz==2018.9              # via minio
-radon==2.4.0
+radon==3.0.1
 raven[flask]==6.10.0
 requests==2.21.0
 s3transfer==0.1.13        # via boto3
@@ -61,3 +60,5 @@ sqlalchemy==1.2.15
 urllib3==1.24.1           # via botocore, minio, requests
 uuid==1.30
 werkzeug==0.14.1          # via flask, pytest-flask
+git+https://git@github.com/fabric8-analytics/fabric8-analytics-version-comparator.git@2e7eddc
+git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@d7aaccf

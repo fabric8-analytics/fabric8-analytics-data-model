@@ -37,7 +37,7 @@ def test_pending(client):
     logger.info(response)
     # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     assert 'pending_list' in data
     assert 'all_counts' in data
@@ -50,7 +50,7 @@ def test_sync_all(client):
     logger.info(response)
     # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     assert 'count_imported_EPVs' in data
     assert 'epv' in data
@@ -71,7 +71,7 @@ def test_ingest_to_graph(client):
     data = response.get_data()
     logger.info("Returned data")
     logger.info(data)
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     assert 'count_imported_EPVs' in data
     assert 'epv' in data
@@ -95,7 +95,7 @@ def test_ingest_to_graph_source(client):
                            headers={'Content-Type': 'application/json'})
     # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     assert 'count_imported_EPVs' in data
     assert 'epv' in data
     assert 'message' in data
@@ -117,7 +117,7 @@ def test_ingest_to_graph_valid(client):
                            headers={'Content-Type': 'application/json'})
     # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     epv_keys = input_data[0].keys()
     assert data['message'] == 'Invalid keys found in input: ' + ','.join(epv_keys)
 
@@ -148,7 +148,7 @@ def test_selective_ingest_empty(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
@@ -158,7 +158,7 @@ def test_selective_ingest_empty(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
@@ -168,7 +168,7 @@ def test_selective_ingest_empty(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
@@ -184,7 +184,7 @@ def test_selective_ingest_nonempty(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
@@ -204,7 +204,7 @@ def test_selective_ingest_valid(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
@@ -226,7 +226,7 @@ def test_selective_ingest_valid_source(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200
@@ -293,7 +293,7 @@ def test_create_blank_nodes_invalid(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
@@ -307,7 +307,7 @@ def test_create_blank_nodes_empty(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     # we expect that the HTTP code will be 400/Bad Request
     assert response.status_code == 400
@@ -327,7 +327,7 @@ def test_create_blank_nodes_valid(client):
     response = client.post(url,
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
-    data = json.loads(response.get_data())
+    data = json.loads(response.get_data().decode('utf-8'))
     logger.info(data)
     # we expect that the HTTP code will be 200/OK
     assert response.status_code == 200

@@ -8,6 +8,7 @@ from six import string_types
 import config
 from utils import get_current_version
 from datetime import datetime
+from f8a_utils.versions import get_latest_versions_for_ep
 
 logger = logging.getLogger(config.APP_NAME)
 
@@ -22,6 +23,9 @@ class GraphPopulator(object):
         pkg_name = epv.get('name')
         version = epv.get('version')
         source_repo = epv.get('source_repo', '')
+        latest_version = epv.get('latest_version', '')
+        if not latest_version:
+            latest_version = get_latest_versions_for_ep(ecosystem, pkg_name)
         if ecosystem and pkg_name and version:
             # Query to Create Package Node
             # TODO: refactor into the separate module
@@ -33,8 +37,9 @@ class GraphPopulator(object):
                       "property('{ecosystem}_pkg_count',1)).iterate();" \
                       "graph.addVertex('ecosystem', '{ecosystem}', " \
                       "'name', '{pkg_name}', 'vertex_label', 'Package');}};" \
+                      "pkg.property('latest_version', '{latest_version}');" \
                       "pkg.property('last_updated', {last_updated});".format(
-                            ecosystem=ecosystem, pkg_name=pkg_name,
+                            ecosystem=ecosystem, latest_version=latest_version, pkg_name=pkg_name,
                             last_updated=str(time.time())
                       )
 
@@ -487,6 +492,7 @@ class GraphPopulator(object):
                 str_gremlin += str_gremlin_version
                 if not prp_package:
                     # TODO: refactor into the separate module
+                    latest_version = get_latest_versions_for_ep(ecosystem, pkg_name)
                     str_gremlin += "pkg = g.V().has('ecosystem','{ecosystem}')." \
                                    "has('name', '{pkg_name}').tryNext().orElseGet{{" \
                                    "g.V().has('vertex_label','Count').choose(has('" \
@@ -496,9 +502,10 @@ class GraphPopulator(object):
                                    "'{ecosystem}_pkg_count',1)).iterate();graph.addVertex(" \
                                    "'ecosystem', '{ecosystem}', 'name', '{pkg_name}', " \
                                    "'vertex_label', 'Package');}};" \
+                                   "pkg.property('latest_version', '{latest_version}');" \
                                    "pkg.property('last_updated', {last_updated});".format(
-                                        ecosystem=ecosystem, pkg_name=pkg_name,
-                                        last_updated=str(time.time())
+                                        ecosystem=ecosystem, latest_version=latest_version,
+                                        pkg_name=pkg_name, last_updated=str(time.time())
                                    )
                 # TODO: refactor into the separate module
                 str_gremlin += "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \

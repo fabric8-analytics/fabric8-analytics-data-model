@@ -19,11 +19,9 @@ LABEL author "Devtools <devtools@redhat.com>"
 # Note: cron daemon ( crond ) will be invoked from within entry point
 # --------------------------------------------------------------------------------------------------------------
 
-# install python packages
-COPY ./requirements.txt /
-RUN pip install -r requirements.txt && rm requirements.txt
-
+COPY ./ /tmp/f8a_data_model/
 COPY ./src /src
+RUN cd /tmp/f8a_data_model && pip3 install .
 
 ADD scripts/entrypoint.sh /bin/entrypoint.sh
 ADD populate_schema.py /populate_schema.py
