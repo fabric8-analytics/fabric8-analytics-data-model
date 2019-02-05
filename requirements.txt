@@ -51,7 +51,7 @@ pytest-mock==1.10.0
 pytest==4.1.0
 python-dateutil==2.7.5    # via botocore, minio
 pytz==2018.9              # via minio
-radon==2.4.0
+radon==3.0.1
 raven[flask]==6.10.0
 requests==2.21.0
 s3transfer==0.1.13        # via boto3
