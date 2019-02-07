@@ -11,7 +11,6 @@ from minio import Minio
 from minio.error import ResponseError, BucketAlreadyOwnedByYou, BucketAlreadyExists
 from data_importer import import_epv_from_s3_http
 from graph_manager import BayesianGraph
-import pytest
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -69,7 +68,6 @@ def test_create_minio_bucket():
                                 'test/data/S3-data/pypi/access_points/0.4.59/metadata.json')
         minioClient.fput_object(config.AWS_EPV_BUCKET, 'pypi/access_points/0.4.59.json',
                                 'test/data/S3-data/pypi/access_points/0.4.59.json')
-
     except ResponseError as err:
         logger.error(err)
 

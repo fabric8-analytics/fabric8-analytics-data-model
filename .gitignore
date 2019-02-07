@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .cache/
+.pytest_cache/
 env*/
 venv/
 error.log
@@ -24,3 +25,5 @@ coverage.xml
 *.mo
 *.pot
 
+# Config
+*config.py

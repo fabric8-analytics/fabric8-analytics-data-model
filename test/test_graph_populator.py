@@ -2,7 +2,6 @@
 
 from graph_populator import GraphPopulator
 import pytest
-import json
 import logging
 import config
 
@@ -21,6 +20,11 @@ def test_sanitize_text_for_query():
     assert 'ASL 2.0' == f('ASL\n"2.0"')
     assert '[ok]' == f('["ok\']')
     assert 'ok' == f("'ok'")
+
+
+def test_sanitize_text_for_query_whitespace_characters():
+    """Test GraphPopulator._sanitize_text_for_query(), input is whitespace characters."""
+    f = GraphPopulator.sanitize_text_for_query
     assert '' == f(None)
     assert '' == f('')
     assert '' == f(' ')
@@ -29,6 +33,11 @@ def test_sanitize_text_for_query():
     assert '' == f(' \n ')
     assert '' == f('\n\n')
     assert '' == f('\t')
+
+
+def test_sanitize_text_for_query_exception_handling():
+    """Test GraphPopulator._sanitize_text_for_query()."""
+    f = GraphPopulator.sanitize_text_for_query
     with pytest.raises(ValueError):
         f(100)
     with pytest.raises(ValueError):
@@ -49,6 +58,11 @@ def test_sanitize_text_for_query_for_unicode_input():
     assert 'ASL 2.0' == f(u'ASL\n"2.0"')
     assert '[ok]' == f(u'["ok\']')
     assert 'ok' == f(u"'ok'")
+
+
+def test_sanitize_text_for_query_whitespace_characters_in_unicode():
+    """Test GraphPopulator._sanitize_text_for_query(), input is whitespace characters."""
+    f = GraphPopulator.sanitize_text_for_query
     assert '' == f(u'')
     assert '' == f(u' ')
     assert '' == f(u'\n')
@@ -75,7 +89,7 @@ def test_correct_license_splitting():
     assert f(l2) == ['Apache License, Version2', 'GPL, Version 2.1']
 
 
-def test_construct_version_query():
+def test_construct_version_query_1():
     """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
@@ -88,8 +102,15 @@ def test_construct_version_query():
     q = GraphPopulator.construct_version_query(input_json)
     logger.info(q)
 
-    assert q is ''
+    assert "access_points" in q
+    assert "0.4.59" in q
+    assert "pypi" in q
+    assert "addVertex" in q
+    assert "drop()" not in q
 
+
+def test_construct_version_query_2():
+    """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
@@ -129,6 +150,9 @@ def test_construct_version_query():
     assert "0.4.59" in q
     assert "pypi" in q
 
+
+def test_construct_version_query_3():
+    """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
@@ -147,6 +171,9 @@ def test_construct_version_query():
     assert "0.4.59" in q
     assert "pypi" in q
 
+
+def test_construct_version_query_4():
+    """Test the GraphPopulator.construct_version_query() class method."""
     input_json = {
         "version": "0.4.59",
         "package": "access_points",
@@ -164,6 +191,41 @@ def test_construct_version_query():
     assert "access_points" in q
     assert "0.4.59" in q
     assert "pypi" in q
+
+    input_json = {
+        "version": "deb579d6e030503f430978ee229008b9bc912d40",
+        "package": "github.com/gorilla/mux",
+        "ecosystem": "go",
+        "analyses": {
+            "source_licenses": {
+                "status": "success",
+                "summary": {
+                    "sure_licenses": [
+                        "BSD-Modified"
+                    ]
+                }
+            },
+            "metadata": {
+                "details": [
+                    {
+                        "code_repository": {
+                            "type": "git",
+                            "url": "https://github.com/gorilla/mux"
+                        },
+                        "dependencies": [],
+                        "ecosystem": "gofedlib",
+                        "name": "github.com/gorilla/mux",
+                        "version": "deb579d6e030503f430978ee229008b9bc912d40"
+                    }
+                ]
+            }
+        }
+    }
+    q = GraphPopulator.construct_version_query(input_json)
+
+    assert "'declared_licenses'" in q
+    assert "'licenses'" in q
+    assert "BSD-Modified" in q
 
 
 def test_construct_package_query():
@@ -248,7 +310,13 @@ def test_create_query_string():
 if __name__ == '__main__':
     test_sanitize_text_for_query()
     test_sanitize_text_for_query_for_unicode_input()
-    test_construct_version_query()
+    test_sanitize_text_for_query_whitespace_characters()
+    test_sanitize_text_for_query_whitespace_characters_in_unicode()
+    test_sanitize_text_for_query_exception_handling()
+    test_construct_version_query_1()
+    test_construct_version_query_2()
+    test_construct_version_query_3()
+    test_construct_version_query_4()
     test_construct_package_query()
     test_create_query_string()
     test_correct_license_splitting()

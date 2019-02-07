@@ -2,6 +2,7 @@
 
 directories="src test"
 separate_files="sanitycheck.py populate_schema.py"
+
 pass=0
 fail=0
 
@@ -12,15 +13,15 @@ function prepare_venv() {
         VIRTUALENV=$(which virtualenv-3)
     fi
 
-    ${VIRTUALENV} -p python3 venv && source venv/bin/activate && python3 "$(which pip3)" install pydocstyle
+    ${VIRTUALENV} -p python3 venv && source venv/bin/activate && python3 "$(which pip3)" install pyflakes
 }
 
-# run the pydocstyle for all files that are provided in $1
+# run the pyflakes for all files that are provided in $1
 function check_files() {
     for source in $1
     do
         echo "$source"
-        pydocstyle --count "$source"
+        pyflakes "$source"
         if [ $? -eq 0 ]
         then
             echo "    Pass"
@@ -36,15 +37,14 @@ function check_files() {
     done
 }
 
+[ "$NOVENV" == "1" ] || prepare_venv || exit 1
 
 echo "----------------------------------------------------"
-echo "Checking documentation strings in all sources stored"
-echo "in following directories:"
+echo "Checking source files for common errors in following"
+echo "directories:"
 echo "$directories"
 echo "----------------------------------------------------"
 echo
-
-[ "$NOVENV" == "1" ] || prepare_venv || exit 1
 
 # checks for the whole directories
 for directory in $directories
@@ -54,22 +54,20 @@ do
     check_files "$files"
 done
 
-
-echo
 echo "----------------------------------------------------"
-echo "Checking documentation strings in the following files"
+echo "Checking following source files for common errors:"
 echo "$separate_files"
 echo "----------------------------------------------------"
+echo
 
 check_files "$separate_files"
-
 
 if [ $fail -eq 0 ]
 then
     echo "All checks passed for $pass source files"
 else
     let total=$pass+$fail
-    echo "Documentation strings should be added and/or fixed in $fail source files out of $total files"
+    echo "$fail source files out of $total files needs to be checked and fixed"
     exit 1
 fi
 

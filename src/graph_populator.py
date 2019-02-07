@@ -6,12 +6,70 @@ import time
 from dateutil.parser import parse as parse_datetime
 from six import string_types
 import config
+from utils import get_current_version
+from datetime import datetime
 
 logger = logging.getLogger(config.APP_NAME)
 
 
 class GraphPopulator(object):
     """Class containing classmethods used to construct queries to the graph database."""
+
+    @classmethod
+    def construct_graph_nodes(cls, epv):
+        """Create query string to create empty EPV nodes."""
+        ecosystem = epv.get('ecosystem')
+        pkg_name = epv.get('name')
+        version = epv.get('version')
+        source_repo = epv.get('source_repo', '')
+        if ecosystem and pkg_name and version:
+            # Query to Create Package Node
+            # TODO: refactor into the separate module
+            pkg_str = "pkg = g.V().has('ecosystem','{ecosystem}').has('name', '{pkg_name}')." \
+                      "tryNext().orElseGet{{g.V()." \
+                      "has('vertex_label','Count').choose(has('{ecosystem}_pkg_count')," \
+                      "sack(assign).by('{ecosystem}_pkg_count').sack(sum).by(constant(" \
+                      "1)).property('{ecosystem}_pkg_count',sack())," \
+                      "property('{ecosystem}_pkg_count',1)).iterate();" \
+                      "graph.addVertex('ecosystem', '{ecosystem}', " \
+                      "'name', '{pkg_name}', 'vertex_label', 'Package');}};" \
+                      "pkg.property('last_updated', {last_updated});".format(
+                            ecosystem=ecosystem, pkg_name=pkg_name,
+                            last_updated=str(time.time())
+                      )
+
+            # Query to Create Version Node
+            # TODO: refactor into the separate module
+            ver_str = "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', " \
+                      "'{pkg_name}').has('version', '{version}').tryNext().orElseGet{{" \
+                      "g.V().has('vertex_label','Count').choose(has('{ecosystem}_ver_count')," \
+                      "sack(assign).by('{ecosystem}_ver_count').sack(sum).by(constant(" \
+                      "1)).property('{ecosystem}_ver_count',sack())," \
+                      "property('{ecosystem}_ver_count',1)).iterate();" \
+                      "graph.addVertex('pecosystem','{ecosystem}', 'pname','{pkg_name}', " \
+                      "'version', '{version}', 'vertex_label', 'Version');}};" \
+                      "ver.property('last_updated',{last_updated});".format(
+                            ecosystem=ecosystem, pkg_name=pkg_name, version=version,
+                            last_updated=str(time.time())
+                      )
+            # Add version node properties
+            if source_repo:
+                ver_str += "ver.property('source_repo','{source_repo}');".format(
+                    source_repo=source_repo
+                )
+
+            # Query to create an edge between Package Node to Version Node
+            # TODO: refactor into the separate module
+            edge_str = "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
+                       "'{pkg_name}').has('version','{version}').in(" \
+                       "'has_version').tryNext()" \
+                       ".orElseGet{{pkg.addEdge('has_version', ver)}};".format(
+                            ecosystem=ecosystem, pkg_name=pkg_name, version=version
+                       )
+
+            return pkg_str + ver_str + edge_str
+        else:
+            return None
 
     @classmethod
     def sanitize_text_for_query(cls, text):
@@ -39,8 +97,8 @@ class GraphPopulator(object):
         final_declared_licenses = list()
         for dl in license_list:
             dl = cls.sanitize_text_for_query(dl)
-            if dl.startswith(("version", "Version")):
-                final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl
+            if dl.startswith(("version", "Version", " version", " Version")):
+                final_declared_licenses[-1] = final_declared_licenses[-1] + ", " + dl.strip()
             else:
                 final_declared_licenses.append(dl)
         return final_declared_licenses
@@ -48,16 +106,21 @@ class GraphPopulator(object):
     @classmethod
     def construct_version_query(cls, input_json):
         """Construct the query to retrieve detailed information of given version of a package."""
+        # TODO: reduce cyclomatic complexity
+        # see https://fabric8-analytics.github.io/dashboard/fabric8-analytics-data-model.cc.D.html
+        # issue: https://github.com/fabric8-analytics/fabric8-analytics-data-model/issues/232
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
         version = cls.sanitize_text_for_query(input_json.get('version'))
         description = ''
+        source_repo = input_json.get('source_repo', None)
 
         details_data = input_json.get('analyses', {}).get('metadata', {}).get('details', [])
         if len(details_data) > 0:
             description = details_data[0].get('description', '')
             description = cls.sanitize_text_for_query(description)
 
+        licenses = []
         drop_props = []
         str_version = prp_version = drop_prop = ""
         # Check if license and cve analyses succeeded. Then we refresh the property
@@ -66,10 +129,15 @@ class GraphPopulator(object):
         if 'success' == input_json.get('analyses', {}).get('security_issues', {}).get('status'):
             drop_props.append('cve_ids')
 
+        # TODO: refactor into the separate module
         str_version += "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', '{pkg_name}')." \
                        "has('version', '{version}').tryNext().orElseGet{{" \
+                       "g.V().has('vertex_label','Count').choose(" \
+                       "has('{ecosystem}_ver_count'),sack(assign).by('{ecosystem}_ver_count')." \
+                       "sack(sum).by(constant(1)).property('{ecosystem}_ver_count',sack())," \
+                       "property('{ecosystem}_ver_count',1)).iterate();" \
                        "graph.addVertex('pecosystem','{ecosystem}', 'pname','{pkg_name}', " \
-                       "'version', '{version}', 'vertex_label', 'Version')}};" \
+                       "'version', '{version}', 'vertex_label', 'Version');}};" \
                        "ver.property('last_updated',{last_updated});".format(
                             ecosystem=ecosystem, pkg_name=pkg_name, version=version,
                             last_updated=str(time.time())
@@ -78,7 +146,12 @@ class GraphPopulator(object):
         # Add Description if not blank
         if description:
             prp_version += "ver.property('description','{description}');".format(
-                description=re.sub('[^A-Za-z0-9_\\\/\'":. ]', '', description)
+                description=re.sub(r'[^A-Za-z0-9_\\/\'":. ]', '', description)
+            )
+        # Add Source Repo if not blank
+        if source_repo:
+            prp_version += "ver.property('source_repo','{source_repo}');".format(
+                source_repo=source_repo
             )
         # Get Code Metrics Details
         if 'code_metrics' in input_json.get('analyses', {}):
@@ -165,8 +238,12 @@ class GraphPopulator(object):
                         declared_licenses = [x.strip() for x in no_newlines.split(",")]
                     else:  # default behavior
                         # split by comma
-                        declared_licenses = [x.strip() for x in declared_str.split(",")]
-                declared_licenses = cls.correct_license_splitting(declared_licenses)
+                        declared_licenses = [x.strip()
+                                             for x in declared_str.split(",")]
+                elif ecosystem == "go" and licenses:
+                    declared_licenses = licenses
+                declared_licenses = cls.correct_license_splitting(
+                    declared_licenses)
 
                 # Clear declared licenses field before refreshing
                 drop_props.append('declared_licenses')
@@ -190,29 +267,44 @@ class GraphPopulator(object):
                             p="','".join(drop_props)
                          )
 
-        str_version = drop_prop + str_version + prp_version if prp_version else ''
+        str_version = drop_prop + str_version + (prp_version if prp_version else '')
 
         return str_version
 
     @classmethod
     def construct_package_query(cls, input_json):
         """Construct the query to retrieve detailed information of given package."""
+        # TODO: reduce cyclomatic complexity
+        # see https://fabric8-analytics.github.io/dashboard/fabric8-analytics-data-model.cc.D.html
+        # issue: https://github.com/fabric8-analytics/fabric8-analytics-data-model/issues/232
         pkg_name = input_json.get('package')
         ecosystem = input_json.get('ecosystem')
         pkg_name_tokens = re.split(r'\W+', pkg_name)
         prp_package = ""
         drop_prop = ""
         drop_props = []
+        # TODO: refactor into the separate module
         str_package = "pkg = g.V().has('ecosystem','{ecosystem}').has('name', '{pkg_name}')." \
-                      "tryNext().orElseGet{{graph.addVertex('ecosystem', '{ecosystem}', 'name', " \
-                      "'{pkg_name}', 'vertex_label', 'Package')}};" \
+                      "tryNext().orElseGet{{g.V()." \
+                      "has('vertex_label','Count').choose(has('{ecosystem}_pkg_count')," \
+                      "sack(assign).by('{ecosystem}_pkg_count').sack(sum).by(constant(" \
+                      "1)).property('{ecosystem}_pkg_count',sack())," \
+                      "property('{ecosystem}_pkg_count',1)).iterate();" \
+                      "graph.addVertex('ecosystem', '{ecosystem}', 'name', " \
+                      "'{pkg_name}', 'vertex_label', 'Package'); }};" \
                       "pkg.property('last_updated', {last_updated});".format(
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time())
                       )
+        cur_latest_ver, cur_libio_latest_ver = get_current_version(ecosystem, pkg_name)
+        cur_date = (datetime.utcnow()).strftime('%Y%m%d')
+        last_updated_flag = 'false'
 
         latest_version = cls.sanitize_text_for_query(input_json.get('latest_version'))
         if latest_version:
             prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
+            if latest_version != cur_latest_ver:
+                prp_package += "pkg.property('latest_version_last_updated', '{}');".format(cur_date)
+                last_updated_flag = 'true'
 
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):
@@ -238,7 +330,9 @@ class GraphPopulator(object):
             gh_open_issues_count = str(gh_details.get('open_issues_count', -1))
             gh_subscribers_count = str(gh_details.get('subscribers_count', -1))
             gh_contributors_count = str(gh_details.get('contributors_count', -1))
+            topics = gh_details.get('topics', [])
 
+            # TODO: refactor into the separate module
             prp_package += "pkg.property('gh_prs_last_year_opened', {gh_prs_last_year_opened});" \
                            "pkg.property('gh_prs_last_month_opened', {gh_prs_last_month_opened});" \
                            "pkg.property('gh_prs_last_year_closed', {gh_prs_last_year_closed});" \
@@ -270,6 +364,12 @@ class GraphPopulator(object):
                                 gh_contributors_count=gh_contributors_count
                            )
 
+            # Add github topics
+            if topics:
+                drop_props.append('topics')
+                str_package += " ".join(["pkg.property('topics', '{}');".format(t)
+                                         for t in topics if t])
+
         # Add tokens for a package
         if pkg_name_tokens:
             drop_props.append('tokens')
@@ -284,7 +384,7 @@ class GraphPopulator(object):
             libio_dependents_projects = details.get('dependents', {}).get('count', -1)
             libio_dependents_repos = details.get('dependent_repositories', {}).get('count', -1)
             releases = details.get('releases', {})
-            libio_total_releases = releases.get('count', -1)
+            libio_total_releases = int(releases.get('count', -1))
             libio_latest_version = libio_latest_published_at = ''
             if libio_total_releases > 0:
                 if v2:
@@ -294,6 +394,10 @@ class GraphPopulator(object):
                 else:
                     libio_latest_published_at = releases.get('latest', {}).get('published_at', '')
                     libio_latest_version = releases.get('latest', {}).get('version', '')
+
+                if libio_latest_version != cur_libio_latest_ver and last_updated_flag != 'true':
+                    prp_package += "pkg.property('latest_version_last_updated', '{}');"\
+                        .format(cur_date)
 
             if libio_latest_published_at:
                 t = libio_latest_published_at
@@ -382,14 +486,21 @@ class GraphPopulator(object):
             if str_gremlin_version:
                 str_gremlin += str_gremlin_version
                 if not prp_package:
+                    # TODO: refactor into the separate module
                     str_gremlin += "pkg = g.V().has('ecosystem','{ecosystem}')." \
                                    "has('name', '{pkg_name}').tryNext().orElseGet{{" \
-                                   "graph.addVertex('ecosystem', '{ecosystem}', 'name', " \
-                                   "'{pkg_name}', 'vertex_label', 'Package')}};" \
+                                   "g.V().has('vertex_label','Count').choose(has('" \
+                                   "{ecosystem}_pkg_count'),sack(assign).by('" \
+                                   "{ecosystem}_pkg_count').sack(sum).by(constant(1))." \
+                                   "property('{ecosystem}_pkg_count',sack()),property(" \
+                                   "'{ecosystem}_pkg_count',1)).iterate();graph.addVertex(" \
+                                   "'ecosystem', '{ecosystem}', 'name', '{pkg_name}', " \
+                                   "'vertex_label', 'Package');}};" \
                                    "pkg.property('last_updated', {last_updated});".format(
                                         ecosystem=ecosystem, pkg_name=pkg_name,
                                         last_updated=str(time.time())
                                    )
+                # TODO: refactor into the separate module
                 str_gremlin += "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
                                "'{pkg_name}').has('version','{version}').in(" \
                                "'has_version').tryNext()" \

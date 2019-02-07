@@ -26,6 +26,11 @@
             latest_version = mgmt.makePropertyKey('latest_version').dataType(String.class).make();
         }
 
+        latest_version_last_updated = mgmt.getPropertyKey('latest_version_last_updated');
+        if(latest_version_last_updated == null) {
+            latest_version_last_updated = mgmt.makePropertyKey('latest_version_last_updated').dataType(String.class).make();
+        }
+
         // package github details
 
         gh_stargazers = mgmt.getPropertyKey('gh_stargazers');
@@ -190,9 +195,34 @@
              cve_id = mgmt.makePropertyKey('cve_id').dataType(String.class).make();
         }
 
+        cvedb_version = mgmt.getPropertyKey('cvedb_version');
+        if(cvedb_version == null ) {
+             cvedb_version = mgmt.makePropertyKey('cvedb_version').dataType(String.class).make();
+        }
+
         cvss = mgmt.getPropertyKey('cvss');
         if(cvss == null) {
             cvss = mgmt.makePropertyKey('cvss').dataType(Float.class).make();
+        }
+
+        cvss_v2 = mgmt.getPropertyKey('cvss_v2');
+        if(cvss_v2 == null) {
+            cvss_v2 = mgmt.makePropertyKey('cvss_v2').dataType(Float.class).make();
+        }
+
+        cvss_v3 = mgmt.getPropertyKey('cvss_v3');
+        if(cvss_v3 == null) {
+            cvss_v3 = mgmt.makePropertyKey('cvss_v3').dataType(Float.class).make();
+        }
+
+        nvd_status = mgmt.getPropertyKey('nvd_status');
+        if(nvd_status == null){
+            nvd_status = mgmt.makePropertyKey('nvd_status').dataType(String.class).make();
+        }
+
+        fixed_in = mgmt.getPropertyKey('fixed_in');
+        if(fixed_in == null){
+            fixed_in = mgmt.makePropertyKey('fixed_in').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
         summary = mgmt.getPropertyKey('summary');
@@ -337,6 +367,11 @@
         last_updated = mgmt.getPropertyKey('last_updated');
         if(last_updated == null){
             last_updated = mgmt.makePropertyKey('last_updated').dataType(Double.class).make();
+        }
+
+        modified_date = mgmt.getPropertyKey('modified_date');
+        if(modified_date == null){
+            modified_date = mgmt.makePropertyKey('modified_date').dataType(String.class).make();
         }
 
         // for Black Duck Security
@@ -526,6 +561,21 @@
             manual_tagging_required = mgmt.makePropertyKey('manual_tagging_required').dataType(Boolean.class).make();
         }
 
+        // # for Repository Node
+        repo_url = mgmt.getPropertyKey('repo_url');
+        if(repo_url == null) {
+            repo_url = mgmt.makePropertyKey('repo_url').dataType(String.class).make();
+        }
+        repo_user = mgmt.getPropertyKey('repo_user');
+        if(repo_user == null) {
+            repo_user = mgmt.makePropertyKey('repo_user').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        // # for 3rd party ingestion
+        source_repo = mgmt.getPropertyKey('source_repo');
+        if(source_repo == null) {
+            source_repo = mgmt.makePropertyKey('source_repo').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
 
         // # for indexes
         if(null == mgmt.getGraphIndex('CVEidIndex')) {
@@ -560,6 +610,9 @@
             mgmt.buildIndex('CategoryNameIndex', Vertex.class).addKey(ctname).unique().buildCompositeIndex();
         }
 
+        if(null == mgmt.getGraphIndex('RepoURLIndex')) {
+            mgmt.buildIndex('RepoURLIndex', Vertex.class).addKey(repo_url).unique().buildCompositeIndex();
+        }
 
         List<String> allKeys = [
                 'ecosystem',
@@ -574,6 +627,7 @@
                 'pname',
                 'pecosystem',
                 'version',
+                'latest_version_last_updated',
                 //'description',
                 'shipped_as_downstream',
                 //'licenses',
@@ -590,7 +644,10 @@
                 'lname',
                 'license_count',
                 'email',
-                'cve_id',
+                //'cve_id',
+                //'fixed_in',
+                'nvd_status',
+                'cvedb_version',
                 //'summary',
                 //'access_authentication',
                 //'access_complexity',
@@ -601,6 +658,7 @@
                 //'references',
                 'vertex_label',
                 'last_updated',
+                'modified_date',
                 //'base_score',
                 //'exploitability_subscore',
                 //'impact_subscore',
@@ -634,7 +692,9 @@
                 'user_tags',
                 'tags_count',
                 'category_deps_count',
-                'category_runtime'
+                'category_runtime',
+                'source_repo',
+                'repo_user'
         ]
 
         allKeys.each { k ->

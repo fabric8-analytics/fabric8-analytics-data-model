@@ -2,13 +2,14 @@
 
 import os
 import flask
-from flask import Flask, request, redirect, make_response
+from flask import Flask, request
 from flask_cors import CORS
 import json
 import sys
 import data_importer
 from graph_manager import BayesianGraph
 from graph_populator import GraphPopulator
+from cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion
 from raven.contrib.flask import Sentry
 import config
 from werkzeug.contrib.fixers import ProxyFix
@@ -18,6 +19,7 @@ from flask import Blueprint, current_app
 
 api_v1 = Blueprint('api_v1', __name__)
 
+# TODO: https://github.com/fabric8-analytics/fabric8-analytics-data-model/issues/196
 # Python2.x: Make default encoding as UTF-8
 if sys.version_info.major == 2:
     reload(sys)
@@ -92,10 +94,9 @@ def ingest_to_graph():
     """Import e/p/v data and generate response for the POST request to /api/v1/ingest_to_graph."""
     input_json = request.get_json()
     current_app.logger.info("Ingesting the given list of EPVs - " + json.dumps(input_json))
-
     expected_keys = set(['ecosystem', 'name', 'version'])
     for epv in input_json:
-        if expected_keys != set(epv.keys()):
+        if not expected_keys.issubset(set(epv.keys())):
             response = {'message': 'Invalid keys found in input: ' + ','.join(epv.keys())}
             return flask.jsonify(response), 400
 
@@ -111,9 +112,33 @@ def ingest_to_graph():
         return flask.jsonify(response)
 
 
+@api_v1.route('/api/v1/create_nodes', methods=['POST'])
+def create_nodes():
+    """Create e/p/v graph node and generate response for the POST request to/api/v1/create_nodes."""
+    input_json = request.get_json()
+    if not input_json:
+        return flask.jsonify(message="No EPVs provided. Please provide valid list of EPVs"), 400
+
+    expected_keys = set(['ecosystem', 'name', 'version'])
+    for epv in input_json:
+        # We expect alteast Ecosystem, Package and Version as a payload
+        if not expected_keys.issubset(set(epv.keys())):
+            response = {'message': 'Invalid keys found in input: ' + ','.join(epv.keys())}
+            return flask.jsonify(response), 400
+
+    current_app.logger.info("Creating the nodes for EPVs - " + json.dumps(input_json))
+    report = data_importer.create_graph_nodes(list_epv=input_json)
+    current_app.logger.info(report)
+
+    if report.get('status') is not 'Success':
+        return flask.jsonify(report), 500
+    else:
+        return flask.jsonify(report)
+
+
 @api_v1.route('/api/v1/selective_ingest', methods=['POST'])
 def selective_ingest():
-    """Import e/p/v data and generate response for the POST request to /api/v1/selective."""
+    """Import e/p/v data and generate response for the POST request to /api/v1/selective_ingest."""
     input_json = request.get_json()
 
     if input_json.get('package_list') is None or len(input_json.get('package_list')) == 0:
@@ -167,6 +192,7 @@ def handle_properties(ecosystem, package, version):
     :param version: str, package version
     :return: 200 on success, 400 on failure
     """
+    # TODO: reduce cyclomatic complexity
     input_json = request.get_json()
     properties = input_json.get('properties')
 
@@ -220,6 +246,70 @@ def handle_properties(ecosystem, package, version):
     return flask.jsonify(response_json), 200
 
 
+@api_v1.route('/api/v1/cves', methods=['PUT', 'DELETE'])
+def cves_put_delete():
+    """Put or delete CVE nodes.
+
+    Missing EPVs will be created.
+    """
+    payload = request.get_json(silent=True)
+    try:
+        if request.method == 'PUT':
+            cve = CVEPut(payload)
+            print(cve)
+        elif request.method == 'DELETE':
+            cve = CVEDelete(payload)
+        else:
+            # this should never happen
+            return flask.jsonify({'error': 'method not allowed'}), 405
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 400
+
+    try:
+        cve.process()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+
+    return flask.jsonify({}), 200
+
+
+@api_v1.route('/api/v1/cves/<string:ecosystem>', methods=['GET'])
+@api_v1.route('/api/v1/cves/<string:ecosystem>/<string:name>', methods=['GET'])
+@api_v1.route('/api/v1/cves/<string:ecosystem>/<string:name>/<string:version>', methods=['GET'])
+def cves_get(ecosystem, name=None, version=None):
+    """Get list of CVEs for E, EP, or EPV."""
+    cve = CVEGet(ecosystem, name, version)
+    try:
+        result = cve.get()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify(result), 200
+
+
+@api_v1.route('/api/v1/cvedb-version', methods=['GET'])
+def cvedb_version_get():
+    """Get CVEDB version."""
+    try:
+        version = CVEDBVersion().get()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify({'version': version}), 200
+
+
+@api_v1.route('/api/v1/cvedb-version', methods=['PUT'])
+def cvedb_version_put():
+    """Create or replace CVEDB version."""
+    payload = request.get_json(silent=True)
+
+    if not payload or 'version' not in payload:
+        return flask.jsonify({'error': 'invalid input'}), 400
+    try:
+        version = CVEDBVersion().put(payload)
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+    return flask.jsonify({'version': version}), 200
+
+
 def create_app():
     """Create Flask app object."""
     new_app = Flask(config.APP_NAME)
@@ -247,19 +337,6 @@ app = create_app()
 setup_logging(app)
 app.wsgi_app = ProxyFix(app.wsgi_app)
 sentry = Sentry(app, dsn=config.SENTRY_DSN, logging=True, level=logging.ERROR)
-
-# Check whether schema is created or not
-# populate schema if not already done
-try:
-    status, json_result = BayesianGraph.populate_schema()
-    if status:
-        app.logger.info("Ready to serve requests")
-    else:
-        app.logger.error(json_result)
-        raise RuntimeError("Failed to setup graph schema")
-except Exception:
-    sentry.captureException()
-    raise RuntimeError("Failed to initialized graph schema")
 
 
 if __name__ == "__main__":

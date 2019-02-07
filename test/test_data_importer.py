@@ -1,7 +1,6 @@
 """Tests for the data_importer module (to be done)."""
 
 import data_importer
-import pytest
 
 
 def test_parse_int_or_none_for_integer_input():
@@ -81,7 +80,7 @@ def test_import_epv_http():
 
 if __name__ == '__main__':
     test_parse_int_or_none_for_integer_input()
-    test_parse_int_or_none_for_integer_input_overflow()
+    test_parse_int_or_none_for_integer_input_overflows()
     test_parse_int_or_none_for_float_input()
     test_parse_int_or_none_for_string_input()
     test_parse_int_or_none_for_unicode_string_input()

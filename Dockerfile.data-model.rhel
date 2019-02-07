@@ -1,9 +1,6 @@
-FROM centos:7
-MAINTAINER Saleem Ansari <sansari@redhat.com>
-
-RUN yum install -y epel-release && \
-    yum install -y python-pip python-devel gcc && \
-    yum clean all
+FROM quay.io/openshiftio/rhel-base-fabric8-analytics-data-model:latest
+LABEL maintainer "Devtools <devtools@redhat.com>"
+LABEL author "Devtools <devtools@redhat.com>"
 
 # --------------------------------------------------------------------------------------------------------------
 # Note: Need to remove cron job support for now as we are hitting user-permission issues when run on openshift
@@ -32,4 +29,3 @@ ADD scripts/entrypoint.sh /bin/entrypoint.sh
 ADD populate_schema.py /populate_schema.py
 
 ENTRYPOINT ["/bin/entrypoint.sh"]
-

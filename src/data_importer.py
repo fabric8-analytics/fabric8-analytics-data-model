@@ -58,6 +58,7 @@ def _get_exception_msg(prefix, e):
 
 
 def _import_keys_from_s3_http(data_source, epv_list):
+    # TODO: reduce cyclomatic complexity
     logger.debug("Begin import...")
     report = {'status': 'Success', 'message': 'The import finished successfully!'}
     count_imported_EPVs = 0
@@ -71,8 +72,13 @@ def _import_keys_from_s3_http(data_source, epv_list):
             pkg_ecosystem = contents.get('ecosystem')
             pkg_name = contents.get('package')
             pkg_version = contents.get('version') or ''
+            pkg_source = contents.get('source_repo', pkg_ecosystem)
 
-            obj = {'ecosystem': pkg_ecosystem, 'package': pkg_name, 'version': pkg_version}
+            obj = {
+                'ecosystem': pkg_ecosystem,
+                'package': pkg_name,
+                'version': pkg_version,
+                'source_repo': pkg_source}
 
             try:
                 # Check other Version level information and add it to common object
@@ -116,14 +122,14 @@ def _import_keys_from_s3_http(data_source, epv_list):
 
                         # update first key with graph synced tag
                         logger.info("Mark as synced in RDS %s" % last_imported_EPV)
-                        if not config.AWS_S3_IS_LOCAL:
+                        if not config.AWS_S3_IS_LOCAL:  # pragma: no cover
                             PostgresHandler().mark_epv_synced(
                                 obj.get('ecosystem'),
                                 obj.get('package'),
                                 obj.get('version')
                             )
 
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.error(e)
                 msg = _get_exception_msg("The import failed", e)
                 report['status'] = 'Failure'
@@ -153,13 +159,14 @@ def _log_report_msg(import_type, report):
 
     if report.get('status') is 'Success':
         logger.debug(msg)
-    else:
+    else:  # pragma: no cover
         # TODO: retry??
         logger.error(msg)
 
 
 def import_epv_http(data_source, list_epv, select_doc=None):
     """Import the ecostystem+package+version triple from S3 database using selected data source."""
+    # TODO: reduce cyclomatic complexity
     if select_doc is None or len(select_doc) == 0:
         select_doc = []
 
@@ -171,14 +178,15 @@ def import_epv_http(data_source, list_epv, select_doc=None):
             epv_ecosystem = epv.get('ecosystem', None)
             epv_name = epv.get('name', None)
             epv_version = epv.get('version', '')
+            epv_source = epv.get('source_repo', epv_ecosystem)
 
-            if not epv_ecosystem or not epv_name:
+            if not epv_ecosystem or not epv_name:  # pragma: no cover
                 # this must be logged
                 logger.info("Skipping %s" % epv)
                 continue
 
             # Get Package level keys
-            package_prefix = version_prefix = epv_ecosystem + "/" + epv_name + "/"
+            package_prefix = version_prefix = epv_source + "/" + epv_name + "/"
 
             pkg_list_keys = data_source.list_files(bucket_name=config.AWS_PKG_BUCKET,
                                                    prefix=package_prefix)
@@ -186,7 +194,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
             ver_list_keys = []
             if epv_version:
                 # Get EPV level keys
-                version_prefix = epv_ecosystem + "/" + epv_name + "/" + epv_version
+                version_prefix = epv_source + "/" + epv_name + "/" + epv_version
                 ver_list_keys.extend(data_source.list_files(bucket_name=config.AWS_EPV_BUCKET,
                                                             prefix=version_prefix + "/"))
 
@@ -199,7 +207,8 @@ def import_epv_http(data_source, list_epv, select_doc=None):
             # store s3 object paths for this epv
             pkg_data = {'package': epv_name, 'version': epv_version, 'ecosystem': epv_ecosystem,
                         'ver_key_prefix': version_prefix, 'ver_list_keys': ver_list_keys,
-                        'pkg_key_prefix': package_prefix, 'pkg_list_keys': pkg_list_keys
+                        'pkg_key_prefix': package_prefix, 'pkg_list_keys': pkg_list_keys,
+                        'source_repo': epv_source
                         }
 
             object_paths = {package_prefix: pkg_data}
@@ -212,7 +221,7 @@ def import_epv_http(data_source, list_epv, select_doc=None):
         # Log the report
         _log_report_msg("import_epv()", report)
 
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         msg = _get_exception_msg("import_epv() failed with error", e)
         raise RuntimeError(msg)
     return report
@@ -230,6 +239,46 @@ def import_epv_from_s3_http(list_epv, select_doc=None):
                                         access_key=access_key,
                                         secret_key=secret_key),
                            list_epv, select_doc)
+
+
+def create_graph_nodes(list_epv):
+    """Create blank graph nodes given an EPV."""
+    count_blank_epvs_created = 0
+    success_epvs = []
+    failure_epvs = []
+
+    for item in list_epv:
+        str_gremlin = GraphPopulator.construct_graph_nodes(item)
+        epv = item.get('ecosystem') + ":" + item.get('name') + ":" + item.get('version')
+
+        if str_gremlin:
+            payload = {'gremlin': str_gremlin}
+            print(json.dumps(payload))
+            try:
+                result = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload),
+                                       timeout=30)
+                resp = result.json()
+                print(json.dumps(resp))
+
+                if resp['status']['code'] == 200:
+                    count_blank_epvs_created += 1
+                    success_epvs.append(epv)
+            except Exception as e:  # pragma: no cover
+                logger.error(e)
+                failure_json = {epv: e}
+                failure_epvs.append(failure_json)
+
+    status = "Success"
+    if count_blank_epvs_created == 0:
+        status = "Failure"
+
+    response = {
+        "epv_nodes_created": count_blank_epvs_created,
+        "success_list": success_epvs,
+        "failure_list": failure_epvs,
+        "status": status
+    }
+    return response
 
 
 class PostgresHandler(object):
@@ -296,11 +345,13 @@ class PostgresHandler(object):
 
     def _generate_fetch_query(self, ecosystem, package, version, limit, offset):
         query = """
-                    SELECT e.name AS ename, p.name AS pname, v.identifier AS versionid
-                    FROM versions v
+                    SELECT DISTINCT e.name AS ename, p.name AS pname, v.identifier AS versionid
+                    FROM analyses a
+                         JOIN versions v ON a.version_id = v.id
                          JOIN packages p ON v.package_id = p.id
                          JOIN ecosystems e ON p.ecosystem_id = e.id
                     WHERE v.synced2graph = FALSE
+                         AND a.finished_at IS NOT NULL
                     """
 
         if ecosystem:
@@ -332,11 +383,13 @@ class PostgresHandler(object):
 
     def _generate_count_query(self, ecosystem, package, version):
         query = """
-                    SELECT COUNT(*) as CNT
-                    FROM versions v
+                    SELECT COUNT(DISTINCT(e.name, p.name, v.identifier)) as CNT
+                    FROM analyses a
+                         JOIN versions v ON a.version_id = v.id
                          JOIN packages p ON v.package_id = p.id
                          JOIN ecosystems e ON p.ecosystem_id = e.id
                     WHERE v.synced2graph = FALSE
+                         AND a.finished_at IS NOT NULL
                     """
 
         if ecosystem:
