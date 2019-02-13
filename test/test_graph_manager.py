@@ -1,8 +1,8 @@
 """Tests for the graph_manager module (to be done)."""
 
-from graph_manager import BayesianGraph as g
+from src.graph_manager import BayesianGraph as g
 import logging
-import config
+from src import config
 
 
 logger = logging.getLogger(config.APP_NAME)

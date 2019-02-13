@@ -5,8 +5,8 @@ import re
 import time
 from dateutil.parser import parse as parse_datetime
 from six import string_types
-import config
-from utils import get_current_version
+from src import config
+from src.utils import get_current_version
 from datetime import datetime
 from f8a_utils.versions import get_latest_versions_for_ep
 

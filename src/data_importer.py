@@ -1,12 +1,11 @@
 """Module with functions to fetch data from the S3 data source."""
 
-from graph_populator import GraphPopulator
+from src.graph_populator import GraphPopulator
 import logging
-import config
-import traceback
+from src import config
 import json
 import requests
-from data_source.s3_data_source import S3DataSource
+from src.data_source.s3_data_source import S3DataSource
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

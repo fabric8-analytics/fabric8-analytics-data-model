@@ -5,7 +5,7 @@ the Minio storage.
 """
 
 import logging
-from data_importer import PostgresHandler
+from src.data_importer import PostgresHandler
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)

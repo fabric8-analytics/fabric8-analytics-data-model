@@ -5,7 +5,7 @@ from requests.packages.urllib3.util.retry import Retry
 import requests
 import json
 import logging
-import config
+from src import config
 from datetime import datetime
 
 logger = logging.getLogger(__name__)

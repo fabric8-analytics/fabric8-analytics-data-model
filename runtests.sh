@@ -76,7 +76,7 @@ setup_virtualenv
 
 source venv/bin/activate
 
-PYTHONPATH=$(pwd)/src
+PYTHONPATH=$(pwd)
 export PYTHONPATH
 
 export BAYESIAN_PGBOUNCER_SERVICE_HOST="localhost"
@@ -97,7 +97,7 @@ echo "*** Unit tests ***"
 echo "*****************************************"
 echo "Check for sanity of the connections..."
 
-if python sanitycheck.py
+if python3 sanitycheck.py
 then
     python3 populate_schema.py
     py.test --cov=src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/

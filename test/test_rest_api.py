@@ -1,7 +1,7 @@
 """Tests for the rest_api module."""
 
 import logging
-import config
+from src import config
 import json
 from flask import url_for
 from mock import patch
@@ -122,7 +122,7 @@ def test_ingest_to_graph_valid(client):
     assert data['message'] == 'Invalid keys found in input: ' + ','.join(epv_keys)
 
 
-@patch("rest_api.data_importer.import_epv_from_s3_http")
+@patch("src.rest_api.data_importer.import_epv_from_s3_http")
 def test_ingest_to_graph_report(mocker, client):
     """Add test for ingest to graph API when report status is Failure."""
     input_data = [
@@ -235,7 +235,7 @@ def test_selective_ingest_valid_source(client):
 
 def test_handle_properties_put(client, mocker):
     """Test PUT on /api/v1/<e>/<p>/<v>/properties."""
-    gremlin_mock = mocker.patch('rest_api.BayesianGraph.execute')
+    gremlin_mock = mocker.patch('src.rest_api.BayesianGraph.execute')
     gremlin_mock.return_value = (True, {})
     url = url_for('api_v1.handle_properties', ecosystem='maven',
                   package='net.iharder:base64', version='2.3.9')
@@ -262,7 +262,7 @@ def test_handle_properties_put(client, mocker):
 
 def test_handle_properties_delete(client, mocker):
     """Test DELETE on /api/v1/<e>/<p>/<v>/properties."""
-    gremlin_mock = mocker.patch('rest_api.BayesianGraph.execute')
+    gremlin_mock = mocker.patch('src.rest_api.BayesianGraph.execute')
     gremlin_mock.return_value = (True, {})
     url = url_for('api_v1.handle_properties', ecosystem='maven',
                   package='net.iharder:base64', version='2.3.9')
@@ -334,7 +334,7 @@ def test_create_blank_nodes_valid(client):
     assert data['epv_nodes_created'] == 1
 
 
-@patch("rest_api.data_importer.create_graph_nodes")
+@patch("src.rest_api.data_importer.create_graph_nodes")
 def test_create_blank_nodes_report_status(mocker, client):
     """Add test to create blank nodes API when report status is Failure."""
     input_data = [
@@ -353,7 +353,7 @@ def test_create_blank_nodes_report_status(mocker, client):
     assert response.status_code == 500
 
 
-@patch("rest_api.CVEPut.process")
+@patch("src.rest_api.CVEPut.process")
 def test_cves_put(mocker, client):
     """Test PUT /api/v1/cves."""
     mocker.return_value = {}
@@ -368,7 +368,7 @@ def test_cves_put(mocker, client):
     assert response.json == {}
 
 
-@patch("rest_api.CVEPut.process")
+@patch("src.rest_api.CVEPut.process")
 def test_cves_put_invalid_input(mocker, client):
     """Test PUT /api/v1/cves with invalid input."""
     mocker.return_value = {}
@@ -383,7 +383,7 @@ def test_cves_put_invalid_input(mocker, client):
     assert 'error' in response.json
 
 
-@patch("rest_api.CVEDelete.process")
+@patch("src.rest_api.CVEDelete.process")
 def test_cves_delete(mocker, client):
     """Test DELETE /api/v1/cves."""
     mocker.return_value = {}
@@ -398,7 +398,7 @@ def test_cves_delete(mocker, client):
     assert response.json == {}
 
 
-@patch("rest_api.CVEDelete.process")
+@patch("src.rest_api.CVEDelete.process")
 def test_cves_delete_invalid_input(mocker, client):
     """Test DELETE /api/v1/cves with invalid input."""
     mocker.return_value = {}
@@ -413,7 +413,7 @@ def test_cves_delete_invalid_input(mocker, client):
     assert 'error' in response.json
 
 
-@patch("rest_api.CVEGet.get")
+@patch("src.rest_api.CVEGet.get")
 def test_cves_get_e(mocker, client):
     """Test GET /api/v1/cves/<ecosystem>."""
     mocker.return_value = {'count': 1, 'cve_ids': ['CVE-2018-0001']}
@@ -425,7 +425,7 @@ def test_cves_get_e(mocker, client):
     assert response.status_code == 200
 
 
-@patch("rest_api.CVEGet.get")
+@patch("src.rest_api.CVEGet.get")
 def test_cves_get_ep(mocker, client):
     """Test GET /api/v1/cves/<ecosystem>/<name>."""
     mocker.return_value = {'count': 1, 'cve_ids': ['CVE-2018-0001']}
@@ -437,7 +437,7 @@ def test_cves_get_ep(mocker, client):
     assert response.status_code == 200
 
 
-@patch("cve.call_gremlin")
+@patch("src.cve.call_gremlin")
 def test_cvedb_version_get(mocker, client):
     """Test GET /api/v1/cvedb-version."""
     mocker.return_value = {'result': {'data': ['9f4d54dd1a21584a40596c05d60ab00974953047']}}
@@ -453,7 +453,7 @@ def test_cvedb_version_get(mocker, client):
     assert resp['version'] == '9f4d54dd1a21584a40596c05d60ab00974953047'
 
 
-@patch("cve.call_gremlin")
+@patch("src.cve.call_gremlin")
 def test_cvedb_version_put(mocker, client):
     """Test PUT /api/v1/cvedb-version."""
     mocker.return_value = {'result': {'data': ['9f4d54dd1a21584a40596c05d60ab00974953047']}}

@@ -2,7 +2,7 @@
 
 import pytest
 
-from rest_api import create_app
+from src.rest_api import create_app
 
 
 @pytest.fixture(scope='session')

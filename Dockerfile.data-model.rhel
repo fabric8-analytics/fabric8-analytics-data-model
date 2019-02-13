@@ -18,6 +18,8 @@ LABEL author "Devtools <devtools@redhat.com>"
 
 # Note: cron daemon ( crond ) will be invoked from within entry point
 # --------------------------------------------------------------------------------------------------------------
+RUN pip3 install git+https://git@github.com/fabric8-analytics/fabric8-analytics-version-comparator.git
+RUN pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@latest
 
 COPY ./ /tmp/f8a_data_model/
 COPY ./src /src
