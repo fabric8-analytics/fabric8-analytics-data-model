@@ -1,9 +1,9 @@
 """Tests for the graph_populator module."""
 
-from graph_populator import GraphPopulator
+from src.graph_populator import GraphPopulator
 import pytest
 import logging
-import config
+from src import config
 
 logger = logging.getLogger(config.APP_NAME)
 

@@ -2,7 +2,8 @@ FROM centos:7
 MAINTAINER Saleem Ansari <sansari@redhat.com>
 
 RUN yum install -y epel-release && \
-    yum install -y python-pip python-devel gcc && \
+    yum install -y python34-pip python34-devel gcc && \
+    yum install -y git && \
     yum clean all
 
 # --------------------------------------------------------------------------------------------------------------
@@ -21,15 +22,14 @@ RUN yum install -y epel-release && \
 
 # Note: cron daemon ( crond ) will be invoked from within entry point
 # --------------------------------------------------------------------------------------------------------------
+RUN pip3 install git+https://git@github.com/fabric8-analytics/fabric8-analytics-version-comparator.git
+RUN pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git
 
-# install python packages
-COPY ./requirements.txt /
-RUN pip install -r requirements.txt && rm requirements.txt
-
+COPY ./ /tmp/f8a_data_model/
 COPY ./src /src
+RUN cd /tmp/f8a_data_model && pip3 install .
 
 ADD scripts/entrypoint.sh /bin/entrypoint.sh
 ADD populate_schema.py /populate_schema.py
 
 ENTRYPOINT ["/bin/entrypoint.sh"]
-

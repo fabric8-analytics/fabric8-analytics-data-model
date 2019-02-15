@@ -1,6 +1,6 @@
 """Template for a singleton object which will have reference to Graph object."""
 
-import config
+from src import config
 import json
 import requests
 import os

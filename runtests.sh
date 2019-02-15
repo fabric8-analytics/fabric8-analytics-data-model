@@ -44,7 +44,7 @@ function start_services {
 function setup_virtualenv {
     echo "Create Virtualenv for Python deps ..."
 
-    virtualenv --python /usr/bin/python2.7 env-test
+    virtualenv -p python3 venv && source venv/bin/activate
 
     if [ $? -ne 0 ]
     then
@@ -53,21 +53,19 @@ function setup_virtualenv {
     fi
     printf "%sPython virtual environment initialized%s\n" "${YELLOW}" "${NORMAL}"
 
-    source env-test/bin/activate
-
     pip install -U pip
-    pip install -r requirements.txt
+    pip3 install -r requirements.txt
 
     # Install profiling module
-    pip install pytest-profiling
+    pip3 install pytest-profiling
 
     # Install pytest-coverage module
-    pip install pytest-cov
+    pip3 install pytest-cov
 }
 
 function destroy_virtualenv {
     echo "Remove Virtualenv ..."
-    rm -rf env-test/
+    rm -rf venv/
 }
 
 echo JAVA_OPTIONS value: "$JAVA_OPTIONS"
@@ -76,9 +74,9 @@ start_services
 
 setup_virtualenv
 
-source env-test/bin/activate
+source venv/bin/activate
 
-PYTHONPATH=$(pwd)/src
+PYTHONPATH=$(pwd)
 export PYTHONPATH
 
 export BAYESIAN_PGBOUNCER_SERVICE_HOST="localhost"
@@ -99,9 +97,9 @@ echo "*** Unit tests ***"
 echo "*****************************************"
 echo "Check for sanity of the connections..."
 
-if python sanitycheck.py
+if python3 sanitycheck.py
 then
-    python populate_schema.py
+    python3 populate_schema.py
     py.test --cov=src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
     codecov --token=3c1d9638-afb6-40e6-85eb-3fb193000d4b
 else
