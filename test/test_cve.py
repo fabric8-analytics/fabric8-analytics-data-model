@@ -3,7 +3,7 @@
 import pytest
 from mock import patch
 
-from cve import (
+from src.cve import (
     CVEPut, CVEDelete, CVEGet,
     cve_node_replace_script_template,
     cve_node_delete_script_template
@@ -123,7 +123,7 @@ def test_cve_delete_prepare_payload():
     assert bindings['cve_id']
 
 
-@patch("cve.call_gremlin")
+@patch("src.cve.call_gremlin")
 def test_cve_get_e(mocker):
     """Test getting CVEs for (ecosystem)."""
     mocker.return_value = {'result': {'data': ['CVE-2018-0001']}}
@@ -139,7 +139,7 @@ def test_cve_get_e(mocker):
     assert response['cve_ids'][0] == 'CVE-2018-0001'
 
 
-@patch("cve.call_gremlin")
+@patch("src.cve.call_gremlin")
 def test_cve_get_ep(mocker):
     """Test getting CVEs for (ecosystem,name)."""
     mocker.return_value = {'result': {'data': ['CVE-2018-0001', 'CVE-2018-0002']}}
@@ -156,7 +156,7 @@ def test_cve_get_ep(mocker):
     assert response['cve_ids'][1] in ('CVE-2018-0001', 'CVE-2018-0002')
 
 
-@patch("cve.call_gremlin")
+@patch("src.cve.call_gremlin")
 def test_cve_get_epv(mocker):
     """Test getting CVEs for (ecosystem,name,version)."""
     mocker.return_value = {'result': {'data': []}}

@@ -8,7 +8,7 @@ do
 done
 
 if [ ! -z "$SKIP_SCHEMA" ]; then
-    python populate_schema.py
+    python3 populate_schema.py
 fi
 
 # Start data model service with time out

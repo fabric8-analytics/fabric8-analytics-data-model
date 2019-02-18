@@ -1,10 +1,10 @@
 """Sanity check of the graph DB REST API."""
 
-from graph_manager import BayesianGraph
+from src.graph_manager import BayesianGraph
 import time
 import sys
 import logging
-import config
+from src import config
 
 logging.basicConfig()
 logger = logging.getLogger(config.APP_NAME)
