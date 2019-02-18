@@ -1,9 +1,9 @@
 """This module encapsulates CVE related queries."""
 
 import logging
-from graph_populator import GraphPopulator
-from graph_manager import BayesianGraph
-from utils import get_timestamp, call_gremlin
+from src.graph_populator import GraphPopulator
+from src.graph_manager import BayesianGraph
+from src.utils import get_timestamp, call_gremlin
 
 logger = logging.getLogger(__name__)
 

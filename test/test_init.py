@@ -1,11 +1,11 @@
 """Tests for the __init__ script."""
 
-import __init__
+from src import logger
 
 
 def test_logger():
     """Test the logger initialized in __init__."""
-    assert __init__.logger is not None
+    assert logger is not None
 
 
 if __name__ == '__main__':
