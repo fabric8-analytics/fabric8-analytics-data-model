@@ -2,9 +2,9 @@
 
 import pytest
 import datetime
-from utils import get_current_version, execute_gremlin_dsl, get_timestamp, call_gremlin
+from src.utils import get_current_version, execute_gremlin_dsl, get_timestamp, call_gremlin
 import logging
-import config
+from src import config
 from mock import patch
 from conftest import RequestsMockResponse
 
@@ -18,7 +18,7 @@ def test_get_current_version():
     assert out2 == -1
 
 
-@patch("utils.get_session_retry")
+@patch("src.utils.get_session_retry")
 def test_execute_gremlin_dsl(mocker):
     """Test the function get_version_information."""
     mocker.return_value = ""
@@ -60,7 +60,7 @@ class MockedResponse:
         return '404'
 
 
-@patch("utils.get_session_retry")
+@patch("src.utils.get_session_retry")
 def test_execute_gremlin_dsl2(mocker):
     """Test the function get_version_information."""
     mocker.return_value = MockedSession()
@@ -84,14 +84,14 @@ def test_get_timestamp():
     assert result == timestamp
 
 
-@patch("utils.requests.post")
+@patch("src.utils.requests.post")
 def test_gremlin_call(mocker):
     """Test utils.call_gremlin()."""
     mocker.return_value = RequestsMockResponse({}, 200)
     assert call_gremlin({'dummy': 'payload'}) == {}
 
 
-@patch("utils.requests.post")
+@patch("src.utils.requests.post")
 def test_bad_gremlin_call(mocker):
     """Test utils.call_gremlin()."""
     mocker.return_value = RequestsMockResponse({}, 500)

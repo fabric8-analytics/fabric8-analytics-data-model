@@ -6,12 +6,12 @@ from flask import Flask, request
 from flask_cors import CORS
 import json
 import sys
-import data_importer
-from graph_manager import BayesianGraph
-from graph_populator import GraphPopulator
-from cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion
+from src import data_importer
+from src.graph_manager import BayesianGraph
+from src.graph_populator import GraphPopulator
+from src.cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion
 from raven.contrib.flask import Sentry
-import config
+from src import config as config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
 from flask import Blueprint, current_app
@@ -313,7 +313,7 @@ def cvedb_version_put():
 def create_app():
     """Create Flask app object."""
     new_app = Flask(config.APP_NAME)
-    new_app.config.from_object('config')
+    new_app.config.from_object('src.config')
     CORS(new_app)
     new_app.register_blueprint(api_v1)
     return new_app

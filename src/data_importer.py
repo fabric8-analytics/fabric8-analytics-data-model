@@ -1,16 +1,16 @@
 """Module with functions to fetch data from the S3 data source."""
 
-from graph_populator import GraphPopulator
+from src.graph_populator import GraphPopulator
 import logging
-import config
-import traceback
+from src import config
 import json
 import requests
-from data_source.s3_data_source import S3DataSource
+from src.data_source.s3_data_source import S3DataSource
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
+from f8a_utils.versions import get_latest_versions_for_ep
 
 logger = logging.getLogger(config.APP_NAME)
 
@@ -51,8 +51,8 @@ def _other_key_info(data_source, other_keys, bucket_name=None):
 
 def _get_exception_msg(prefix, e):
     msg = prefix + ": " + str(e)
-    logger.error(msg)
-    tb = traceback.format_exc()
+    # logger.error(msg)
+    tb = logging.exception(msg)
     logger.error("Traceback for latest failure in import call: %s" % tb)
     return msg
 
@@ -80,11 +80,20 @@ def _import_keys_from_s3_http(data_source, epv_list):
                 'version': pkg_version,
                 'source_repo': pkg_source}
 
+            latest_version = get_latest_versions_for_ep(pkg_ecosystem, pkg_name)
+            latest_epv_list = [{
+                'ecosystem': pkg_ecosystem,
+                'name': pkg_name,
+                'version': latest_version
+            }]
+            create_graph_nodes(latest_epv_list)
+
             try:
                 # Check other Version level information and add it to common object
                 if len(contents.get('ver_list_keys')) > 0:
                     first_key = contents['ver_key_prefix'] + '.json'
                     first_obj = _first_key_info(data_source, first_key, config.AWS_EPV_BUCKET)
+                    first_obj['latest_version'] = latest_version
                     obj.update(first_obj)
                     ver_obj = _other_key_info(data_source, contents.get('ver_list_keys'),
                                               config.AWS_EPV_BUCKET)

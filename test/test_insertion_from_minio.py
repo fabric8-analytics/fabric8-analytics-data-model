@@ -5,12 +5,13 @@ the Minio storage.
 """
 
 import logging
-import config
+import logging
+from src import config
 import traceback
 from minio import Minio
 from minio.error import ResponseError, BucketAlreadyOwnedByYou, BucketAlreadyExists
-from data_importer import import_epv_from_s3_http
-from graph_manager import BayesianGraph
+from src.data_importer import import_epv_from_s3_http
+from src.graph_manager import BayesianGraph
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)

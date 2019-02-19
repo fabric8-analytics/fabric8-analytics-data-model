@@ -2,8 +2,8 @@
 
 # TODO: to be implemented
 
-from data_source.s3_data_source import S3DataSource
-import config
+from src.data_source.s3_data_source import S3DataSource
+from src import config
 import pytest
 
 

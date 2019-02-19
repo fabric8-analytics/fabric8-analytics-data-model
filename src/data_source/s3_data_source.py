@@ -1,10 +1,10 @@
 """Data source that returns data read from the AWS S3 database."""
 
-from data_source.abstract_data_source import AbstractDataSource
+from src.data_source.abstract_data_source import AbstractDataSource
 import botocore
 import boto3
 import json
-import config
+from src import config
 
 
 class S3DataSource(AbstractDataSource):
