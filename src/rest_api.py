@@ -5,7 +5,6 @@ import flask
 from flask import Flask, request
 from flask_cors import CORS
 import json
-import sys
 from src import data_importer
 from src.graph_manager import BayesianGraph
 from src.graph_populator import GraphPopulator
@@ -18,12 +17,6 @@ from flask import Blueprint, current_app
 
 
 api_v1 = Blueprint('api_v1', __name__)
-
-# TODO: https://github.com/fabric8-analytics/fabric8-analytics-data-model/issues/196
-# Python2.x: Make default encoding as UTF-8
-if sys.version_info.major == 3:
-    reload(sys)
-    sys.setdefaultencoding('UTF8')
 
 
 @api_v1.route('/api/v1/readiness')
