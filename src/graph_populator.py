@@ -76,7 +76,9 @@ class GraphPopulator(object):
 
     @classmethod
     def sanitize_text_for_query(cls, text):
-        """Sanitize text so it can used in queries.
+        """
+        Sanitize text so it can used in queries.
+
         :param text: string, text to sanitize
         :return: sanitized text
         """

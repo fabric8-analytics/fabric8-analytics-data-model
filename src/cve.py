@@ -72,6 +72,7 @@ class CVEPut(object):
 
     def get_qstrings_for_edges(self):
         """Construct Gremlin scripts that will connect CVE node with EPVs.
+
         :return: list, list of gremlin scripts
         """
         return [
@@ -84,6 +85,7 @@ class CVEPut(object):
 
     def get_qstring_for_cve_node(self):
         """Construct Gremlin script that will create a CVE node.
+
         :return: (str, str), gremlin script and bindings
         """
         query_str = cve_node_replace_script_template
