@@ -5,7 +5,6 @@ the Minio storage.
 """
 
 import logging
-import logging
 from src import config
 import traceback
 from minio import Minio
