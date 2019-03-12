@@ -123,6 +123,11 @@
 
         // for CVEs
 
+        cecosystem = mgmt.getPropertyKey('cecosystem');
+        if(cecosystem == null) {
+            cecosystem = mgmt.makePropertyKey('cecosystem').dataType(String.class).make();
+        }
+
         cve_ids = mgmt.getPropertyKey('cve_ids');
         if(cve_ids == null) {
             cve_ids = mgmt.makePropertyKey('cve_ids').dataType(String.class).cardinality(Cardinality.SET).make();
@@ -646,6 +651,7 @@
                 'email',
                 //'cve_id',
                 //'fixed_in',
+                'cecosystem',
                 'nvd_status',
                 'cvedb_version',
                 //'summary',

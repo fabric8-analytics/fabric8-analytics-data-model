@@ -232,11 +232,11 @@ class CVEDBVersion(object):
 
 # add or replace CVE node
 cve_node_replace_script_template = """\
-cve_v=g.V().has('cve_id',cve_id).tryNext().orElseGet{\
+cve_v=g.V().has('cve_id',cve_id).has('cecosystem', ecosystem).tryNext().orElseGet{\
 graph.addVertex(label, 'CVE',\
 'vertex_label', 'CVE',\
 'cve_id', cve_id)};\
-cve_v.property('ecosystem', ecosystem);\
+cve_v.property('cecosystem', ecosystem);\
 cve_v.property('description', description);\
 cve_v.property('cvss_v2', cvss_v2);\
 cve_v.property('modified_date', modified_date);\
@@ -249,7 +249,7 @@ cve_v.property('nvd_status', nvd_status);\
 
 # add edge between CVE node and Version node if it does not exist previously
 add_affected_edge_script_template = """\
-cve_v=g.V().has('cve_id',cve_id).next();\
+cve_v=g.V().has('cve_id',cve_id).has('cecosystem', '{ecosystem}').next();\
 version_v=g.V().has('pecosystem','{ecosystem}')\
 .has('pname','{name}')\
 .has('version','{version}');\
@@ -270,7 +270,7 @@ g.V().has('cve_id',cve_id)\
 # get CVEs for ecosystem
 cve_nodes_for_ecosystem_script_template = """\
 g.V().has("vertex_label", "CVE")\
-.has("ecosystem",ecosystem)\
+.has("cecosystem",ecosystem)\
 .values("cve_id")\
 .dedup();\
 """
