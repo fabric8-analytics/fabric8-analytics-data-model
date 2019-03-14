@@ -57,6 +57,7 @@ class CVEPut(object):
 
     def create_pv_nodes(self):
         """Create Package and Version nodes, if needed."""
+        nodes = []  # return (e, p, v) tuples of created/existing nodes; for easier testing
         for pv_dict in self._cve_dict.get('affected'):
             epv_dict = pv_dict.copy()
             epv_dict['ecosystem'] = self._cve_dict.get('ecosystem')
@@ -69,6 +70,9 @@ class CVEPut(object):
                 logger.error('Error creating nodes for {e}/{p}/{v}: {r}'.format(
                     e=e, p=p, v=v, r=str(json_response))
                 )
+            else:
+                nodes.append((e, p, v))
+        return nodes
 
     def get_qstrings_for_edges(self):
         """Construct Gremlin scripts that will connect CVE node with EPVs.

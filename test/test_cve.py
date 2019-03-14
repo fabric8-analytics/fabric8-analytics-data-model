@@ -91,6 +91,32 @@ def test_cve_put_get_qstrings_for_edges():
     assert len(results) == 2  # 2 edges as the CVE affects 2 versions
 
 
+@patch("src.cve.GraphPopulator.construct_graph_nodes")
+@patch("src.cve.BayesianGraph.execute")
+def test_create_pv_nodes(mock_bg, mock_gp):
+    """Test CVEPut.create_pv_nodes()."""
+    mock_gp.return_value = 'query'
+    mock_bg.return_value = True, {}
+
+    cve = CVEPut(valid_put_input)
+    nodes = cve.create_pv_nodes()
+    assert len(nodes) == 2
+    assert ('pypi', 'numpy', '10.0') in nodes
+    assert ('pypi', 'numpy', '11.0') in nodes
+
+
+@patch("src.cve.GraphPopulator.construct_graph_nodes")
+@patch("src.cve.BayesianGraph.execute")
+def test_create_pv_nodes_fail(mock_bg, mock_gp):
+    """Test CVEPut.create_pv_nodes() fail."""
+    mock_gp.return_value = 'query'
+    mock_bg.return_value = (False, {'error': 'something happened'})
+
+    cve = CVEPut(valid_put_input)
+    nodes = cve.create_pv_nodes()
+    assert len(nodes) == 0
+
+
 valid_delete_input = {
     'cve_id': 'CVE-2018-0001'
 }
