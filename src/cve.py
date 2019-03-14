@@ -232,14 +232,17 @@ class CVEDBVersion(object):
 
 # add or replace CVE node
 cve_node_replace_script_template = """\
-cve_v=g.V().has('cve_id',cve_id).has('cecosystem', ecosystem).tryNext().orElseGet{\
-graph.addVertex(label, 'CVE',\
-'vertex_label', 'CVE',\
-'cve_id', cve_id)};\
-cve_v.property('cecosystem', ecosystem);\
-cve_v.property('description', description);\
-cve_v.property('cvss_v2', cvss_v2);\
-cve_v.property('modified_date', modified_date);\
+g.V().has('cve_id',cve_id).has('cecosystem', ecosystem)\
+.drop()\
+.iterate();\
+cve_v=g.addV('CVE')\
+.property('cecosystem',ecosystem)\
+.property('cve_id',cve_id)\
+.property('description',description)\
+.property('cvss_v2',cvss_v2)\
+.property('timestamp',timestamp)\
+.property('modified_date', modified_date);\
+.next();\
 """
 
 # add or replace additional non-mandatory properties for CVE node
