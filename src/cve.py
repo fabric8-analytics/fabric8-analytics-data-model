@@ -253,7 +253,7 @@ cve_v.property('nvd_status', nvd_status);\
 
 # add edge between CVE node and Version node if it does not exist previously
 add_affected_edge_script_template = """\
-cve_v=g.V().has('cve_id',cve_id).has('cecosystem', '{ecosystem}').next();\
+cve_v=g.V().has('cve_id',cve_id).next();\
 version_v=g.V().has('pecosystem','{ecosystem}')\
 .has('pname','{name}')\
 .has('version','{version}');\
