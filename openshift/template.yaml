@@ -68,6 +68,11 @@ objects:
               secretKeyRef:
                 name: coreapi-postgres
                 key: database
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: worker
+                key: sentry_dsn
           - name: POSTGRESQL_PASSWORD
             valueFrom:
               secretKeyRef:
