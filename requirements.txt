@@ -61,4 +61,4 @@ urllib3==1.24.1           # via botocore, minio, requests
 uuid==1.30
 werkzeug==0.14.1          # via flask, pytest-flask
 git+https://git@github.com/fabric8-analytics/fabric8-analytics-version-comparator.git@2e7eddc
-git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@d7aaccf
+git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@d6c3ac8
