@@ -27,3 +27,5 @@ coverage.xml
 
 # Config
 *config.py
+
+.DS_Store
