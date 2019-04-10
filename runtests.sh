@@ -54,13 +54,13 @@ function setup_virtualenv {
     printf "%sPython virtual environment initialized%s\n" "${YELLOW}" "${NORMAL}"
 
     pip install -U pip
-    pip3 install -r requirements.txt
+    pip3.6 install -r requirements.txt
 
     # Install profiling module
-    pip3 install pytest-profiling
+    pip3.6 install pytest-profiling
 
     # Install pytest-coverage module
-    pip3 install pytest-cov
+    pip3.6 install pytest-cov
 }
 
 function destroy_virtualenv {
