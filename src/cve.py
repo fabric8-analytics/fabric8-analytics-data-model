@@ -236,6 +236,7 @@ class CVEDBVersion(object):
 
 # add or replace CVE node
 cve_node_replace_script_template = """\
+g.V().has('cve_id',cve_id).inE('has_cve').drop().iterate();\
 cve_v=g.V().has('cve_id',cve_id).has('cecosystem', ecosystem).tryNext().orElseGet{\
 graph.addVertex(label, 'CVE',\
 'vertex_label', 'CVE',\
