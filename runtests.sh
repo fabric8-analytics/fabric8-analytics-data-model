@@ -13,6 +13,10 @@ YELLOW=$(tput bold && tput setaf 3)
 
 DOCKER_CMD="docker-compose -f docker-compose-tests.yml"
 
+check_python_version() {
+    python3 tools/check_python_version.py 3 6
+}
+
 gc() {
   retval=$?
 
@@ -68,6 +72,7 @@ function destroy_virtualenv {
     rm -rf venv/
 }
 
+check_python_version
 echo JAVA_OPTIONS value: "$JAVA_OPTIONS"
 
 start_services
