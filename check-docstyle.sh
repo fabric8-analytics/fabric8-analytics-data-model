@@ -1,6 +1,6 @@
 #!/bin/bash
 
-directories="src test"
+directories="src test tools"
 separate_files="sanitycheck.py populate_schema.py setup.py"
 pass=0
 fail=0
