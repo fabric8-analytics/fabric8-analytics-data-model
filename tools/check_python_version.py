@@ -1,4 +1,17 @@
-"""Check if the installed Python interpreter has correct version."""
+"""Check if the installed Python interpreter has correct version.
+
+This script has to be called with two command line arguments:
+expected_major_version expected_minor_version
+
+The script then check if actual Python version (major+minor) is
+the same or newer than expected version.
+
+Usage:
+python check_python_version.py 2.7
+python3 check_python_version.py 3.6
+python3 check_python_version.py 3.7
+etc.
+"""
 
 import sys
 
@@ -10,12 +23,14 @@ def get_expected_version(arguments):
               "      python3 check_python_version.py major minor")
         raise Exception("CLI arguments missing")
 
+    # try to read major version
     try:
         major = int(arguments[1])
     except Exception as e:
         print("Can not parse major version '{}'".format(arguments[1]))
         raise e
 
+    # try to read minor version
     try:
         minor = int(arguments[2])
     except Exception as e:
