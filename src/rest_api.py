@@ -249,7 +249,6 @@ def cves_put_delete():
     try:
         if request.method == 'PUT':
             cve = CVEPut(payload)
-            print(cve)
         elif request.method == 'DELETE':
             cve = CVEDelete(payload)
         else:

@@ -83,7 +83,7 @@ def call_gremlin(json_payload):
     url = config.GREMLIN_SERVER_URL_REST
     payload_str = json.dumps(json_payload)
     logger.debug('Calling Gremlin at {url} with payload {p}'.format(url=url, p=payload_str))
-    response = requests.post(url, data=payload_str)
+    response = get_session_retry().post(url, data=payload_str)
     if response.status_code != 200:
         logger.error('Gremlin call failed ({st}): {resp}'.format(
             st=response.status_code, resp=str(response.content)
