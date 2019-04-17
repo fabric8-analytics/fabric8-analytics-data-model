@@ -124,6 +124,7 @@ def test_create_pv_nodes_fail(mock_bg, mock_gp):
 
 @patch("src.cve.CVEPut.create_pv_nodes")
 def test_put_process_epv_fail(mock_pv):
+    """Test the CVEPut.process() fail."""
     mock_pv.return_value = [], False
 
     cve = CVEPut(valid_put_input)
@@ -133,6 +134,7 @@ def test_put_process_epv_fail(mock_pv):
 @patch("src.cve.CVEPut.create_pv_nodes")
 @patch("src.utils.requests.Session.post")
 def test_put_process_cve_fail(mock_gremlin, mock_pv):
+    """Test the CVEPut.process() success."""
     mock_pv.return_value = [], True
     mock_gremlin.side_effect = [RequestsMockResponse({}, 200),
                                 RequestsMockResponse({}, 200),
