@@ -43,8 +43,6 @@ class MockedSession:
 
     def post(self, url="http://", data=None):
         """Get post value."""
-        print(url)
-        print(data)
         return MockedResponse()
 
 
@@ -84,14 +82,14 @@ def test_get_timestamp():
     assert result == timestamp
 
 
-@patch("src.utils.requests.post")
+@patch("src.utils.requests.Session.post")
 def test_gremlin_call(mocker):
     """Test utils.call_gremlin()."""
     mocker.return_value = RequestsMockResponse({}, 200)
     assert call_gremlin({'dummy': 'payload'}) == {}
 
 
-@patch("src.utils.requests.post")
+@patch("src.utils.requests.Session.post")
 def test_bad_gremlin_call(mocker):
     """Test utils.call_gremlin()."""
     mocker.return_value = RequestsMockResponse({}, 500)

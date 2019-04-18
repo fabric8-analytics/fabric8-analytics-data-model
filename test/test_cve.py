@@ -2,6 +2,7 @@
 
 import pytest
 from mock import patch
+from conftest import RequestsMockResponse
 
 from src.cve import (
     CVEPut, CVEDelete, CVEGet,
@@ -15,6 +16,8 @@ valid_put_input = {
     'description': 'Some description.',
     'cvss_v2': 5.0,
     'ecosystem': 'pypi',
+    'fixed_in': ['12.0'],
+    'nvd_status': 'Analyzed',
     'affected': [
         {
             'name': 'numpy',
@@ -99,8 +102,9 @@ def test_create_pv_nodes(mock_bg, mock_gp):
     mock_bg.return_value = True, {}
 
     cve = CVEPut(valid_put_input)
-    nodes = cve.create_pv_nodes()
+    nodes, successfull_create = cve.create_pv_nodes()
     assert len(nodes) == 2
+    assert successfull_create is True
     assert ('pypi', 'numpy', '10.0') in nodes
     assert ('pypi', 'numpy', '11.0') in nodes
 
@@ -113,8 +117,32 @@ def test_create_pv_nodes_fail(mock_bg, mock_gp):
     mock_bg.return_value = (False, {'error': 'something happened'})
 
     cve = CVEPut(valid_put_input)
-    nodes = cve.create_pv_nodes()
+    nodes, successfull_create = cve.create_pv_nodes()
     assert len(nodes) == 0
+    assert successfull_create is False
+
+
+@patch("src.cve.CVEPut.create_pv_nodes")
+def test_put_process_epv_fail(mock_pv):
+    """Test the CVEPut.process() fail."""
+    mock_pv.return_value = [], False
+
+    cve = CVEPut(valid_put_input)
+    cve.process()
+
+
+@patch("src.cve.CVEPut.create_pv_nodes")
+@patch("src.utils.requests.Session.post")
+def test_put_process_cve_fail(mock_gremlin, mock_pv):
+    """Test the CVEPut.process() success."""
+    mock_pv.return_value = [], True
+    mock_gremlin.side_effect = [RequestsMockResponse({}, 200),
+                                RequestsMockResponse({}, 200),
+                                RequestsMockResponse({}, 500),
+                                RequestsMockResponse({}, 200)]
+
+    cve = CVEPut(valid_put_input)
+    cve.process()
 
 
 valid_delete_input = {

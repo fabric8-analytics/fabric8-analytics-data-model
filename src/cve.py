@@ -45,19 +45,39 @@ class CVEPut(object):
 
     def process(self):
         """Add or replace CVE node in graph."""
-        # Create EPV nodes first
-        self.create_pv_nodes()
-        # Create CVE node
-        call_gremlin(
-            self.prepare_payload(*self.get_qstring_for_cve_node())
-        )
-        # Connect CVE node with affected EPV nodes
-        for query_str in self.get_qstrings_for_edges():
-            call_gremlin(self.prepare_payload(query_str, self._get_default_bindings()))
+        # Create EPV nodes first and get a list of failed EPVs
+        # If any of the EPV creation failed, then do not attempt further processing
+        succesfull_epvs, all_epvs_succesfull = self.create_pv_nodes()
+
+        if all_epvs_succesfull:
+            try:
+                # Create CVE node
+                call_gremlin(
+                    self.prepare_payload(*self.get_qstring_for_cve_node())
+                )
+            except ValueError:
+                logger.error('CVEIngestionError - Error creating CVE node: {c}'.format(
+                    c=self._cve_dict['cve_id']))
+            else:
+                try:
+                    # Connect CVE node with affected EPV nodes
+                    for query_str in self.get_qstrings_for_edges():
+                        call_gremlin(self.prepare_payload(query_str, self._get_default_bindings()))
+                    logger.debug("CVEIngestionDebug - CVE sub-graph succesfully created for "
+                                 "CVE node: {c}".format(c=self._cve_dict['cve_id']))
+                except ValueError:
+                    logger.error("CVEIngestionError - Error creating CVE edges."
+                                 "Rolling back CVE node: {c}".format(c=self._cve_dict['cve_id']))
+                    call_gremlin(self.prepare_payload(cvedb_roll_back_cve_template,
+                                                      self._get_default_bindings()))
+        else:
+            logger.error('CVEIngestionError - Error creating EPV nodes for CVE node: {c}'.format(
+                c=self._cve_dict['cve_id']))
 
     def create_pv_nodes(self):
         """Create Package and Version nodes, if needed."""
         nodes = []  # return (e, p, v) tuples of created/existing nodes; for easier testing
+        all_epvs_created = True
         for pv_dict in self._cve_dict.get('affected'):
             epv_dict = pv_dict.copy()
             epv_dict['ecosystem'] = self._cve_dict.get('ecosystem')
@@ -67,12 +87,13 @@ class CVEPut(object):
             p = epv_dict.get('name')
             v = epv_dict.get('version')
             if not success:
-                logger.error('Error creating nodes for {e}/{p}/{v}: {r}'.format(
+                logger.error('CVEIngestionError - Error creating nodes for {e}/{p}/{v}: {r}'.format(
                     e=e, p=p, v=v, r=str(json_response))
                 )
+                all_epvs_created = False
             else:
                 nodes.append((e, p, v))
-        return nodes
+        return nodes, all_epvs_created
 
     def get_qstrings_for_edges(self):
         """Construct Gremlin scripts that will connect CVE node with EPVs.
@@ -310,4 +331,9 @@ cve_v.property('cvedb_version', cvedb_version);\
 cvedb_version_get_script_template = """\
 g.V().has('vertex_label', 'CVEDBVersion')\
 .values("cvedb_version")\
+"""
+
+# Rollback CVE Node
+cvedb_roll_back_cve_template = """
+g.V().has('cve_id', cve_id).drop().iterate();
 """
