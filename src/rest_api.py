@@ -73,7 +73,7 @@ def sync_all():
                     'epv': pending_list,
                     'count_imported_EPVs': report.get('count_imported_EPVs')}
 
-        if report.get('status') is not 'Success':
+        if report.get('status') != 'Success':
             return flask.jsonify(response), 500
         else:
             return flask.jsonify(response)
@@ -99,7 +99,7 @@ def ingest_to_graph():
                 'count_imported_EPVs': report.get('count_imported_EPVs')}
     print(response)
     # TODO the previous code can raise a runtime exception, does not we need to handle that?
-    if report.get('status') is not 'Success':
+    if report.get('status') != 'Success':
         return flask.jsonify(response), 500
     else:
         return flask.jsonify(response)
@@ -123,7 +123,7 @@ def create_nodes():
     report = data_importer.create_graph_nodes(list_epv=input_json)
     current_app.logger.info(report)
 
-    if report.get('status') is not 'Success':
+    if report.get('status') != 'Success':
         return flask.jsonify(report), 500
     else:
         return flask.jsonify(report)
@@ -154,7 +154,7 @@ def selective_ingest():
     current_app.logger.info(response)
 
     # TODO the previous code can raise a runtime exception, does not we need to handle that?
-    if report.get('status') is not 'Success':
+    if report.get('status') != 'Success':
         return flask.jsonify(response), 500
     else:
         return flask.jsonify(response)
