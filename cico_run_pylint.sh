@@ -17,4 +17,6 @@ rm -f env-toolkit
 
 prep
 check_python_version
+./detect-common-errors.sh
+./detect-dead-code.sh
 ./run-linter.sh
