@@ -166,7 +166,7 @@ def _log_report_msg(import_type, report):
                      report.get('count_imported_EPVs'),
                      report.get('last_imported_EPV'))
 
-    if report.get('status') is 'Success':
+    if report.get('status') == 'Success':
         logger.debug(msg)
     else:  # pragma: no cover
         # TODO: retry??
