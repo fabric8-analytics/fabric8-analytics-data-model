@@ -43,6 +43,9 @@ class MockedSession:
 
     def post(self, url="http://", data=None):
         """Get post value."""
+        assert url is not None
+        # just not to have dead code
+        print(data)
         return MockedResponse()
 
 
