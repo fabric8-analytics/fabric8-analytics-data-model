@@ -321,6 +321,7 @@ class GraphPopulator(object):
             gh_issues_last_month_closed = str(gh_details.get('updated_issues', {})
                                               .get('month', {}).get('closed', -1))
             gh_forks = str(gh_details.get('forks_count', -1))
+            gh_refreshed_on = gh_details.get('updated_on')
             gh_stargazers = str(gh_details.get('stargazers_count', -1))
             gh_open_issues_count = str(gh_details.get('open_issues_count', -1))
             gh_subscribers_count = str(gh_details.get('subscribers_count', -1))
@@ -341,6 +342,7 @@ class GraphPopulator(object):
                            "pkg.property('gh_issues_last_month_closed', " \
                            "{gh_issues_last_month_closed});" \
                            "pkg.property('gh_forks', {gh_forks});" \
+                           "pkg.property('gh_refreshed_on', '{gh_refreshed_on}');" \
                            "pkg.property('gh_stargazers', {gh_stargazers});" \
                            "pkg.property('gh_open_issues_count', {gh_open_issues_count});" \
                            "pkg.property('gh_subscribers_count', {gh_subscribers_count});" \
@@ -354,6 +356,7 @@ class GraphPopulator(object):
                             gh_issues_last_year_closed=gh_issues_last_year_closed,
                             gh_issues_last_month_closed=gh_issues_last_month_closed,
                             gh_forks=gh_forks, gh_stargazers=gh_stargazers,
+                            gh_refreshed_on=gh_refreshed_on,
                             gh_open_issues_count=gh_open_issues_count,
                             gh_subscribers_count=gh_subscribers_count,
                             gh_contributors_count=gh_contributors_count)
