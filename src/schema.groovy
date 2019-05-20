@@ -58,6 +58,11 @@
             gh_forks = mgmt.makePropertyKey('gh_forks').dataType(Integer.class).make();
         }
 
+        gh_refreshed_on = mgmt.getPropertyKey('gh_refreshed_on');
+        if(gh_refreshed_on == null) {
+            gh_refreshed_on = mgmt.makePropertyKey('gh_refreshed_on').dataType(String.class).make();
+        }
+
         gh_issues_last_year = mgmt.getPropertyKey('gh_issues_last_year');
         if(gh_issues_last_year == null) {
             gh_issues_last_year = mgmt.makePropertyKey('gh_issues_last_year').dataType(Integer.class).make();
@@ -629,6 +634,7 @@
                 //'gh_open_issues_count',
                 //'gh_subscribers_count',
                 //'gh_contributors_count',
+                'gh_refreshed_on',
                 'pname',
                 'pecosystem',
                 'version',
