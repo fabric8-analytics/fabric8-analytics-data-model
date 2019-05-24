@@ -2,7 +2,8 @@
 
 import pytest
 import datetime
-from src.utils import get_current_version, execute_gremlin_dsl, get_timestamp, call_gremlin
+from src.utils import get_current_version, execute_gremlin_dsl, get_timestamp, \
+    call_gremlin, rectify_latest_version
 import logging
 from src import config
 from mock import patch
@@ -100,7 +101,66 @@ def test_bad_gremlin_call(mocker):
         call_gremlin({'dummy': 'payload'})
 
 
+@patch("src.utils.get_latest_versions_for_ep")
+@patch("src.utils.execute_gremlin_dsl")
+def test_rectify_latest_version(mock1, mock2):
+    """Test rectify_latest_version function."""
+    input_data = [
+        {
+            "ecosystem": "maven",
+            "name": "io.vertx:vertx-web"
+        }
+    ]
+
+    mock2.return_value = "1.2.3"
+    mock1.return_value = {
+        "name": "io.vertx:vertx-web",
+        "latest_version": "1.2.4"
+    }
+
+    resp = rectify_latest_version(input_data)
+    assert resp['status'] == "Success"
+
+    input_data[0]['actual_latest_version'] = "1.1.1"
+    input_data[0]['latest_version'] = "1.1.0"
+    resp = rectify_latest_version(input_data)
+    assert resp['status'] == "Success"
+
+    input_data.append({
+        "ecosystem": "maven",
+        "name": "io.vertx:vertx-client"
+    })
+    mock1.return_value = None
+    resp = rectify_latest_version(input_data)
+    assert resp['status'] == "Success"
+
+
+@patch("src.utils.GREMLIN_QUERY_SIZE", 1)
+@patch("src.utils.get_latest_versions_for_ep")
+@patch("src.utils.execute_gremlin_dsl")
+def test_rectify_latest_version2(mock1, mock2):
+    """Test rectify_latest_version function."""
+    input_data = [
+        {
+            "ecosystem": "maven",
+            "name": "io.vertx:vertx-web"
+        }
+    ]
+
+    mock2.return_value = "1.2.3"
+    mock1.return_value = None
+
+    input_data.append({
+        "ecosystem": "maven",
+        "name": "io.vertx:vertx-client"
+    })
+    resp = rectify_latest_version(input_data)
+    assert resp['status'] == "Success"
+
+
 if __name__ == '__main__':
     test_get_current_version()
     test_execute_gremlin_dsl()
     test_execute_gremlin_dsl2()
+    test_rectify_latest_version()
+    test_rectify_latest_version2()

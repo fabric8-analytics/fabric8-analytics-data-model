@@ -53,6 +53,8 @@ objects:
             value: ${DATA_IMPORTER_SERVICE_TIMEOUT}
           - name: GREMLIN_USE_SECURE_CONNECTION
             value: ${GREMLIN_USE_SECURE_CONNECTION}
+          - name: GREMLIN_QUERY_SIZE
+            value: "25"
           - name: AWS_EPV_BUCKET
             valueFrom:
               configMapKeyRef:
