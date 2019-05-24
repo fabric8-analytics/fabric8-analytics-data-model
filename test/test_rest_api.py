@@ -484,3 +484,42 @@ def test_cvedb_version_put_invalid_input(client):
     resp = response.json
     assert len(resp) == 1
     assert 'error' in resp
+
+
+@patch("src.rest_api.rectify_latest_version")
+def test_sync_latest_version(mocker, client):
+    """Add test for sync_latest_version."""
+    mocker.return_value = {
+        "message": "Latest version rectified for the EPVs",
+        "status": "Success"
+    }
+    input_data = [
+        {
+            "ecosystem": "maven",
+            "name": "io.vertx:vertx-web"
+        }
+    ]
+    url = url_for('api_v1.sync_latest_version')
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    logger.info(response)
+    # we expect that the HTTP code will be 200/OK
+    assert response.status_code == 200
+    data = response.json
+    logger.info(data)
+    assert data['message'] == 'Latest version rectified for the EPVs'
+
+    mocker.return_value = {
+        "message": "Failed",
+        "status": "Failure"
+    }
+    response = client.post(url,
+                           data=json.dumps(input_data),
+                           headers={'Content-Type': 'application/json'})
+    logger.info(response)
+    # we expect that the HTTP code will be 200/OK
+    assert response.status_code == 500
+    data = response.json
+    logger.info(data)
+    assert data['message'] == 'Failed'
