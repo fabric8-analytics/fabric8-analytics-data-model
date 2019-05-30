@@ -100,12 +100,14 @@ def rectify_latest_version(input):
     """Rectify the latest version of the EPVs."""
     query_str = "g.V().has('ecosystem', '{arg0}')." \
                 "has('name', '{arg1}')" \
-                ".property('latest_version', '{arg2}');"
+                ".property('latest_version', '{arg2}')." \
+                ".property('latest_version_last_updated', '{arg3}');"
     args = []
     resp = {
         "message": "Latest version rectified for the EPVs",
         "status": "Success"
     }
+    cur_date = (datetime.utcnow()).strftime('%Y%m%d')
     for epv in input:
         if 'ecosystem' in epv and 'name' in epv:
             eco = epv['ecosystem']
@@ -119,6 +121,7 @@ def rectify_latest_version(input):
             else:
                 latest = get_latest_versions_for_ep(eco, pkg)
             tmp['2'] = latest
+            tmp['3'] = cur_date
             known_latest = ''
             if 'latest_version' in epv:
                 known_latest = epv['latest_version']
@@ -136,7 +139,8 @@ def batch_query_executor(query_string, args):
     query = ""
     for arg in args:
         if len(arg) == 3:
-            tmp_query = query_string.format(arg0=arg['0'], arg1=arg['1'], arg2=arg['2'])
+            tmp_query = query_string.format(arg0=arg['0'], arg1=arg['1'],
+                                            arg2=arg['2'], arg3=arg['3'])
             counter += 1
         if counter == 1:
             query = ""
