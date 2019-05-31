@@ -138,7 +138,7 @@ def batch_query_executor(query_string, args):
     counter = 0
     query = ""
     for arg in args:
-        if len(arg) == 3:
+        if len(arg) == 4:
             tmp_query = query_string.format(arg0=arg['0'], arg1=arg['1'],
                                             arg2=arg['2'], arg3=arg['3'])
             counter += 1
