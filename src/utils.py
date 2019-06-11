@@ -98,9 +98,9 @@ def call_gremlin(json_payload):
 
 def rectify_latest_version(input):
     """Rectify the latest version of the EPVs."""
-    query_str = "g.V().has('ecosystem', '{arg0}')." \
-                "has('name', '{arg1}')" \
-                ".property('latest_version', '{arg2}')." \
+    query_str = "g.V().has('ecosystem', '{arg0}')" \
+                ".has('name', '{arg1}')" \
+                ".property('latest_version', '{arg2}')" \
                 ".property('latest_version_last_updated', '{arg3}');"
     args = []
     resp = {
