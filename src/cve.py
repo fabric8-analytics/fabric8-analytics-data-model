@@ -47,9 +47,7 @@ class CVEPut(object):
         """Add or replace CVE node in graph."""
         # Create EPV nodes first and get a list of failed EPVs
         # If any of the EPV creation failed, then do not attempt further processing
-        # YZ: fetch all versions
         succesfull_epvs, all_epvs_succesfull = self.create_pv_nodes()
-        # YZ: from remaining versions, calculate highest
 
         if all_epvs_succesfull:
             try:
