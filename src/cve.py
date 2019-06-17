@@ -124,6 +124,11 @@ class CVEPut(object):
         if self._cve_dict.get('fixed_in'):
             for ver in self._cve_dict.get('fixed_in'):
                 query_str += "cve_v.property('fixed_in', '" + ver + "');"
+
+        if self._cve_dict.get('cve_sources'):
+            query_str += cve_node_replace_script_template_cve_sources
+            bindings['cve_sources'] = self._cve_dict.get('cve_sources')
+
         return query_str, bindings
 
     def prepare_payload(self, query_str, bindings):
@@ -271,6 +276,11 @@ cve_v.property('modified_date', modified_date);\
 # add or replace additional non-mandatory properties for CVE node
 cve_node_replace_script_template_nvd_status = """\
 cve_v.property('nvd_status', nvd_status);\
+"""
+
+# add or replace additional non-mandatory properties for CVE node
+cve_node_replace_script_template_cve_sources = """\
+cve_v.property('cve_sources', cve_sources);\
 """
 
 # add edge between CVE node and Version node if it does not exist previously
