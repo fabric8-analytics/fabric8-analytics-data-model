@@ -3,7 +3,9 @@
 import pytest
 import datetime
 from src.utils import get_current_version, execute_gremlin_dsl, get_timestamp, \
-    call_gremlin, rectify_latest_version
+    call_gremlin, rectify_latest_version, get_latest_version_non_cve, \
+    update_non_cve_version, get_all_versions, fetch_pkg_details_via_cve, \
+    sync_all_non_cve_version
 import logging
 from src import config
 from mock import patch
@@ -158,9 +160,119 @@ def test_rectify_latest_version2(mock1, mock2):
     assert resp['status'] == "Success"
 
 
+@patch("src.utils.get_all_versions")
+@patch("src.utils.execute_gremlin_dsl")
+def test_get_latest_version_non_cve(mock1, mock2):
+    """Test get_latest_version_non_cve function."""
+    mock1.return_value = {
+        "result": {
+                "data": ["1.2.3"]
+            }
+    }
+    ver = get_latest_version_non_cve("maven", "io.vertx:vertx-web", "1.1.1")
+    assert ver == "1.1.1"
+
+    mock2.return_value = ["1.1.1", "1.1.2"]
+    ver = get_latest_version_non_cve("maven", "io.vertx:vertx-web", "-1")
+    assert ver == "1.1.2"
+
+
+@patch("src.utils.execute_gremlin_dsl")
+def test_update_non_cve_version(mock1):
+    """Test update_non_cve_version function."""
+    input = {
+        "npm@DELIM@lodash": "1.1.1",
+        "npm@DELIM@request": "2.2.2"
+    }
+    mock1.return_value = {
+        "result": {
+            "data": ["blahblah"]
+        }
+    }
+    res = update_non_cve_version(input)
+    assert res == "Success"
+
+    mock1.return_value = {
+        "result": {
+            "data": []
+        }
+    }
+    res = update_non_cve_version(input)
+    assert res is None
+
+
+@patch("src.utils.execute_gremlin_dsl")
+def test_get_all_versions(mock1):
+    """Test get_all_versions function."""
+    mock1.return_value = {
+        "result": {
+            "data": ["1.1", "1.2", "1.3", "1.x", "> 2.4", "~1.2", "1.6|8"]
+        }
+    }
+
+    vers = get_all_versions('npm', 'lodash', True)
+    assert "1.1" in vers
+    assert "1.x" not in vers
+
+    vers = get_all_versions('npm', 'lodash', False)
+    assert "1.1" in vers
+    assert "1.x" not in vers
+
+
+@patch("src.utils.execute_gremlin_dsl")
+def test_fetch_pkg_details_via_cve(mock1):
+    """Test fetch_pkg_details_via_cve function."""
+    mock1.return_value = {
+        "result": {
+            "data": [{
+                "ecosystem": ["npm"],
+                "name": ["lodash"],
+                "latest_version": ["1.1.1"]
+            }]
+        }
+    }
+    res = fetch_pkg_details_via_cve("1")
+    assert res[0]["latest_version"] == "1.1.1"
+
+    mock1.return_value = None
+    res = fetch_pkg_details_via_cve("1")
+    assert len(res) == 0
+
+
+@patch("src.utils.update_non_cve_on_pkg")
+@patch("src.utils.get_latest_version_non_cve")
+@patch("src.utils.fetch_pkg_details_via_cve")
+@patch("src.utils.execute_gremlin_dsl")
+def test_sync_all_non_cve_version(mock1, mock2, mock3, mock4):
+    """Test sync_all_non_cve_version function."""
+    mock1.return_value = {
+        "result": {
+            "data": ["1"]
+        }
+    }
+
+    mock2.return_value = [
+        {
+            "ecosystem": "npm",
+            "name": "lodash",
+            "latest_version": "1.1.1"
+        }
+    ]
+
+    mock3.return_value = "1.1.2"
+    mock4.return_value = None
+    res = sync_all_non_cve_version(["npm"])
+    assert res["message"] == "Latest non cve version rectified for the EPVs"
+
+
 if __name__ == '__main__':
     test_get_current_version()
     test_execute_gremlin_dsl()
     test_execute_gremlin_dsl2()
     test_rectify_latest_version()
     test_rectify_latest_version2()
+    test_get_latest_version_non_cve()
+    test_update_non_cve_version()
+    test_get_all_versions()
+    test_fetch_pkg_details_via_cve()
+    test_sync_all_non_cve_version()

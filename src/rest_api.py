@@ -14,7 +14,7 @@ from src import config as config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
 from flask import Blueprint, current_app
-from src.utils import rectify_latest_version
+from src.utils import rectify_latest_version, sync_all_non_cve_version
 
 api_v1 = Blueprint('api_v1', __name__)
 
@@ -38,6 +38,20 @@ def sync_latest_version():
     input_json = request.get_json()
     current_app.logger.info("List of EPVs for version rectification- " + json.dumps(input_json))
     report = rectify_latest_version(input_json)
+    response = {'message': report.get('message')}
+    if report.get('status') != 'Success':
+        return flask.jsonify(response), 500
+    else:
+        return flask.jsonify(response)
+
+
+@api_v1.route('/api/v1/sync_latest_non_cve_version', methods=['POST'])
+def sync_latest_non_cve_version():
+    """Post request to sync all the pkgs with latest non cve version to Graph."""
+    input_json = request.get_json()
+    current_app.logger.info("Latest non cve version to be synced for- " + json.dumps(input_json))
+    # Update all the pkg nodes with latest non cve version for eco provided
+    report = sync_all_non_cve_version(input_json)
     response = {'message': report.get('message')}
     if report.get('status') != 'Success':
         return flask.jsonify(response), 500

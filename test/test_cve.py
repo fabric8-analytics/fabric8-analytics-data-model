@@ -100,15 +100,16 @@ def test_cve_put_get_qstrings_for_edges():
 @patch("src.cve.BayesianGraph.execute")
 def test_create_pv_nodes(mock_bg, mock_gp):
     """Test CVEPut.create_pv_nodes()."""
-    mock_gp.return_value = 'query'
+    mock_gp.return_value = "query pkg.property('latest_version', '1.2.3');"
     mock_bg.return_value = True, {}
 
     cve = CVEPut(valid_put_input)
-    nodes, successfull_create = cve.create_pv_nodes()
+    nodes, successfull_create, aff = cve.create_pv_nodes()
     assert len(nodes) == 2
     assert successfull_create is True
     assert ('pypi', 'numpy', '10.0') in nodes
     assert ('pypi', 'numpy', '11.0') in nodes
+    assert aff['pypi@DELIM@numpy'] == "1.2.3"
 
 
 @patch("src.cve.GraphPopulator.construct_graph_nodes")
@@ -119,7 +120,7 @@ def test_create_pv_nodes_fail(mock_bg, mock_gp):
     mock_bg.return_value = (False, {'error': 'something happened'})
 
     cve = CVEPut(valid_put_input)
-    nodes, successfull_create = cve.create_pv_nodes()
+    nodes, successfull_create, aff = cve.create_pv_nodes()
     assert len(nodes) == 0
     assert successfull_create is False
 
@@ -127,7 +128,7 @@ def test_create_pv_nodes_fail(mock_bg, mock_gp):
 @patch("src.cve.CVEPut.create_pv_nodes")
 def test_put_process_epv_fail(mock_pv):
     """Test the CVEPut.process() fail."""
-    mock_pv.return_value = [], False
+    mock_pv.return_value = [], False, {}
 
     cve = CVEPut(valid_put_input)
     cve.process()
@@ -137,7 +138,7 @@ def test_put_process_epv_fail(mock_pv):
 @patch("src.utils.requests.Session.post")
 def test_put_process_cve_fail(mock_gremlin, mock_pv):
     """Test the CVEPut.process() success."""
-    mock_pv.return_value = [], True
+    mock_pv.return_value = [], True, {}
     mock_gremlin.side_effect = [RequestsMockResponse({}, 200),
                                 RequestsMockResponse({}, 200),
                                 RequestsMockResponse({}, 500),

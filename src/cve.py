@@ -3,7 +3,7 @@
 import logging
 from src.graph_populator import GraphPopulator
 from src.graph_manager import BayesianGraph
-from src.utils import get_timestamp, call_gremlin
+from src.utils import get_timestamp, call_gremlin, update_non_cve_version
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class CVEPut(object):
         """Add or replace CVE node in graph."""
         # Create EPV nodes first and get a list of failed EPVs
         # If any of the EPV creation failed, then do not attempt further processing
-        succesfull_epvs, all_epvs_succesfull = self.create_pv_nodes()
+        succesfull_epvs, all_epvs_succesfull, affected_pkgs = self.create_pv_nodes()
 
         if all_epvs_succesfull:
             try:
@@ -65,6 +65,8 @@ class CVEPut(object):
                         call_gremlin(self.prepare_payload(query_str, self._get_default_bindings()))
                     logger.debug("CVEIngestionDebug - CVE sub-graph succesfully created for "
                                  "CVE node: {c}".format(c=self._cve_dict['cve_id']))
+                    logger.info("Updating non cve latest version")
+                    update_non_cve_version(affected_pkgs)
                 except ValueError:
                     logger.error("CVEIngestionError - Error creating CVE edges."
                                  "Rolling back CVE node: {c}".format(c=self._cve_dict['cve_id']))
@@ -77,15 +79,22 @@ class CVEPut(object):
     def create_pv_nodes(self):
         """Create Package and Version nodes, if needed."""
         nodes = []  # return (e, p, v) tuples of created/existing nodes; for easier testing
+        affected_pkgs = {}
         all_epvs_created = True
         for pv_dict in self._cve_dict.get('affected'):
             epv_dict = pv_dict.copy()
             epv_dict['ecosystem'] = self._cve_dict.get('ecosystem')
             query = GraphPopulator.construct_graph_nodes(epv_dict)
+            latest_version = "-1"
+            # Fetch the value of the latest_version from the query created
+            if "latest_version" in query:
+                data = query.split("\'latest_version\'")[1].split(");")[0]
+                latest_version = data.replace(",", "").strip().replace("'", "")
             success, json_response = BayesianGraph.execute(query)
             e = epv_dict.get('ecosystem')
             p = epv_dict.get('name')
             v = epv_dict.get('version')
+            affected_pkgs[e + "@DELIM@" + p] = latest_version
             if not success:
                 logger.error('CVEIngestionError - Error creating nodes for {e}/{p}/{v}: {r}'.format(
                     e=e, p=p, v=v, r=str(json_response))
@@ -93,7 +102,7 @@ class CVEPut(object):
                 all_epvs_created = False
             else:
                 nodes.append((e, p, v))
-        return nodes, all_epvs_created
+        return nodes, all_epvs_created, affected_pkgs
 
     def get_qstrings_for_edges(self):
         """Construct Gremlin scripts that will connect CVE node with EPVs.

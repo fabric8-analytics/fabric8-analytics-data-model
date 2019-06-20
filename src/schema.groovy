@@ -31,6 +31,11 @@
             latest_version_last_updated = mgmt.makePropertyKey('latest_version_last_updated').dataType(String.class).make();
         }
 
+        latest_non_cve_version = mgmt.getPropertyKey('latest_non_cve_version');
+        if(latest_non_cve_version == null) {
+            latest_non_cve_version = mgmt.makePropertyKey('latest_non_cve_version').dataType(String.class).make();
+        }
+
         // package github details
 
         gh_stargazers = mgmt.getPropertyKey('gh_stargazers');

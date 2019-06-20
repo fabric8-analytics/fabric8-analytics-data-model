@@ -6,7 +6,7 @@ import time
 from dateutil.parser import parse as parse_datetime
 from six import string_types
 from src import config
-from src.utils import get_current_version
+from src.utils import get_current_version, get_latest_version_non_cve
 from datetime import datetime
 from f8a_utils.versions import get_latest_versions_for_ep
 
@@ -296,6 +296,9 @@ class GraphPopulator(object):
 
         latest_version = cls.sanitize_text_for_query(input_json.get('latest_version'))
         if latest_version:
+            # If latest version dont have cve, then it becomes the latest non cve version as well
+            non_cve_ver = get_latest_version_non_cve(ecosystem, pkg_name, latest_version)
+            prp_package += "pkg.property('latest_non_cve_version', '{}');".format(non_cve_ver)
             prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
             if latest_version != cur_latest_ver:
                 prp_package += "pkg.property('latest_version_last_updated', '{}');".format(cur_date)
