@@ -181,8 +181,14 @@ def test_get_latest_version_non_cve(mock1, mock2):
 def test_update_non_cve_version(mock1):
     """Test update_non_cve_version function."""
     input = {
-        "npm@DELIM@lodash": "1.1.1",
-        "npm@DELIM@request": "2.2.2"
+        "lodash": {
+            "latest_version": "1.1.1",
+            "ecosystem": "pypi"
+        },
+        "request": {
+            "latest_version": "1.1.2",
+            "ecosystem": "pypi"
+        }
     }
     mock1.return_value = {
         "result": {

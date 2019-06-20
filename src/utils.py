@@ -107,11 +107,11 @@ def update_non_cve_version(affected_pkgs):
     """To update the latest non cve version on the pkg node."""
     x = 0
     for key in affected_pkgs:
-        eco = key.split("@DELIM@")[0]
-        pkg = key.split("@DELIM@")[1]
+        eco = affected_pkgs[key]['ecosystem']
+        pkg = key
         # Get the latest non cve version
         latest_ver = get_latest_version_non_cve(eco, pkg,
-                                                affected_pkgs[key])
+                                                affected_pkgs[key]['latest_version'])
         logger.info("latest non cve version ->", latest_ver)
         # Update the package node to include the property for non cve version
         res = update_non_cve_on_pkg(eco, pkg, latest_ver)
@@ -169,6 +169,8 @@ def get_all_versions(eco, pkg, cve_check):
         return valid_versions
 
     for version in result_data:
+        """ Prevent any versions with special characters from getting into the valid version list.
+        Ex: ^1.4, ~1.2, 1.x etc """
         if len(re.findall("[\\^*<>+=~|\\s\xa0]|.x", version)) == 0:
             valid_versions.append(version)
 

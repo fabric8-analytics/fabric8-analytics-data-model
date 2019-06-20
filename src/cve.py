@@ -94,7 +94,12 @@ class CVEPut(object):
             e = epv_dict.get('ecosystem')
             p = epv_dict.get('name')
             v = epv_dict.get('version')
-            affected_pkgs[e + "@DELIM@" + p] = latest_version
+            if p not in affected_pkgs:
+                tmp = {
+                    "ecosystem": e,
+                    "latest_version": latest_version
+                }
+                affected_pkgs[p] = tmp
             if not success:
                 logger.error('CVEIngestionError - Error creating nodes for {e}/{p}/{v}: {r}'.format(
                     e=e, p=p, v=v, r=str(json_response))

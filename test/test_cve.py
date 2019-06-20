@@ -109,7 +109,8 @@ def test_create_pv_nodes(mock_bg, mock_gp):
     assert successfull_create is True
     assert ('pypi', 'numpy', '10.0') in nodes
     assert ('pypi', 'numpy', '11.0') in nodes
-    assert aff['pypi@DELIM@numpy'] == "1.2.3"
+    assert aff['numpy']['ecosystem'] == "pypi"
+    assert aff['numpy']['latest_version'] == "1.2.3"
 
 
 @patch("src.cve.GraphPopulator.construct_graph_nodes")
