@@ -12,6 +12,7 @@ from f8a_utils.versions import get_latest_versions_for_ep, select_latest_version
 import re
 
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 GREMLIN_QUERY_SIZE = int(os.getenv('GREMLIN_QUERY_SIZE', 25))
 
