@@ -486,10 +486,15 @@ def test_cvedb_version_put_invalid_input(client):
     assert 'error' in resp
 
 
+@patch("src.rest_api.sync_all_latest_version")
 @patch("src.rest_api.rectify_latest_version")
-def test_sync_latest_version(mocker, client):
+def test_sync_latest_version(mocker, mock1, client):
     """Add test for sync_latest_version."""
     mocker.return_value = {
+        "message": "Latest version rectified for the EPVs",
+        "status": "Success"
+    }
+    mock1.return_value = {
         "message": "Latest version rectified for the EPVs",
         "status": "Success"
     }
@@ -523,6 +528,15 @@ def test_sync_latest_version(mocker, client):
     data = response.json
     logger.info(data)
     assert data['message'] == 'Failed'
+
+    url = url_for('api_v1.sync_latest_version')
+    response = client.post(url,
+                           data=json.dumps(["all"]),
+                           headers={'Content-Type': 'application/json'})
+    logger.info(response)
+    data = response.json
+    # we expect that the HTTP code will be 200/OK
+    assert data['message'] == 'Latest version rectified for the EPVs'
 
 
 @patch("src.rest_api.sync_all_non_cve_version")

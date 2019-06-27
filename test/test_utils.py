@@ -167,6 +167,14 @@ def test_rectify_latest_version2(mock1, mock2):
     resp = rectify_latest_version(input_data)
     assert resp['status'] == "Success"
 
+    mock1.return_value = {
+        "name": "io.vertx:vertx-web",
+        "latest_version": "1.2.4"
+    }
+
+    resp = rectify_latest_version(input_data)
+    assert resp['status'] == "Success"
+
 
 @patch("src.utils.get_all_versions")
 @patch("src.utils.execute_gremlin_dsl")
