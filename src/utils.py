@@ -14,7 +14,7 @@ import re
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-GREMLIN_QUERY_SIZE = int(os.getenv('GREMLIN_QUERY_SIZE', 25))
+GREMLIN_QUERY_SIZE = int(os.getenv('GREMLIN_QUERY_SIZE', 20))
 
 
 def get_session_retry(retries=3, backoff_factor=0.2, status_forcelist=(404, 500, 502, 504),
@@ -113,7 +113,7 @@ def update_non_cve_version(affected_pkgs):
         # Get the latest non cve version
         latest_ver = get_latest_version_non_cve(eco, pkg,
                                                 affected_pkgs[key]['latest_version'])
-        logger.info("latest non cve version ->", latest_ver)
+        logger.info("latest non cve version ->{l}".format(l=latest_ver))
         # Update the package node to include the property for non cve version
         res = update_non_cve_on_pkg(eco, pkg, latest_ver)
         if res == "Success":
@@ -262,6 +262,31 @@ def sync_all_non_cve_version(input):
     return resp
 
 
+def sync_all_latest_version(file_loc):
+    """Rectify the latest version field for all the pkgs in graph."""
+    logger.info("Sync operation started for latest version for all the packages")
+    file = open(file_loc)
+    json_data = json.load(file)
+    resp = {
+        "message": "Latest version rectified for the EPVs",
+        "status": "Success"
+    }
+    for eco in json_data:
+        input = []
+        logger.info("Latest version sync for {e}".format(e=eco))
+        pkgs = json_data[eco]
+        for pkg in pkgs:
+            tmp = {
+                "ecosystem": eco,
+                "name": pkg
+            }
+            input.append(tmp)
+        rectify_latest_version(input)
+    file.close()
+    logger.info("----------Latest version sync completed--------------")
+    return resp
+
+
 def rectify_latest_version(input):
     """Rectify the latest version of the EPVs."""
     query_str = "g.V().has('ecosystem', '{arg0}')" \
@@ -294,7 +319,7 @@ def rectify_latest_version(input):
             if known_latest != latest:
                 args.append(tmp)
     result_data = batch_query_executor(query_str, args)
-    logger.info("Latest version updated for the EPVs ->", result_data)
+    logger.info("Latest version updated for the EPVs -> {r}".format(r=result_data))
     return resp
 
 
@@ -302,6 +327,8 @@ def batch_query_executor(query_string, args):
     """Execute the gremlin query in batches of 20."""
     tmp_query = ""
     counter = 0
+    success_count = 0
+    failed_count = 0
     query = ""
     for arg in args:
         if len(arg) == 4:
@@ -317,14 +344,20 @@ def batch_query_executor(query_string, args):
             payload = {'gremlin': query}
             gremlin_response = execute_gremlin_dsl(payload)
             if gremlin_response is None:
+                failed_count += GREMLIN_QUERY_SIZE
                 logger.error("Error while trying to fetch data from graph. "
-                             "Expected response, got None...Query->", query)
+                             "Expected response, got None...Query-> {q}".format(q=query))
+            else:
+                success_count += GREMLIN_QUERY_SIZE
 
     if counter < GREMLIN_QUERY_SIZE:
         payload = {'gremlin': query}
         gremlin_response = execute_gremlin_dsl(payload)
         if gremlin_response is None:
+            failed_count += counter
             logger.error("Error while trying to fetch data from graph. "
-                         "Expected response, got None...Query->", query)
+                         "Expected response, got None...Query-> {q}".format(q=query))
+        else:
+            success_count += counter
 
     return args

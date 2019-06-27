@@ -1,0 +1,17 @@
+{
+  "maven": [
+    "io.github.scalapb-json:scalapb-circe_sjs0.6_2.12",
+    "net.anwiba.commons.swing.icons:org.oxygen.oxygen-icons",
+    "org.apache.activemq:activemq-itest-spring31"
+  ],
+  "pypi": [
+    "trident",
+    "classifiers-generator",
+    "lp-mongodb"
+  ],
+  "npm": [
+    "metaverse-rpc",
+    "dng-toast",
+    "pandas-js"
+  ]
+}

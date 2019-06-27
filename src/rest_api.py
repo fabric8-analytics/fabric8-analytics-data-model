@@ -14,7 +14,7 @@ from src import config as config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
 from flask import Blueprint, current_app
-from src.utils import rectify_latest_version, sync_all_non_cve_version
+from src.utils import rectify_latest_version, sync_all_non_cve_version, sync_all_latest_version
 
 api_v1 = Blueprint('api_v1', __name__)
 
@@ -37,7 +37,10 @@ def sync_latest_version():
     """Post request to sync all the EPV's latest version to Graph."""
     input_json = request.get_json()
     current_app.logger.info("List of EPVs for version rectification- " + json.dumps(input_json))
-    report = rectify_latest_version(input_json)
+    if len(input_json) == 1 and input_json[0] == "all":
+        report = sync_all_latest_version("src/data_source/all_packages.json")
+    else:
+        report = rectify_latest_version(input_json)
     response = {'message': report.get('message')}
     if report.get('status') != 'Success':
         return flask.jsonify(response), 500

@@ -5,7 +5,7 @@ import datetime
 from src.utils import get_current_version, execute_gremlin_dsl, get_timestamp, \
     call_gremlin, rectify_latest_version, get_latest_version_non_cve, \
     update_non_cve_version, get_all_versions, fetch_pkg_details_via_cve, \
-    sync_all_non_cve_version
+    sync_all_non_cve_version, sync_all_latest_version
 import logging
 from src import config
 from mock import patch
@@ -101,6 +101,14 @@ def test_bad_gremlin_call(mocker):
     mocker.return_value = RequestsMockResponse({}, 500)
     with pytest.raises(ValueError):
         call_gremlin({'dummy': 'payload'})
+
+
+@patch("src.utils.rectify_latest_version")
+def test_sync_all_latest_version(mock1):
+    """Test sync_all_latest_version function."""
+    mock1.return_value = ""
+    resp = sync_all_latest_version("test/data/all_packages_test.json")
+    assert resp['status'] == "Success"
 
 
 @patch("src.utils.get_latest_versions_for_ep")
