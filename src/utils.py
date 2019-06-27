@@ -113,7 +113,7 @@ def update_non_cve_version(affected_pkgs):
         # Get the latest non cve version
         latest_ver = get_latest_version_non_cve(eco, pkg,
                                                 affected_pkgs[key]['latest_version'])
-        logger.info("latest non cve version ->{l}".format(l=latest_ver))
+        logger.info("latest non cve version ->{lver}".format(lver=latest_ver))
         # Update the package node to include the property for non cve version
         res = update_non_cve_on_pkg(eco, pkg, latest_ver)
         if res == "Success":
