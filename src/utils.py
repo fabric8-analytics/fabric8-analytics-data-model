@@ -265,24 +265,23 @@ def sync_all_non_cve_version(input):
 def sync_all_latest_version(file_loc):
     """Rectify the latest version field for all the pkgs in graph."""
     logger.info("Sync operation started for latest version for all the packages")
-    file = open(file_loc)
-    json_data = json.load(file)
-    resp = {
-        "message": "Latest version rectified for the EPVs",
-        "status": "Success"
-    }
-    for eco in json_data:
-        input = []
-        logger.info("Latest version sync for {e}".format(e=eco))
-        pkgs = json_data[eco]
-        for pkg in pkgs:
-            tmp = {
-                "ecosystem": eco,
-                "name": pkg
-            }
-            input.append(tmp)
-        rectify_latest_version(input)
-    file.close()
+    with open(file_loc) as file:
+        json_data = json.load(file)
+        resp = {
+            "message": "Latest version rectified for the EPVs",
+            "status": "Success"
+        }
+        for eco in json_data:
+            input = []
+            logger.info("Latest version sync for {e}".format(e=eco))
+            pkgs = json_data[eco]
+            for pkg in pkgs:
+                tmp = {
+                    "ecosystem": eco,
+                    "name": pkg
+                }
+                input.append(tmp)
+            rectify_latest_version(input)
     logger.info("----------Latest version sync completed--------------")
     return resp
 
