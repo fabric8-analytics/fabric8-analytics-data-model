@@ -14,7 +14,8 @@ from src import config as config
 from werkzeug.contrib.fixers import ProxyFix
 import logging
 from flask import Blueprint, current_app
-from src.utils import rectify_latest_version, sync_all_non_cve_version, sync_all_latest_version
+from src.utils import rectify_latest_version, sync_all_non_cve_version,\
+    sync_all_latest_version, sync_all_cve_source
 
 api_v1 = Blueprint('api_v1', __name__)
 
@@ -55,6 +56,20 @@ def sync_latest_non_cve_version():
     current_app.logger.info("Latest non cve version to be synced for- " + json.dumps(input_json))
     # Update all the pkg nodes with latest non cve version for eco provided
     report = sync_all_non_cve_version(input_json)
+    response = {'message': report.get('message')}
+    if report.get('status') != 'Success':
+        return flask.jsonify(response), 500
+    else:
+        return flask.jsonify(response)
+
+
+@api_v1.route('/api/v1/sync_cve_source', methods=['POST'])
+def sync_cve_source():
+    """Post request to sync all the existing cve node with the cve source given in input."""
+    input_json = request.get_json()
+    current_app.logger.info("cve source to be synced for- " + json.dumps(input_json))
+    # Update all the cve nodes with cve source for eco provided
+    report = sync_all_cve_source(input_json)
     response = {'message': report.get('message')}
     if report.get('status') != 'Success':
         return flask.jsonify(response), 500
