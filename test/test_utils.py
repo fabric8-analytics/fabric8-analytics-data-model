@@ -329,3 +329,5 @@ if __name__ == '__main__':
     test_get_all_versions()
     test_fetch_pkg_details_via_cve()
     test_sync_all_non_cve_version()
+    test_sync_all_cve_source()
+    test_rectify_cve_source()

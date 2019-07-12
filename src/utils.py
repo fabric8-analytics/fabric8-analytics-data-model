@@ -298,9 +298,7 @@ def rectify_cve_source(input, cve_sources):
     for cve in input:
         tmp = {
             "0": cve,
-            "1": cve_sources,
-            "2": "",
-            "3": ""
+            "1": cve_sources
         }
         args.append(tmp)
     result_data = batch_query_executor(query_str, args)
@@ -379,6 +377,9 @@ def batch_query_executor(query_string, args):
         if len(arg) == 4:
             tmp_query = query_string.format(arg0=arg['0'], arg1=arg['1'],
                                             arg2=arg['2'], arg3=arg['3'])
+            counter += 1
+        if len(arg) == 2:
+            tmp_query = query_string.format(arg0=arg['0'], arg1=arg['1'])
             counter += 1
         if counter == 1:
             query = ""
