@@ -53,6 +53,10 @@ objects:
             value: ${DATA_IMPORTER_SERVICE_TIMEOUT}
           - name: GREMLIN_USE_SECURE_CONNECTION
             value: ${GREMLIN_USE_SECURE_CONNECTION}
+          - name: BAYESIAN_GREMLIN_HTTPINGESTION_SERVICE_HOST
+            value: ${GREMLIN_HOST}
+          - name: BAYESIAN_GREMLIN_HTTPINGESTION_SERVICE_PORT
+            value: ${GREMLIN_PORT}
           - name: GREMLIN_QUERY_SIZE
             value: "25"
           - name: AWS_EPV_BUCKET
@@ -198,6 +202,18 @@ parameters:
   required: true
   name: REPLICAS
   value: "1"
+
+- description: Gremlin host
+  displayName: Gremlin host
+  required: true
+  name: GREMLIN_HOST
+  value: "bayesian-gremlin-httpingestion"
+
+- description: Gremlin port
+  displayName: Gremlin port
+  required: true
+  name: GREMLIN_PORT
+  value: "8182"
 
 - description: "Flask logging level (see: https://docs.python.org/3/library/logging.html#levels)"
   displayName: Flask logging level
