@@ -16,7 +16,8 @@ LOGFILE_PATH = os.environ.get("LOGFILE_PATH", "/tmp/error.log")
 _gremlin_securely = "true" == os.environ.get("GREMLIN_USE_SECURE_CONNECTION", "false").lower()
 GREMLIN_SERVER_URL_REST = "{proto}://{host}:{port}".format(
     proto="https" if _gremlin_securely else "http",
-    host=os.environ.get("BAYESIAN_GREMLIN_HTTPINGESTION_SERVICE_HOST", "bayesian-gremlin-httpingestion"),
+    host=os.environ.get("BAYESIAN_GREMLIN_HTTPINGESTION_SERVICE_HOST",
+                        "bayesian-gremlin-httpingestion"),
     port=os.environ.get("BAYESIAN_GREMLIN_HTTPINGESTION_SERVICE_PORT", "8182"))
 
 # To load data from S3
