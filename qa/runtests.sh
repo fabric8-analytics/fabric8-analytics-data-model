@@ -1,5 +1,9 @@
 #!/usr/bin/bash -ex
 
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+pushd "${SCRIPT_DIR}/.." > /dev/null
+
 COVERAGE_THRESHOLD=90
 
 export TERM=xterm
@@ -115,3 +119,5 @@ printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
 deactivate
 
 destroy_virtualenv
+
+popd > /dev/null

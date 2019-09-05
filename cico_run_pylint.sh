@@ -17,9 +17,9 @@ rm -f env-toolkit
 
 prep
 check_python_version
-./detect-common-errors.sh
-./detect-dead-code.sh
-./measure-cyclomatic-complexity.sh
+./qa/detect-common-errors.sh
+./qa/detect-dead-code.sh
+./qa/measure-cyclomatic-complexity.sh
 #./measure-cyclomatic-complexity.sh --fail-on-error
-./measure-maintainability-index.sh --fail-on-error
-./run-linter.sh
+./qa/measure-maintainability-index.sh --fail-on-error
+./qa/run-linter.sh

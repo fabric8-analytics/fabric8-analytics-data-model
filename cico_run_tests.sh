@@ -9,6 +9,6 @@ docker_login
 # not needed for tests, but we can check that the image actually builds
 build_image
 
-./runtests.sh
+./qa/runtests.sh
 
 push_image
