@@ -22,8 +22,8 @@ def test_http_connection():
     # logger.info code
     # logger.info data
     # logger.info data['result']['data']
-    assert (code is True)
-    assert (data['result']['data'][0] >= 0)
+    assert code is True
+    assert data['result']['data'][0] >= 0
 
     logger.info("Connection to HTTP endpoint: SUCCESS")
 
