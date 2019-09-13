@@ -8,6 +8,6 @@ docker_login
 
 build_image
 
-./runtests.sh
+./qa/runtests.sh
 
 push_image
