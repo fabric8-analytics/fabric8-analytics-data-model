@@ -81,12 +81,13 @@ def _import_keys_from_s3_http(data_source, epv_list):
                 'source_repo': pkg_source}
 
             latest_version = get_latest_versions_for_ep(pkg_ecosystem, pkg_name)
-            latest_epv_list = [{
-                'ecosystem': pkg_ecosystem,
-                'name': pkg_name,
-                'version': latest_version
-            }]
-            create_graph_nodes(latest_epv_list)
+            if latest_version:
+                latest_epv_list = [{
+                    'ecosystem': pkg_ecosystem,
+                    'name': pkg_name,
+                    'version': latest_version
+                }]
+                create_graph_nodes(latest_epv_list)
 
             try:
                 # Check other Version level information and add it to common object
