@@ -58,7 +58,7 @@ HTTP Status Code: 200 success
 URL: /api/v1/sync_all
 ```
 Description: Generate response for the GET request to /api/v1/sync_all. Get the pending list from RDS and 
-             get the data from S3 and populate in graph and mark the epv as synced in RDS.
+             get the data from S3 and populate in graph and mark the epvs as synced in RDS.
 Method: GET
 Input:  Request (Query) Params ->  ecosystem, package, version, limit, offset
 Output: 
