@@ -12,7 +12,8 @@ services:
       RABBITMQ_USER: guest
       RABBITMQ_PASS: guest
   postgres:
-    image: docker.io/samuzzal/coreapi-postgres
+    image: registry.centos.org/centos/postgres
+    container_name: coreapi-postgres
     ports:
      - "6432:5432"
     environment:
