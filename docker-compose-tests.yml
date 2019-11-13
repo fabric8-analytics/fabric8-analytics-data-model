@@ -12,7 +12,7 @@ services:
       RABBITMQ_USER: guest
       RABBITMQ_PASS: guest
   postgres:
-    image: registry.centos.org/centos/postgres
+    image: registry.centos.org/centos/postgresql-94-centos7
     container_name: coreapi-postgres
     ports:
      - "6432:5432"
