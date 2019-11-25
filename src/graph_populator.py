@@ -85,6 +85,8 @@ class GraphPopulator(object):
         if text is None:
             return ''
 
+        if isinstance(text, list) and not text:
+            return ''
         if not isinstance(text, string_types):
             raise ValueError(
                 'Invalid query text: expected string, got {t}'.format(t=type(text))
@@ -293,8 +295,8 @@ class GraphPopulator(object):
         cur_latest_ver, cur_libio_latest_ver = get_current_version(ecosystem, pkg_name)
         cur_date = (datetime.utcnow()).strftime('%Y%m%d')
         last_updated_flag = 'false'
-
         latest_version = cls.sanitize_text_for_query(input_json.get('latest_version'))
+
         if latest_version:
             # If latest version dont have cve, then it becomes the latest non cve version as well
             non_cve_ver = get_latest_version_non_cve(ecosystem, pkg_name, latest_version)
@@ -484,7 +486,6 @@ class GraphPopulator(object):
                 str_gremlin += str_gremlin_version
                 if not prp_package:
                     # TODO: refactor into the separate module
-                    latest_version = get_latest_versions_for_ep(ecosystem, pkg_name)
                     str_gremlin += "pkg = g.V().has('ecosystem','{ecosystem}')." \
                                    "has('name', '{pkg_name}').tryNext().orElseGet{{" \
                                    "g.V().has('vertex_label','Count').choose(has('" \
@@ -494,10 +495,9 @@ class GraphPopulator(object):
                                    "'{ecosystem}_pkg_count',1)).iterate();graph.addVertex(" \
                                    "'ecosystem', '{ecosystem}', 'name', '{pkg_name}', " \
                                    "'vertex_label', 'Package');}};" \
-                                   "pkg.property('latest_version', '{latest_version}');" \
                                    "pkg.property('last_updated', {last_updated});".format(
-                                    ecosystem=ecosystem, latest_version=latest_version,
-                                    pkg_name=pkg_name, last_updated=str(time.time()))
+                                        ecosystem=ecosystem, pkg_name=pkg_name,
+                                        last_updated=str(time.time()))
                 # TODO: refactor into the separate module
                 str_gremlin += "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
                                "'{pkg_name}').has('version','{version}').in(" \
