@@ -107,7 +107,7 @@ def _import_keys_from_s3_http(data_source, epv_list):
                         else:
                             logger.exception('Error %r encountered' % e.response)
                         continue
-                    else:
+                    except Exception as e:
                         logger.exception('Error %r encountered while processing Ecosystem: %s'
                                          'Package: %s Version: %s' %
                                          (e.response, pkg_ecosystem, pkg_name, pkg_version))
