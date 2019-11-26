@@ -35,7 +35,7 @@ def _first_key_info(data_source, first_key, bucket_name=None):
     obj = {}
     try:
         t = data_source.read_json_file(first_key, bucket_name)
-    except ClientError.exception as e:
+    except ClientError as e:
         raise e
     obj["dependents_count"] = t.get("dependents_count", '-1')
     obj["package_info"] = t.get("package_info", {})
