@@ -6,6 +6,7 @@ from src import config
 import json
 import requests
 from src.data_source.s3_data_source import S3DataSource
+from botocore.exceptions import ClientError
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -32,7 +33,10 @@ def parse_int_or_none(s):
 
 def _first_key_info(data_source, first_key, bucket_name=None):
     obj = {}
-    t = data_source.read_json_file(first_key, bucket_name)
+    try:
+        t = data_source.read_json_file(first_key, bucket_name)
+    except ClientError.exception as e:
+        raise e
     obj["dependents_count"] = t.get("dependents_count", '-1')
     obj["package_info"] = t.get("package_info", {})
     obj["latest_version"] = t.get("latest_version", '-1')
@@ -93,7 +97,22 @@ def _import_keys_from_s3_http(data_source, epv_list):
                 # Check other Version level information and add it to common object
                 if len(contents.get('ver_list_keys')) > 0:
                     first_key = contents['ver_key_prefix'] + '.json'
-                    first_obj = _first_key_info(data_source, first_key, config.AWS_EPV_BUCKET)
+                    try:
+                        first_obj = _first_key_info(data_source, first_key, config.AWS_EPV_BUCKET)
+                    except ClientError as e:
+                        if e.response['Error']['Code'] == 'NoSuchKey':
+                            logger.info('No data found for Ecosystem: %s '
+                                        'Package: %s Version: %s' %
+                                        (pkg_ecosystem, pkg_name, pkg_version))
+                        else:
+                            logger.info('Error %r encountered' % e.response)
+                        continue
+                    except Exception as e:
+                        logger.info('Error %r encountered while processing Ecosystem: %s '
+                                    'Package: %s Version: %s' %
+                                    (e.response, pkg_ecosystem, pkg_name, pkg_version))
+                        continue
+
                     first_obj['latest_version'] = latest_version
                     obj.update(first_obj)
                     ver_obj = _other_key_info(data_source, contents.get('ver_list_keys'),
