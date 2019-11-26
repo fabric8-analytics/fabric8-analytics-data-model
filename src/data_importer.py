@@ -101,16 +101,16 @@ def _import_keys_from_s3_http(data_source, epv_list):
                         first_obj = _first_key_info(data_source, first_key, config.AWS_EPV_BUCKET)
                     except ClientError as e:
                         if e.response['Error']['Code'] == 'NoSuchKey':
-                            logger.exception('No data found for Ecosystem: %s'
-                                             'Package: %s Version: %s' %
-                                             (pkg_ecosystem, pkg_name, pkg_version))
+                            logger.info('No data found for Ecosystem: %s '
+                                        'Package: %s Version: %s' %
+                                        (pkg_ecosystem, pkg_name, pkg_version))
                         else:
-                            logger.exception('Error %r encountered' % e.response)
+                            logger.info('Error %r encountered' % e.response)
                         continue
                     except Exception as e:
-                        logger.exception('Error %r encountered while processing Ecosystem: %s'
-                                         'Package: %s Version: %s' %
-                                         (e.response, pkg_ecosystem, pkg_name, pkg_version))
+                        logger.info('Error %r encountered while processing Ecosystem: %s '
+                                    'Package: %s Version: %s' %
+                                    (e.response, pkg_ecosystem, pkg_name, pkg_version))
                         continue
 
                     first_obj['latest_version'] = latest_version
