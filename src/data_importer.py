@@ -139,7 +139,16 @@ def _import_keys_from_s3_http(data_source, epv_list):
                     epv_full = pkg_ecosystem + ":" + pkg_name + ":" + pkg_version
                     logger.info("Ingestion initialized for EPV - %s" % epv_full)
                     epv.append(epv_full)
-                    payload = {'gremlin': str_gremlin}
+                    payload = {
+                        'gremlin': str_gremlin,
+                        'bindings': {
+                            # (fixme) Disable groovy script caching until we move
+                            # to parameterized scripts.
+                            # http://tinkerpop.apache.org/docs/current/reference/#gremlin-server-cache
+                            # http://tinkerpop.apache.org/docs/current/reference/#parameterized-scripts
+                            '#jsr223.groovy.engine.keep.globals': 'phantom'
+                        }
+                    }
                     response = requests.post(config.GREMLIN_SERVER_URL_REST,
                                              data=json.dumps(payload), timeout=30)
                     resp = response.json()
