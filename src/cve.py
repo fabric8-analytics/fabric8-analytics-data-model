@@ -12,7 +12,7 @@ class CVEPut(object):
     """Class encapsulating operations related to adding or replacing CVEs."""
 
     def __init__(self, cve_dict):
-        """Constructor."""
+        """Create CVEPut object based on cve_dict."""
         self._cve_dict = cve_dict
         self.validate_input()
 
@@ -159,7 +159,7 @@ class CVEDelete(object):
     """Class encapsulating operations related to deleting CVEs."""
 
     def __init__(self, cve_id_dict):
-        """Constructor."""
+        """Create CVEDelete object based on cve_id_dict."""
         self._cve_id_dict = cve_id_dict
         self.validate_input()
 
@@ -196,7 +196,7 @@ class CVEGet(object):
     """Class encapsulating operations related to retrieving information about CVEs."""
 
     def __init__(self, ecosystem, name, version):
-        """Constructor."""
+        """Create CVEGet object based on epv."""
         self._ecosystem = ecosystem
         self._name = name
         self._version = version
