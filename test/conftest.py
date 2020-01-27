@@ -15,7 +15,7 @@ class RequestsMockResponse:
     """Mocked response from requests.post()."""
 
     def __init__(self, json_data, status_code):
-        """Constructor."""
+        """Create RequestsMockResponse object."""
         self.json_data = json_data
         self.status_code = status_code
         self.content = 'This is expected ;)'
