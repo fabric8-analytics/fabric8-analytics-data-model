@@ -151,7 +151,7 @@ def get_all_versions(eco, pkg, cve_check):
     """To get all versions for a package."""
     if cve_check:
         query_str = "g.V().has('ecosystem', eco).has('name',pkg).out('has_version')" \
-                    ".not(outE('has_cve')).values('version')"
+                    ".not(outE('has_cve')).not(outE('has_snyk_cve')).values('version')"
     else:
         query_str = "g.V().has('ecosystem', eco).has('name',pkg)" \
                     ".out('has_version').values('version')"

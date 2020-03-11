@@ -154,6 +154,28 @@
             cvss_scores =  mgmt.makePropertyKey('cvss_scores').dataType(Float.class).cardinality(Cardinality.SET).make();
         }
 
+        // for snyk CVEs
+
+        scve_ids = mgmt.getPropertyKey('scve_ids');
+        if(scve_ids == null) {
+            scve_ids = mgmt.makePropertyKey('scve_ids').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        snecosystem = mgmt.getPropertyKey('snecosystem');
+        if(snecosystem == null) {
+            snecosystem = mgmt.makePropertyKey('snecosystem').dataType(String.class).make();
+        }
+
+        sn_id = mgmt.getPropertyKey('sn_id');
+        if(sn_id == null) {
+            sn_id = mgmt.makePropertyKey('sn_id').dataType(String.class).make();
+        }
+
+        scwes = mgmt.getPropertyKey('scwes');
+        if(scwes == null) {
+            scwes = mgmt.makePropertyKey('scwes').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
         // for code metrics
 
         cm_loc = mgmt.getPropertyKey('cm_loc');
@@ -599,6 +621,10 @@
         }
 
         // # for indexes
+        if(null == mgmt.getGraphIndex('SNidIndex')) {
+            mgmt.buildIndex('SNidIndex', Vertex.class).addKey(sn_id).unique().buildCompositeIndex();
+        }
+
         if(null == mgmt.getGraphIndex('CVEidIndex')) {
             mgmt.buildIndex('CVEidIndex', Vertex.class).addKey(cve_id).unique().buildCompositeIndex();
         }
@@ -718,7 +744,8 @@
                 'category_runtime',
                 'source_repo',
                 'repo_user',
-                'cve_sources'
+                'cve_sources',
+                'snecosystem'
         ]
 
         allKeys.each { k ->
