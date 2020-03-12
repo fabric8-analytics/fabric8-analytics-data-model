@@ -30,6 +30,7 @@ class SnykCVEPut(object):
             assert 'malicious' in self._cve_dict
             assert 'ecosystem' in self._cve_dict
             assert 'affected' in self._cve_dict
+            assert 'package' in self._cve_dict
         except AssertionError:
             raise ValueError('Invalid input')
         return True

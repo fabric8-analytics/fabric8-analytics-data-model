@@ -7,7 +7,8 @@ from conftest import RequestsMockResponse
 from src.cve import (
     CVEPut, CVEDelete, CVEGet,
     cve_node_replace_script_template,
-    cve_node_delete_script_template
+    cve_node_delete_script_template,
+    SnykCVEPut, SnykCVEDelete
 )
 
 
@@ -35,6 +36,25 @@ invalid_put_input = {
     'cve_id': 'CVE-2018-0001',
 }
 
+
+valid_snyk_put_input = {
+    'id': 'CVE-2018-0001',
+    'description': 'Some description.',
+    'cvssScore': 5.0,
+    'severity': 'High',
+    'malicious': True,
+    'ecosystem': 'pypi',
+    'affected': ['1.1', '1.2', '1.3'],
+    'package': 'numpy',
+    'initiallyFixedIn': ['1.4'],
+    'cves': ['CVE-99'],
+    'cwes': ['CWS-99']
+}
+
+invalid_snyk_put_input = {
+    'id': 'CVE-2018-0001',
+}
+
 mocker_input = {
     "result": {
         "data": [
@@ -57,6 +77,96 @@ mocker_input = {
         ]
     }
 }
+
+
+def test_snyk_cve_put_creation():
+    """Test SnykCVEPut input validation."""
+    assert SnykCVEPut(valid_snyk_put_input)
+
+    with pytest.raises(ValueError):
+        SnykCVEPut(invalid_snyk_put_input)
+
+
+def test_snyk_cve_put_get_qstring_for_cve_node():
+    """Test SnykCVEPut.get_qstring_for_cve_node()."""
+    cve = SnykCVEPut(valid_snyk_put_input)
+
+    query_str, bindings_dict = cve.get_qstring_for_cve_node()
+
+    json_payload = cve.prepare_payload(query_str, bindings_dict)
+    assert 'bindings' in json_payload
+    bindings = json_payload['bindings']
+
+    assert 'sn_id' in bindings
+    assert bindings['sn_id']
+    assert 'description' in bindings
+    assert bindings['description']
+    assert 'cvss_score' in bindings
+    assert bindings['cvss_score']
+    assert 'modified_date' in bindings
+    assert bindings['modified_date']
+
+
+def test_snyk_cve_put_get_qstrings_for_edges():
+    """Test SnykCVEPut.get_qstrings_for_edges()."""
+    cve = SnykCVEPut(valid_snyk_put_input)
+
+    results = cve.get_qstrings_for_edges()
+    assert len(results) == 3  # 3 edges as the CVE affects 3 versions
+
+
+@patch("src.cve.GraphPopulator.construct_graph_nodes")
+@patch("src.cve.BayesianGraph.execute")
+def test_snyk_create_pv_nodes(mock_bg, mock_gp):
+    """Test SnykCVEPut.create_pv_nodes()."""
+    mock_gp.return_value = "query pkg.property('latest_version', '1.2.3');"
+    mock_bg.return_value = True, {}
+
+    cve = SnykCVEPut(valid_snyk_put_input)
+    nodes, successfull_create, aff = cve.create_pv_nodes()
+    assert len(nodes) == 3
+    assert successfull_create is True
+    assert ('pypi', 'numpy', '1.1') in nodes
+    assert ('pypi', 'numpy', '1.2') in nodes
+    assert ('pypi', 'numpy', '1.3') in nodes
+    assert aff['numpy']['ecosystem'] == "pypi"
+    assert aff['numpy']['latest_version'] == "1.2.3"
+
+
+@patch("src.cve.GraphPopulator.construct_graph_nodes")
+@patch("src.cve.BayesianGraph.execute")
+def test_snyk_create_pv_nodes_fail(mock_bg, mock_gp):
+    """Test SnykCVEPut.create_pv_nodes() fail."""
+    mock_gp.return_value = 'query'
+    mock_bg.return_value = (False, {'error': 'something happened'})
+
+    cve = SnykCVEPut(valid_snyk_put_input)
+    nodes, successfull_create, aff = cve.create_pv_nodes()
+    assert len(nodes) == 0
+    assert successfull_create is False
+
+
+@patch("src.cve.SnykCVEPut.create_pv_nodes")
+def test_snyk_put_process_epv_fail(mock_pv):
+    """Test the SnykCVEPut.process() fail."""
+    mock_pv.return_value = [], False, {}
+
+    cve = SnykCVEPut(valid_snyk_put_input)
+    cve.process()
+
+
+@patch("src.cve.SnykCVEPut.create_pv_nodes")
+@patch("src.utils.requests.Session.post")
+def test_snyk_put_process_cve_fail(mock_gremlin, mock_pv):
+    """Test the SnykCVEPut.process() success."""
+    mock_pv.return_value = [], True, {}
+    mock_gremlin.side_effect = [RequestsMockResponse({}, 200),
+                                RequestsMockResponse({}, 200),
+                                RequestsMockResponse({}, 500),
+                                RequestsMockResponse({}, 200)]
+
+    cve = SnykCVEPut(valid_snyk_put_input)
+    cve.process()
 
 
 def test_cve_put_creation():
@@ -227,3 +337,34 @@ def test_cve_get_epv(mocker):
     assert response['count'] == 0
     assert 'cve_ids' in response
     assert len(response['cve_ids']) == 0
+
+
+valid_snyk_delete_input = {
+    'id': 'SNYK-JS-EJS-10218'
+}
+
+invalid_snyk_delete_input = {
+    'cve': 'SNYK-JS-EJS-10218'
+}
+
+
+def test_snyk_cve_delete_creation():
+    """Test SnykCVEDelete input validation."""
+    assert SnykCVEDelete(valid_snyk_delete_input)
+
+    with pytest.raises(ValueError):
+        SnykCVEDelete(invalid_snyk_delete_input)
+
+
+def test_snyk_cve_delete_prepare_payload():
+    """Test SnykCVEDelete.prepare_payload()."""
+    cve = SnykCVEDelete(valid_snyk_delete_input)
+    json_payload = cve.prepare_payload()
+
+    assert 'gremlin' in json_payload
+
+    assert 'bindings' in json_payload
+    bindings = json_payload['bindings']
+
+    assert 'sn_id' in bindings
+    assert bindings['sn_id']
