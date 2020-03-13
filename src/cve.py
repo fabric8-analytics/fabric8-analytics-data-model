@@ -57,11 +57,11 @@ class SnykCVEPut(object):
                 data = query.split("\'latest_version\'")[1].split(");")[0]
                 latest_version = data.replace(",", "").strip().replace("'", "")
             if p not in affected_pkgs:
-                tmp = {
+                affected_pkg = {
                     "ecosystem": e,
                     "latest_version": latest_version
                 }
-                affected_pkgs[p] = tmp
+                affected_pkgs[p] = affected_pkg
             if not success:
                 logger.error('CVEIngestionError - Error creating nodes for {e}/{p}/{v}: {r}'.format(
                     e=e, p=p, v=v, r=str(json_response))
