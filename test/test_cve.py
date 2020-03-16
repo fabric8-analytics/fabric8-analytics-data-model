@@ -97,8 +97,8 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
     assert 'bindings' in json_payload
     bindings = json_payload['bindings']
 
-    assert 'sn_id' in bindings
-    assert bindings['sn_id']
+    assert 'snyk_vuln_id' in bindings
+    assert bindings['snyk_vuln_id']
     assert 'description' in bindings
     assert bindings['description']
     assert 'cvss_score' in bindings
@@ -366,5 +366,5 @@ def test_snyk_cve_delete_prepare_payload():
     assert 'bindings' in json_payload
     bindings = json_payload['bindings']
 
-    assert 'sn_id' in bindings
-    assert bindings['sn_id']
+    assert 'snyk_vuln_id' in bindings
+    assert bindings['snyk_vuln_id']

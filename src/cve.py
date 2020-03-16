@@ -73,7 +73,7 @@ class SnykCVEPut(object):
 
     def _get_bindings(self):
         return {
-            'sn_id': self._cve_dict.get('id'),
+            'snyk_vuln_id': self._cve_dict.get('id'),
             'description': self._cve_dict.get('description'),
             'cvss_score': self._cve_dict.get('cvssScore') or 10.0,  # assume the worst
             'ecosystem': self._cve_dict.get('ecosystem'),
@@ -90,7 +90,7 @@ class SnykCVEPut(object):
 
     def _get_default_bindings(self):
         return {
-            'sn_id': self._cve_dict.get('id'),
+            'snyk_vuln_id': self._cve_dict.get('id'),
             'ecosystem': self._cve_dict.get('ecosystem')
         }
 
@@ -105,15 +105,15 @@ class SnykCVEPut(object):
 
         if self._cve_dict.get('initiallyFixedIn'):
             for fix in self._cve_dict.get('initiallyFixedIn'):
-                query_str += "cve_v.property('sfixed_in', '" + fix + "');"
+                query_str += "cve_v.property('fixed_in', '" + fix + "');"
 
         if self._cve_dict.get('cves'):
             for cve in self._cve_dict.get('cves'):
-                query_str += "cve_v.property('scve_ids', '" + cve + "');"
+                query_str += "cve_v.property('snyk_cve_ids', '" + cve + "');"
 
         if self._cve_dict.get('cwes'):
             for cwe in self._cve_dict.get('cwes'):
-                query_str += "cve_v.property('scwes', '" + cwe + "');"
+                query_str += "cve_v.property('snyk_cwes', '" + cwe + "');"
 
         return query_str, bindings
 
@@ -204,7 +204,7 @@ class SnykCVEDelete(object):
         payload = {
             'gremlin': snyk_cve_node_delete_script_template,
             'bindings': {
-                'sn_id': self._cve_id_dict.get('id'),
+                'snyk_vuln_id': self._cve_id_dict.get('id'),
                 'timestamp': timestamp
             }
         }
@@ -493,18 +493,18 @@ cve_v.property('modified_date', modified_date);\
 
 # add or replace CVE node
 cve_snyk_node_replace_script_template = """\
-g.V().has('sn_id',sn_id).inE('has_snyk_cve').drop().iterate();\
-cve_v=g.V().has('sn_id',sn_id).has('snecosystem', ecosystem).tryNext().orElseGet{\
+g.V().has('snyk_vuln_id',snyk_vuln_id).inE('has_snyk_cve').drop().iterate();\
+cve_v=g.V().has('snyk_vuln_id',snyk_vuln_id).has('snyk_ecosystem', ecosystem).tryNext().orElseGet{\
 graph.addVertex(label, 'SCVE',\
 'vertex_label', 'SCVE',\
-'sn_id', sn_id)};\
-cve_v.property('snecosystem', ecosystem);\
-cve_v.property('scvss_score', cvss_score);\
-cve_v.property('sdescription', description);\
+'snyk_vuln_id', snyk_vuln_id)};\
+cve_v.property('snyk_ecosystem', ecosystem);\
+cve_v.property('cvss_scores', cvss_score);\
+cve_v.property('description', description);\
 cve_v.property('severity', severity);\
 cve_v.property('title', title);\
-cve_v.property('surl', url);\
-cve_v.property('scvss_v3', cvssV3);\
+cve_v.property('snyk_url', url);\
+cve_v.property('snyk_cvss_v3', cvssV3);\
 cve_v.property('exploit', exploit);\
 cve_v.property('fixable', fixable);\
 cve_v.property('malicious', malicious);\
@@ -537,11 +537,11 @@ g.V().has('pecosystem','{ecosystem}')\
 
 # add edge between CVE node and Version node if it does not exist previously
 add_affected_snyk_edge_script_template = """\
-cve_v=g.V().has('sn_id',sn_id).next();\
+cve_v=g.V().has('snyk_vuln_id',snyk_vuln_id).next();\
 version_v=g.V().has('pecosystem','{ecosystem}')\
 .has('pname','{name}')\
 .has('version','{version}');\
-version_v.out('has_snyk_cve').has('sn_id', sn_id).tryNext().orElseGet{{\
+version_v.out('has_snyk_cve').has('snyk_vuln_id', snyk_vuln_id).tryNext().orElseGet{{\
 g.V().has('pecosystem','{ecosystem}')\
 .has('pname','{name}')\
 .has('version','{version}')\
@@ -557,7 +557,7 @@ g.V().has('cve_id',cve_id)\
 
 # delete Snyk CVE node
 snyk_cve_node_delete_script_template = """\
-g.V().has('sn_id',sn_id)\
+g.V().has('snyk_vuln_id',snyk_vuln_id)\
 .property('modified_date',timestamp)\
 .inE('has_snyk_cve').drop().iterate();\
 """
@@ -609,5 +609,5 @@ g.V().has('cve_id', cve_id).drop().iterate();
 
 # Rollback Snyk CVE Node
 snyk_roll_back_cve_template = """
-g.V().has('sn_id', sn_id).drop().iterate();
+g.V().has('snyk_vuln_id', snyk_vuln_id).drop().iterate();
 """
