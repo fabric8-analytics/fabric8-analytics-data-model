@@ -8,7 +8,7 @@ import json
 from src import data_importer
 from src.graph_manager import BayesianGraph
 from src.graph_populator import GraphPopulator
-from src.cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion
+from src.cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion, SnykCVEPut, SnykCVEDelete
 from raven.contrib.flask import Sentry
 from src import config as config
 from werkzeug.contrib.fixers import ProxyFix
@@ -296,6 +296,32 @@ def cves_put_delete():
             cve = CVEPut(payload)
         elif request.method == 'DELETE':
             cve = CVEDelete(payload)
+        else:
+            # this should never happen
+            return flask.jsonify({'error': 'method not allowed'}), 405
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 400
+
+    try:
+        cve.process()
+    except ValueError as e:
+        return flask.jsonify({'error': str(e)}), 500
+
+    return flask.jsonify({}), 200
+
+
+@api_v1.route('/api/v1/snyk-cves', methods=['PUT', 'DELETE'])
+def snyk_cves_put_delete():
+    """Put or delete Snyk CVE nodes.
+
+    Missing EPVs will be created.
+    """
+    payload = request.get_json(silent=True)
+    try:
+        if request.method == 'PUT':
+            cve = SnykCVEPut(payload)
+        elif request.method == 'DELETE':
+            cve = SnykCVEDelete(payload)
         else:
             # this should never happen
             return flask.jsonify({'error': 'method not allowed'}), 405

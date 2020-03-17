@@ -154,6 +154,28 @@
             cvss_scores =  mgmt.makePropertyKey('cvss_scores').dataType(Float.class).cardinality(Cardinality.SET).make();
         }
 
+        // for snyk CVEs
+
+        snyk_cve_ids = mgmt.getPropertyKey('snyk_cve_ids');
+        if(snyk_cve_ids == null) {
+            snyk_cve_ids = mgmt.makePropertyKey('snyk_cve_ids').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        snyk_ecosystem = mgmt.getPropertyKey('snyk_ecosystem');
+        if(snyk_ecosystem == null) {
+            snyk_ecosystem = mgmt.makePropertyKey('snyk_ecosystem').dataType(String.class).make();
+        }
+
+        snyk_vuln_id = mgmt.getPropertyKey('snyk_vuln_id');
+        if(snyk_vuln_id == null) {
+            snyk_vuln_id = mgmt.makePropertyKey('snyk_vuln_id').dataType(String.class).make();
+        }
+
+        snyk_cwes = mgmt.getPropertyKey('snyk_cwes');
+        if(snyk_cwes == null) {
+            snyk_cwes = mgmt.makePropertyKey('snyk_cwes').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
         // for code metrics
 
         cm_loc = mgmt.getPropertyKey('cm_loc');
@@ -599,6 +621,10 @@
         }
 
         // # for indexes
+        if(null == mgmt.getGraphIndex('SNVidIndex')) {
+            mgmt.buildIndex('SNVidIndex', Vertex.class).addKey(snyk_vuln_id).unique().buildCompositeIndex();
+        }
+
         if(null == mgmt.getGraphIndex('CVEidIndex')) {
             mgmt.buildIndex('CVEidIndex', Vertex.class).addKey(cve_id).unique().buildCompositeIndex();
         }
@@ -718,7 +744,8 @@
                 'category_runtime',
                 'source_repo',
                 'repo_user',
-                'cve_sources'
+                'cve_sources',
+                'snyk_ecosystem'
         ]
 
         allKeys.each { k ->

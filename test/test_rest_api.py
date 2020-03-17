@@ -6,7 +6,9 @@ import json
 from flask import url_for
 from mock import patch
 from test_cve import (
-    valid_put_input, invalid_put_input, valid_delete_input, invalid_delete_input
+    valid_put_input, invalid_put_input, valid_delete_input, invalid_delete_input,
+    invalid_snyk_delete_input, valid_snyk_delete_input, valid_snyk_put_input,
+    invalid_snyk_put_input
 )
 
 logger = logging.getLogger(config.APP_NAME)
@@ -351,6 +353,66 @@ def test_create_blank_nodes_report_status(mocker, client):
                            data=json.dumps(input_data),
                            headers={'Content-Type': 'application/json'})
     assert response.status_code == 500
+
+
+@patch("src.rest_api.SnykCVEPut.process")
+def test_snyk_cves_put(mocker, client):
+    """Test PUT /api/v1/cves."""
+    mocker.return_value = {}
+    url = url_for('api_v1.snyk_cves_put_delete')
+    response = client.put(
+        url,
+        data=json.dumps(valid_snyk_put_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    # we expect that the HTTP code will be 200/OK
+    assert response.status_code == 200
+    assert response.json == {}
+
+
+@patch("src.rest_api.SnykCVEPut.process")
+def test_snyk_cves_put_invalid_input(mocker, client):
+    """Test PUT /api/v1/cves with invalid input."""
+    mocker.return_value = {}
+    url = url_for('api_v1.snyk_cves_put_delete')
+    response = client.put(
+        url,
+        data=json.dumps(invalid_snyk_put_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    # we expect that the HTTP code will be 400/Bad Request
+    assert response.status_code == 400
+    assert 'error' in response.json
+
+
+@patch("src.rest_api.SnykCVEDelete.process")
+def test_snyk_cves_delete(mocker, client):
+    """Test DELETE /api/v1/cves."""
+    mocker.return_value = {}
+    url = url_for('api_v1.snyk_cves_put_delete')
+    response = client.delete(
+        url,
+        data=json.dumps(valid_snyk_delete_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    # we expect that the HTTP code will be 200/OK
+    assert response.status_code == 200
+    assert response.json == {}
+
+
+@patch("src.rest_api.SnykCVEDelete.process")
+def test_snyk_cves_delete_invalid_input(mocker, client):
+    """Test DELETE /api/v1/cves with invalid input."""
+    mocker.return_value = {}
+    url = url_for('api_v1.snyk_cves_put_delete')
+    response = client.delete(
+        url,
+        data=json.dumps(invalid_snyk_delete_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    # we expect that the HTTP code will be 400/Bad Request
+    assert response.status_code == 400
+    assert 'error' in response.json
 
 
 @patch("src.rest_api.CVEPut.process")

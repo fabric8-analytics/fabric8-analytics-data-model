@@ -8,6 +8,210 @@ from src.utils import get_timestamp, call_gremlin, update_non_cve_version
 logger = logging.getLogger(__name__)
 
 
+class SnykCVEPut(object):
+    """Class encapsulating operations related to adding or replacing snyk CVEs."""
+
+    def __init__(self, cve_dict):
+        """Create CVEPut object based on cve_dict."""
+        self._cve_dict = cve_dict
+        self.validate_input()
+        logger.info("Data validation done for snyk")
+
+    def validate_input(self):
+        """Validate input."""
+        try:
+            assert self._cve_dict
+            assert 'id' in self._cve_dict
+            assert 'description' in self._cve_dict
+            # if CVE is new, the score doesn't have to be available
+            if self._cve_dict.get('cvssScore'):
+                assert type(self._cve_dict.get('cvssScore')) == float
+            assert 'severity' in self._cve_dict
+            assert 'malicious' in self._cve_dict
+            assert 'ecosystem' in self._cve_dict
+            assert 'affected' in self._cve_dict
+            assert 'package' in self._cve_dict
+        except AssertionError:
+            raise ValueError('Invalid input')
+        return True
+
+    def create_pv_nodes(self):
+        """Create Package and Version nodes, if needed."""
+        nodes = []  # return (e, p, v) tuples of created/existing nodes; for easier testing
+        affected_pkgs = {}
+        all_epvs_created = True
+        epv_dict = {
+            "ecosystem": self._cve_dict.get('ecosystem'),
+            "name": self._cve_dict.get('package')
+        }
+        for ver in self._cve_dict.get('affected'):
+            epv_dict['version'] = ver
+            query = GraphPopulator.construct_graph_nodes(epv_dict)
+            success, json_response = BayesianGraph.execute(query)
+            e = epv_dict.get('ecosystem')
+            p = epv_dict.get('name')
+            v = epv_dict.get('version')
+            # Fetch the value of the latest_version from the query created
+            latest_version = "-1"
+            if "latest_version" in query:
+                data = query.split("\'latest_version\'")[1].split(");")[0]
+                latest_version = data.replace(",", "").strip().replace("'", "")
+            if p not in affected_pkgs:
+                affected_pkg = {
+                    "ecosystem": e,
+                    "latest_version": latest_version
+                }
+                affected_pkgs[p] = affected_pkg
+            if not success:
+                logger.error('CVEIngestionError - Error creating nodes for {e}/{p}/{v}: {r}'.format(
+                    e=e, p=p, v=v, r=str(json_response))
+                )
+                all_epvs_created = False
+            else:
+                nodes.append((e, p, v))
+        return nodes, all_epvs_created, affected_pkgs
+
+    def _get_bindings(self):
+        return {
+            'snyk_vuln_id': self._cve_dict.get('id'),
+            'description': self._cve_dict.get('description'),
+            'cvss_score': self._cve_dict.get('cvssScore') or 10.0,  # assume the worst
+            'ecosystem': self._cve_dict.get('ecosystem'),
+            'modified_date': get_timestamp(),
+            'severity': self._cve_dict.get('severity'),
+            'title': self._cve_dict.get('title'),
+            'url': self._cve_dict.get('url'),
+            'cvssV3': self._cve_dict.get('cvssV3'),
+            'exploit': self._cve_dict.get('exploit'),
+            'fixable': self._cve_dict.get('fixable'),
+            'malicious': self._cve_dict.get('malicious'),
+            'patch_exists': self._cve_dict.get('patchExists')
+        }
+
+    def _get_default_bindings(self):
+        return {
+            'snyk_vuln_id': self._cve_dict.get('id'),
+            'ecosystem': self._cve_dict.get('ecosystem')
+        }
+
+    def get_qstring_for_cve_node(self):
+        """Construct Gremlin script that will create a CVE node.
+
+        :return: (str, str), gremlin script and bindings
+        """
+        query_str = cve_snyk_node_replace_script_template
+
+        bindings = self._get_bindings()
+
+        if self._cve_dict.get('initiallyFixedIn'):
+            for fix in self._cve_dict.get('initiallyFixedIn'):
+                query_str += "cve_v.property('fixed_in', '" + fix + "');"
+
+        if self._cve_dict.get('cves'):
+            for cve in self._cve_dict.get('cves'):
+                query_str += "cve_v.property('snyk_cve_ids', '" + cve + "');"
+
+        if self._cve_dict.get('cwes'):
+            for cwe in self._cve_dict.get('cwes'):
+                query_str += "cve_v.property('snyk_cwes', '" + cwe + "');"
+
+        return query_str, bindings
+
+    def prepare_payload(self, query_str, bindings):
+        """Prepare payload for Gremlin."""
+        payload = {
+            'gremlin': query_str,
+            'bindings': bindings
+        }
+        logger.debug("Payload for the generated gremlin query {p}".format(p=payload))
+
+        return payload
+
+    def get_qstrings_for_edges(self):
+        """Construct Gremlin scripts that will connect CVE node with EPVs.
+
+        :return: list, list of gremlin scripts
+        """
+        return [
+            add_affected_snyk_edge_script_template.format(
+                ecosystem=self._cve_dict.get('ecosystem'),
+                name=self._cve_dict.get('package'),
+                version=x
+            ) for x in self._cve_dict.get('affected')
+        ]
+
+    def process(self):
+        """Add or replace CVE node in graph."""
+        # Create EPV nodes first and get a list of failed EPVs
+        # If any of the EPV creation failed, then do not attempt further processing
+        succesfull_epvs, all_epvs_succesfull, affected_pkgs = self.create_pv_nodes()
+        logger.info("PV nodes created for snyk")
+
+        if all_epvs_succesfull:
+            try:
+                # Create CVE node
+                call_gremlin(
+                    self.prepare_payload(*self.get_qstring_for_cve_node())
+                )
+            except ValueError:
+                logger.error('Snyk CVEIngestionError - Error creating CVE node: {c}'.format(
+                    c=self._cve_dict['id']))
+            else:
+                try:
+                    # Connect CVE node with affected EPV nodes
+                    for query_str in self.get_qstrings_for_edges():
+                        call_gremlin(self.prepare_payload(query_str, self._get_default_bindings()))
+                    logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully created for "
+                                "CVE node: {c}".format(c=self._cve_dict['id']))
+                    logger.info("Updating non cve latest version (snyk)")
+                    update_non_cve_version(affected_pkgs)
+                except ValueError:
+                    logger.error("Snyk CVEIngestionError - Error creating CVE edges."
+                                 "Rolling back CVE node: {c}".format(c=self._cve_dict['id']))
+                    call_gremlin(self.prepare_payload(snyk_roll_back_cve_template,
+                                                      self._get_default_bindings()))
+        else:
+            logger.error('CVEIngestionError - Error creating EPV nodes for Snyk CVE node: {c}'
+                         .format(c=self._cve_dict['id']))
+
+
+class SnykCVEDelete(object):
+    """Class encapsulating operations related to deleting Snyk CVEs."""
+
+    def __init__(self, cve_id_dict):
+        """Create CVEDelete object based on cve_id_dict."""
+        self._cve_id_dict = cve_id_dict
+        self.validate_input()
+
+    def validate_input(self):
+        """Validate input."""
+        try:
+            assert self._cve_id_dict
+            assert 'id' in self._cve_id_dict
+            assert self._cve_id_dict['id']
+        except AssertionError:
+            raise ValueError('Invalid input')
+        return True
+
+    def process(self):
+        """Delete CVE node from graph."""
+        json_payload = self.prepare_payload()
+        call_gremlin(json_payload)
+
+    def prepare_payload(self):
+        """Prepare payload for Gremlin."""
+        timestamp = get_timestamp()
+        payload = {
+            'gremlin': snyk_cve_node_delete_script_template,
+            'bindings': {
+                'snyk_vuln_id': self._cve_id_dict.get('id'),
+                'timestamp': timestamp
+            }
+        }
+
+        return payload
+
+
 class CVEPut(object):
     """Class encapsulating operations related to adding or replacing CVEs."""
 
@@ -287,6 +491,27 @@ cve_v.property('cvss_v2', cvss_v2);\
 cve_v.property('modified_date', modified_date);\
 """
 
+# add or replace CVE node
+cve_snyk_node_replace_script_template = """\
+g.V().has('snyk_vuln_id',snyk_vuln_id).inE('has_snyk_cve').drop().iterate();\
+cve_v=g.V().has('snyk_vuln_id',snyk_vuln_id).has('snyk_ecosystem', ecosystem).tryNext().orElseGet{\
+graph.addVertex(label, 'SCVE',\
+'vertex_label', 'SCVE',\
+'snyk_vuln_id', snyk_vuln_id)};\
+cve_v.property('snyk_ecosystem', ecosystem);\
+cve_v.property('cvss_scores', cvss_score);\
+cve_v.property('description', description);\
+cve_v.property('severity', severity);\
+cve_v.property('title', title);\
+cve_v.property('snyk_url', url);\
+cve_v.property('snyk_cvss_v3', cvssV3);\
+cve_v.property('exploit', exploit);\
+cve_v.property('fixable', fixable);\
+cve_v.property('malicious', malicious);\
+cve_v.property('patch_exists', patch_exists);\
+cve_v.property('modified_date', modified_date);\
+"""
+
 # add or replace additional non-mandatory properties for CVE node
 cve_node_replace_script_template_nvd_status = """\
 cve_v.property('nvd_status', nvd_status);\
@@ -310,11 +535,31 @@ g.V().has('pecosystem','{ecosystem}')\
 .next().addEdge('has_cve', cve_v)}};\
 """
 
+# add edge between CVE node and Version node if it does not exist previously
+add_affected_snyk_edge_script_template = """\
+cve_v=g.V().has('snyk_vuln_id',snyk_vuln_id).next();\
+version_v=g.V().has('pecosystem','{ecosystem}')\
+.has('pname','{name}')\
+.has('version','{version}');\
+version_v.out('has_snyk_cve').has('snyk_vuln_id', snyk_vuln_id).tryNext().orElseGet{{\
+g.V().has('pecosystem','{ecosystem}')\
+.has('pname','{name}')\
+.has('version','{version}')\
+.next().addEdge('has_snyk_cve', cve_v)}};\
+"""
+
 # delete CVE node
 cve_node_delete_script_template = """\
 g.V().has('cve_id',cve_id)\
 .property('modified_date',timestamp)\
 .inE('has_cve').drop().iterate();\
+"""
+
+# delete Snyk CVE node
+snyk_cve_node_delete_script_template = """\
+g.V().has('snyk_vuln_id',snyk_vuln_id)\
+.property('modified_date',timestamp)\
+.inE('has_snyk_cve').drop().iterate();\
 """
 
 # get CVEs for ecosystem
@@ -360,4 +605,9 @@ g.V().has('vertex_label', 'CVEDBVersion')\
 # Rollback CVE Node
 cvedb_roll_back_cve_template = """
 g.V().has('cve_id', cve_id).drop().iterate();
+"""
+
+# Rollback Snyk CVE Node
+snyk_roll_back_cve_template = """
+g.V().has('snyk_vuln_id', snyk_vuln_id).drop().iterate();
 """
