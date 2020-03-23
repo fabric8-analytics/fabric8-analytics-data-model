@@ -48,7 +48,8 @@ valid_snyk_put_input = {
     'package': 'numpy',
     'initiallyFixedIn': ['1.4'],
     'cves': ['CVE-99'],
-    'cwes': ['CWS-99']
+    'cwes': ['CWS-99'],
+    'pvtVuln': True
 }
 
 invalid_snyk_put_input = {
@@ -71,7 +72,7 @@ mocker_input = {
                 "epv": {
                     "pname": ["io.vertx:vertx-core"],
                     "version": ["3.4.1"],
-                    "pecosystem": ["maven"],
+                    "pecosystem": ["maven"]
                 }
             }
         ]
@@ -105,6 +106,8 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
     assert bindings['cvss_score']
     assert 'modified_date' in bindings
     assert bindings['modified_date']
+    assert 'snyk_pvt_vul' in bindings
+    assert bindings['snyk_pvt_vul']
 
 
 def test_snyk_cve_put_get_qstrings_for_edges():

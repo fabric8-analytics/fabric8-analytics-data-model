@@ -4,6 +4,7 @@ import logging
 from src.graph_populator import GraphPopulator
 from src.graph_manager import BayesianGraph
 from src.utils import get_timestamp, call_gremlin, update_non_cve_version
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -40,35 +41,42 @@ class SnykCVEPut(object):
         nodes = []  # return (e, p, v) tuples of created/existing nodes; for easier testing
         affected_pkgs = {}
         all_epvs_created = True
+        p = self._cve_dict.get('package')
+        e = self._cve_dict.get('ecosystem')
         epv_dict = {
             "ecosystem": self._cve_dict.get('ecosystem'),
             "name": self._cve_dict.get('package')
         }
+        latest_version = ""
         for ver in self._cve_dict.get('affected'):
             epv_dict['version'] = ver
             query = GraphPopulator.construct_graph_nodes(epv_dict)
             success, json_response = BayesianGraph.execute(query)
-            e = epv_dict.get('ecosystem')
-            p = epv_dict.get('name')
-            v = epv_dict.get('version')
-            # Fetch the value of the latest_version from the query created
-            latest_version = "-1"
-            if "latest_version" in query:
+            # Fetch the value of the latest_version from the query create
+            if not latest_version and "latest_version" in query:
                 data = query.split("\'latest_version\'")[1].split(");")[0]
                 latest_version = data.replace(",", "").strip().replace("'", "")
-            if p not in affected_pkgs:
-                affected_pkg = {
-                    "ecosystem": e,
-                    "latest_version": latest_version
-                }
-                affected_pkgs[p] = affected_pkg
+
             if not success:
                 logger.error('CVEIngestionError - Error creating nodes for {e}/{p}/{v}: {r}'.format(
-                    e=e, p=p, v=v, r=str(json_response))
+                    e=e, p=p, v=ver, r=str(json_response))
                 )
                 all_epvs_created = False
             else:
-                nodes.append((e, p, v))
+                nodes.append((e, p, ver))
+
+        if p not in affected_pkgs:
+            affected_pkg = {
+                "ecosystem": e,
+                "latest_version": latest_version
+            }
+            affected_pkgs[p] = affected_pkg
+
+        # To create the latest version node if not present
+        if latest_version and latest_version != "-1":
+            epv_dict['version'] = latest_version
+            query = GraphPopulator.construct_graph_nodes(epv_dict)
+            BayesianGraph.execute(query)
         return nodes, all_epvs_created, affected_pkgs
 
     def _get_bindings(self):
@@ -85,7 +93,8 @@ class SnykCVEPut(object):
             'exploit': self._cve_dict.get('exploit'),
             'fixable': self._cve_dict.get('fixable'),
             'malicious': self._cve_dict.get('malicious'),
-            'patch_exists': self._cve_dict.get('patchExists')
+            'patch_exists': self._cve_dict.get('patchExists'),
+            'snyk_pvt_vul': self._cve_dict.get('pvtVuln')
         }
 
     def _get_default_bindings(self):
@@ -114,6 +123,12 @@ class SnykCVEPut(object):
         if self._cve_dict.get('cwes'):
             for cwe in self._cve_dict.get('cwes'):
                 query_str += "cve_v.property('snyk_cwes', '" + cwe + "');"
+
+        if self._cve_dict.get('references'):
+            for ref in self._cve_dict.get('references'):
+                title = re.sub("[\'\"]", "", ref.get('title'))
+                ref_str = title + ":" + ref.get('url')
+                query_str += "cve_v.property('references', '" + ref_str + "');"
 
         return query_str, bindings
 
@@ -510,6 +525,7 @@ cve_v.property('fixable', fixable);\
 cve_v.property('malicious', malicious);\
 cve_v.property('patch_exists', patch_exists);\
 cve_v.property('modified_date', modified_date);\
+cve_v.property('snyk_pvt_vulnerability', snyk_pvt_vul);\
 """
 
 # add or replace additional non-mandatory properties for CVE node
