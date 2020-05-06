@@ -12,23 +12,23 @@ logger = logging.getLogger(__name__)
 class SnykCVEPut(object):
     """Class encapsulating operations related to adding or replacing snyk CVEs."""
 
-    def __init__(self, cve_dict):
-        """Create CVEPut object based on cve_dict."""
-        self._cve_dict = cve_dict
+    def __init__(self, snyk_pkg_data):
+        """Create CVEPut object based on snyk_pkg_data."""
+        self._snyk_pkg_data = snyk_pkg_data
         self.validate_input()
         logger.info("Data validation done for snyk")
 
     def validate_input(self):
         """Validate input."""
         try:
-            assert self._cve_dict
-            assert 'vulnerabilities'in self._cve_dict
-            assert 'affected'in self._cve_dict
-            assert 'ecosystem' in self._cve_dict
-            assert 'package' in self._cve_dict
-            assert len(self._cve_dict['vulnerabilities']) > 0
-            assert len(self._cve_dict['affected']) > 0
-            for vuln in self._cve_dict['vulnerabilities']:
+            assert self._snyk_pkg_data
+            assert 'vulnerabilities'in self._snyk_pkg_data
+            assert 'affected'in self._snyk_pkg_data
+            assert 'ecosystem' in self._snyk_pkg_data
+            assert 'package' in self._snyk_pkg_data
+            assert len(self._snyk_pkg_data['vulnerabilities']) > 0
+            assert len(self._snyk_pkg_data['affected']) > 0
+            for vuln in self._snyk_pkg_data['vulnerabilities']:
                 assert 'id' in vuln
                 assert 'description' in vuln
                 # if CVE is new, the score doesn't have to be available
@@ -48,16 +48,16 @@ class SnykCVEPut(object):
         nodes = []  # return (e, p, v) tuples of created/existing nodes; for easier testing
         affected_pkgs = {}
         all_epvs_created = True
-        p = self._cve_dict.get('package')
-        e = self._cve_dict.get('ecosystem')
-        latest_version = self._cve_dict.get('latest_version')
+        p = self._snyk_pkg_data.get('package')
+        e = self._snyk_pkg_data.get('ecosystem')
+        latest_version = self._snyk_pkg_data.get('latest_version')
         epv_dict = {
             "ecosystem": e,
             "name": p,
             "latest_version": latest_version
         }
 
-        for ver in self._cve_dict.get('affected'):
+        for ver in self._snyk_pkg_data.get('affected'):
             epv_dict['version'] = ver
             query = GraphPopulator.construct_graph_nodes(epv_dict)
             success, json_response = BayesianGraph.execute(query)
@@ -174,7 +174,7 @@ class SnykCVEPut(object):
         logger.info("PV nodes created for snyk")
 
         if all_epvs_succesfull:
-            for vulnerability in self._cve_dict.get('vulnerabilities'):
+            for vulnerability in self._snyk_pkg_data.get('vulnerabilities'):
                 try:
                     # Create CVE node
                     call_gremlin(
@@ -201,8 +201,8 @@ class SnykCVEPut(object):
                             self._get_default_bindings(vulnerability)))
         else:
             logger.error('CVEIngestionError - Error creating EPV nodes for package: {e} {p}'
-                         .format(e=self._cve_dict.get('ecosystem'),
-                                 p=self._cve_dict.get('package')))
+                         .format(e=self._snyk_pkg_data.get('ecosystem'),
+                                 p=self._snyk_pkg_data.get('package')))
 
 
 class SnykCVEDelete(object):
