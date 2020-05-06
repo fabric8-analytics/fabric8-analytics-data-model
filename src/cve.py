@@ -22,16 +22,23 @@ class SnykCVEPut(object):
         """Validate input."""
         try:
             assert self._cve_dict
-            assert 'id' in self._cve_dict
-            assert 'description' in self._cve_dict
-            # if CVE is new, the score doesn't have to be available
-            if self._cve_dict.get('cvssScore'):
-                assert type(self._cve_dict.get('cvssScore')) == float
-            assert 'severity' in self._cve_dict
-            assert 'malicious' in self._cve_dict
+            assert 'vulnerabilities'in self._cve_dict
+            assert 'affected'in self._cve_dict
             assert 'ecosystem' in self._cve_dict
-            assert 'affected' in self._cve_dict
             assert 'package' in self._cve_dict
+            assert len(self._cve_dict['vulnerabilities']) > 0
+            assert len(self._cve_dict['affected']) > 0
+            for vuln in self._cve_dict['vulnerabilities']:
+                assert 'id' in vuln
+                assert 'description' in vuln
+                # if CVE is new, the score doesn't have to be available
+                if vuln.get('cvssScore'):
+                    assert type(vuln.get('cvssScore')) == float
+                assert 'severity' in vuln
+                assert 'malicious' in vuln
+                assert 'ecosystem' in vuln
+                assert 'affected' in vuln
+                assert 'package' in vuln
         except AssertionError:
             raise ValueError('Invalid input')
         return True
@@ -43,11 +50,13 @@ class SnykCVEPut(object):
         all_epvs_created = True
         p = self._cve_dict.get('package')
         e = self._cve_dict.get('ecosystem')
+        latest_version = self._cve_dict.get('latest_version')
         epv_dict = {
-            "ecosystem": self._cve_dict.get('ecosystem'),
-            "name": self._cve_dict.get('package')
+            "ecosystem": e,
+            "name": p,
+            "latest_version": latest_version
         }
-        latest_version = ""
+
         for ver in self._cve_dict.get('affected'):
             epv_dict['version'] = ver
             query = GraphPopulator.construct_graph_nodes(epv_dict)
@@ -79,57 +88,59 @@ class SnykCVEPut(object):
             BayesianGraph.execute(query)
         return nodes, all_epvs_created, affected_pkgs
 
-    def _get_bindings(self):
+    def _get_bindings(self, vulnerability):
         return {
-            'snyk_vuln_id': self._cve_dict.get('id'),
-            'description': self._cve_dict.get('description'),
-            'cvss_score': self._cve_dict.get('cvssScore') or 10.0,  # assume the worst
-            'ecosystem': self._cve_dict.get('ecosystem'),
+            'snyk_vuln_id': vulnerability.get('id'),
+            'description': vulnerability.get('description'),
+            'cvss_score': vulnerability.get('cvssScore') or 10.0,  # assume the worst
+            'ecosystem': vulnerability.get('ecosystem'),
             'modified_date': get_timestamp(),
-            'severity': self._cve_dict.get('severity'),
-            'title': self._cve_dict.get('title'),
-            'url': self._cve_dict.get('url'),
-            'cvssV3': self._cve_dict.get('cvssV3'),
-            'exploit': self._cve_dict.get('exploit'),
-            'fixable': self._cve_dict.get('fixable'),
-            'malicious': self._cve_dict.get('malicious'),
-            'patch_exists': self._cve_dict.get('patchExists'),
-            'snyk_pvt_vul': self._cve_dict.get('pvtVuln')
+            'severity': vulnerability.get('severity'),
+            'title': vulnerability.get('title') or "",
+            'url': vulnerability.get('url') or "",
+            'cvssV3': vulnerability.get('cvssV3') or "",
+            'exploit': vulnerability.get('exploit') or "",
+            'fixable': vulnerability.get('fixable') or "",
+            'malicious': vulnerability.get('malicious'),
+            'patch_exists': vulnerability.get('patchExists') or "",
+            'snyk_pvt_vul': vulnerability.get('pvtVuln') or False
         }
 
-    def _get_default_bindings(self):
+    def _get_default_bindings(self, vulnerability):
         return {
-            'snyk_vuln_id': self._cve_dict.get('id'),
-            'ecosystem': self._cve_dict.get('ecosystem')
+            'snyk_vuln_id': vulnerability.get('id'),
+            'ecosystem': vulnerability.get('ecosystem')
         }
 
-    def get_qstring_for_cve_node(self):
+    def get_qstring_for_cve_node(self, vulnerability):
         """Construct Gremlin script that will create a CVE node.
 
         :return: (str, str), gremlin script and bindings
         """
         query_str = cve_snyk_node_replace_script_template
 
-        bindings = self._get_bindings()
+        bindings = self._get_bindings(vulnerability)
 
-        if self._cve_dict.get('initiallyFixedIn'):
-            for fix in self._cve_dict.get('initiallyFixedIn'):
+        if vulnerability.get('initiallyFixedIn'):
+            for fix in vulnerability.get('initiallyFixedIn'):
                 query_str += "cve_v.property('fixed_in', '" + fix + "');"
 
-        if self._cve_dict.get('cves'):
-            for cve in self._cve_dict.get('cves'):
+        if vulnerability.get('cves'):
+            for cve in vulnerability.get('cves'):
                 query_str += "cve_v.property('snyk_cve_ids', '" + cve + "');"
 
-        if self._cve_dict.get('cwes'):
-            for cwe in self._cve_dict.get('cwes'):
+        if vulnerability.get('cwes'):
+            for cwe in vulnerability.get('cwes'):
                 query_str += "cve_v.property('snyk_cwes', '" + cwe + "');"
 
-        if self._cve_dict.get('references'):
-            for ref in self._cve_dict.get('references'):
+        if vulnerability.get('references'):
+            for ref in vulnerability.get('references'):
                 title = re.sub("[\'\"]", "", ref.get('title'))
                 ref_str = title + ":" + ref.get('url')
                 query_str += "cve_v.property('references', '" + ref_str + "');"
 
+        logger.info(query_str)
+        logger.info(bindings)
         return query_str, bindings
 
     def prepare_payload(self, query_str, bindings):
@@ -142,17 +153,17 @@ class SnykCVEPut(object):
 
         return payload
 
-    def get_qstrings_for_edges(self):
+    def get_qstrings_for_edges(self, vulnerability):
         """Construct Gremlin scripts that will connect CVE node with EPVs.
 
         :return: list, list of gremlin scripts
         """
         return [
             add_affected_snyk_edge_script_template.format(
-                ecosystem=self._cve_dict.get('ecosystem'),
-                name=self._cve_dict.get('package'),
+                ecosystem=vulnerability.get('ecosystem'),
+                name=vulnerability.get('package'),
                 version=x
-            ) for x in self._cve_dict.get('affected')
+            ) for x in vulnerability.get('affected')
         ]
 
     def process(self):
@@ -163,31 +174,35 @@ class SnykCVEPut(object):
         logger.info("PV nodes created for snyk")
 
         if all_epvs_succesfull:
-            try:
-                # Create CVE node
-                call_gremlin(
-                    self.prepare_payload(*self.get_qstring_for_cve_node())
-                )
-            except ValueError:
-                logger.error('Snyk CVEIngestionError - Error creating CVE node: {c}'.format(
-                    c=self._cve_dict['id']))
-            else:
+            for vulnerability in self._cve_dict.get('vulnerabilities'):
                 try:
-                    # Connect CVE node with affected EPV nodes
-                    for query_str in self.get_qstrings_for_edges():
-                        call_gremlin(self.prepare_payload(query_str, self._get_default_bindings()))
-                    logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully created for "
-                                "CVE node: {c}".format(c=self._cve_dict['id']))
-                    logger.info("Updating non cve latest version (snyk)")
-                    update_non_cve_version(affected_pkgs)
+                    # Create CVE node
+                    call_gremlin(
+                        self.prepare_payload(*self.get_qstring_for_cve_node(vulnerability))
+                    )
                 except ValueError:
-                    logger.error("Snyk CVEIngestionError - Error creating CVE edges."
-                                 "Rolling back CVE node: {c}".format(c=self._cve_dict['id']))
-                    call_gremlin(self.prepare_payload(snyk_roll_back_cve_template,
-                                                      self._get_default_bindings()))
+                    logger.error('Snyk CVEIngestionError - Error creating CVE node: {c}'.format(
+                        c=vulnerability['id']))
+                else:
+                    try:
+                        # Connect CVE node with affected EPV nodes
+                        for query_str in self.get_qstrings_for_edges(vulnerability):
+                            call_gremlin(self.prepare_payload
+                                         (query_str, self._get_default_bindings(vulnerability)))
+                        logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully "
+                                    "created for CVE node: {c}".format(c=vulnerability['id']))
+                        logger.info("Updating non cve latest version (snyk)")
+                        update_non_cve_version(affected_pkgs)
+                    except ValueError:
+                        logger.error("Snyk CVEIngestionError - Error creating CVE edges."
+                                     "Rolling back CVE node: {c}".format(c=vulnerability['id']))
+                        call_gremlin(self.prepare_payload(
+                            snyk_roll_back_cve_template,
+                            self._get_default_bindings(vulnerability)))
         else:
-            logger.error('CVEIngestionError - Error creating EPV nodes for Snyk CVE node: {c}'
-                         .format(c=self._cve_dict['id']))
+            logger.error('CVEIngestionError - Error creating EPV nodes for package: {e} {p}'
+                         .format(e=self._cve_dict.get('ecosystem'),
+                                 p=self._cve_dict.get('package')))
 
 
 class SnykCVEDelete(object):
