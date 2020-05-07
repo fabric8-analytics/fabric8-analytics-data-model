@@ -200,7 +200,8 @@ def test_update_non_cve_version(mock1):
     input = {
         "lodash": {
             "latest_version": "1.1.1",
-            "ecosystem": "pypi"
+            "ecosystem": "pypi",
+            "latest_non_cve_version": "1.1.1"
         },
         "request": {
             "latest_version": "1.1.2",
