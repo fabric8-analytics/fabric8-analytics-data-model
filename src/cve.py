@@ -3,7 +3,7 @@
 import logging
 from src.graph_populator import GraphPopulator
 from src.graph_manager import BayesianGraph
-from src.utils import get_timestamp, call_gremlin, update_non_cve_version
+from src.utils import get_timestamp, call_gremlin, update_non_cve_version, update_non_cve_on_pkg
 import re
 
 logger = logging.getLogger(__name__)
@@ -51,11 +51,17 @@ class SnykCVEPut(object):
         p = self._snyk_pkg_data.get('package')
         e = self._snyk_pkg_data.get('ecosystem')
         latest_version = self._snyk_pkg_data.get('latest_version')
+        latest_non_cve_version = ''
         epv_dict = {
             "ecosystem": e,
             "name": p,
             "latest_version": latest_version
         }
+        if latest_version not in self._snyk_pkg_data.get('affected'):
+            logger.info("Latest version is not affected {}".format(p))
+            latest_non_cve_version = latest_version
+        else:
+            logger.info("Latest version is affected {p} {v}".format(p=p, v=latest_version))
 
         for ver in self._snyk_pkg_data.get('affected'):
             epv_dict['version'] = ver
@@ -74,18 +80,25 @@ class SnykCVEPut(object):
             else:
                 nodes.append((e, p, ver))
 
-        if p not in affected_pkgs:
+        # To create the latest version node if not present
+        if latest_version and latest_version != "-1":
+            epv_dict['version'] = latest_version
+            logger.info("Creating latest version node {e} {p} {v}".format(e=epv_dict['ecosystem'],
+                                                                          p=epv_dict['name'],
+                                                                          v=epv_dict['version']))
+            query = GraphPopulator.construct_graph_nodes(epv_dict)
+            BayesianGraph.execute(query)
+
+        res = ""
+        if latest_non_cve_version:
+            res = update_non_cve_on_pkg(e, p, latest_non_cve_version)
+
+        if p not in affected_pkgs and res != "Success":
             affected_pkg = {
                 "ecosystem": e,
                 "latest_version": latest_version
             }
             affected_pkgs[p] = affected_pkg
-
-        # To create the latest version node if not present
-        if latest_version and latest_version != "-1":
-            epv_dict['version'] = latest_version
-            query = GraphPopulator.construct_graph_nodes(epv_dict)
-            BayesianGraph.execute(query)
         return nodes, all_epvs_created, affected_pkgs
 
     def _get_bindings(self, vulnerability):
