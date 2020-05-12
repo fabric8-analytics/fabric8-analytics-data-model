@@ -38,22 +38,55 @@ invalid_put_input = {
 
 
 valid_snyk_put_input = {
-    'id': 'CVE-2018-0001',
-    'description': 'Some description.',
-    'cvssScore': 5.0,
-    'severity': 'High',
-    'malicious': True,
-    'ecosystem': 'pypi',
-    'affected': ['1.1', '1.2', '1.3'],
-    'package': 'numpy',
-    'initiallyFixedIn': ['1.4'],
-    'cves': ['CVE-99'],
-    'cwes': ['CWS-99'],
-    'pvtVuln': True
+    "affected": ['1.1', '1.2', '1.3'],
+    "all_ver": ['1.1', '1.0', '1.2', '1.3', '1.4'],
+    "latest_version": "1.4",
+    "ecosystem": "pypi",
+    "package": "numpy",
+    "vulnerabilities": [
+        {
+            'id': 'CVE-2018-0001',
+            'description': 'Some description.',
+            'cvssScore': 5.0,
+            'severity': 'High',
+            'malicious': True,
+            'ecosystem': 'pypi',
+            'affected': ['1.1', '1.2', '1.3'],
+            'package': 'numpy',
+            'initiallyFixedIn': ['1.4'],
+            'cves': ['CVE-99'],
+            'cwes': ['CWS-99'],
+            'pvtVuln': True
+        }
+    ]
+}
+
+valid_snyk_put_input2 = {
+    "affected": ['1.1', '1.2', '1.3', '1.4'],
+    "all_ver": ['1.1', '1.0', '1.2', '1.3', '1.4'],
+    "latest_version": "1.4",
+    "ecosystem": "pypi",
+    "package": "numpy",
+    "vulnerabilities": [
+        {
+            'id': 'CVE-2018-0001',
+            'description': 'Some description.',
+            'cvssScore': 5.0,
+            'severity': 'High',
+            'malicious': True,
+            'ecosystem': 'pypi',
+            'affected': ['1.1', '1.2', '1.3', '1.4'],
+            'package': 'numpy',
+            'initiallyFixedIn': ['1.4'],
+            'cves': ['CVE-99'],
+            'cwes': ['CWS-99'],
+            'pvtVuln': True
+        }
+    ]
 }
 
 invalid_snyk_put_input = {
-    'id': 'CVE-2018-0001',
+    'ecosystem': 'npm'
 }
 
 mocker_input = {
@@ -91,8 +124,8 @@ def test_snyk_cve_put_creation():
 def test_snyk_cve_put_get_qstring_for_cve_node():
     """Test SnykCVEPut.get_qstring_for_cve_node()."""
     cve = SnykCVEPut(valid_snyk_put_input)
-
-    query_str, bindings_dict = cve.get_qstring_for_cve_node()
+    vulns = valid_snyk_put_input['vulnerabilities']
+    query_str, bindings_dict = cve.get_qstring_for_cve_node(vulns[0])
 
     json_payload = cve.prepare_payload(query_str, bindings_dict)
     assert 'bindings' in json_payload
@@ -113,17 +146,19 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
 def test_snyk_cve_put_get_qstrings_for_edges():
     """Test SnykCVEPut.get_qstrings_for_edges()."""
     cve = SnykCVEPut(valid_snyk_put_input)
-
-    results = cve.get_qstrings_for_edges()
+    vulns = valid_snyk_put_input['vulnerabilities']
+    results = cve.get_qstrings_for_edges(vulns[0])
     assert len(results) == 3  # 3 edges as the CVE affects 3 versions
 
 
+@patch("src.cve.update_non_cve_on_pkg")
 @patch("src.cve.GraphPopulator.construct_graph_nodes")
 @patch("src.cve.BayesianGraph.execute")
-def test_snyk_create_pv_nodes(mock_bg, mock_gp):
+def test_snyk_create_pv_nodes(mock_bg, mock_gp, util):
     """Test SnykCVEPut.create_pv_nodes()."""
     mock_gp.return_value = "query pkg.property('latest_version', '1.2.3');"
     mock_bg.return_value = True, {}
+    util.return_value = "Success"
 
     cve = SnykCVEPut(valid_snyk_put_input)
     nodes, successfull_create, aff = cve.create_pv_nodes()
@@ -132,8 +167,16 @@ def test_snyk_create_pv_nodes(mock_bg, mock_gp):
     assert ('pypi', 'numpy', '1.1') in nodes
     assert ('pypi', 'numpy', '1.2') in nodes
     assert ('pypi', 'numpy', '1.3') in nodes
+    assert 'numpy' not in aff
+    assert len(aff) == 0
+
+    cve = SnykCVEPut(valid_snyk_put_input2)
+    nodes, successfull_create, aff = cve.create_pv_nodes()
+    assert len(nodes) == 4
+    assert successfull_create is True
+    assert aff['numpy']['latest_version'] == "1.4"
     assert aff['numpy']['ecosystem'] == "pypi"
-    assert aff['numpy']['latest_version'] == "1.2.3"
+    assert 'latest_non_cve_version' not in aff['numpy']
 
 
 @patch("src.cve.GraphPopulator.construct_graph_nodes")
