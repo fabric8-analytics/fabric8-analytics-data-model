@@ -92,7 +92,7 @@ class GraphPopulator(object):
                 'Invalid query text: expected string, got {t}'.format(t=type(text))
             )
         # remove newlines, quotes and backslash character
-        text = " ".join([l.strip() for l in text.split("\n")])
+        text = " ".join([line.strip() for line in text.split("\n")])
         text = re.sub("""['"]""", "", text)
         text = text.replace('\\', "")
         return text.strip()
@@ -195,8 +195,9 @@ class GraphPopulator(object):
         if 'source_licenses' in input_json.get('analyses', {}):
             licenses = input_json.get('analyses').get('source_licenses').get('summary', {}) \
                 .get('sure_licenses', [])
-            licenses = [cls.sanitize_text_for_query(l) for l in licenses]
-            prp_version += " ".join(["ver.property('licenses', '{}');".format(l) for l in licenses])
+            licenses = [cls.sanitize_text_for_query(lic) for lic in licenses]
+            prp_version += " ".join(["ver.property('licenses', '{}');"
+                                    .format(lic) for lic in licenses])
 
         # Add CVE property if it exists
         if 'security_issues' in input_json.get('analyses', {}):
