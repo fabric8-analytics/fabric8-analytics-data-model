@@ -22,8 +22,8 @@ class SnykCVEPut(object):
         """Validate input."""
         try:
             assert self._snyk_pkg_data
-            assert 'vulnerabilities'in self._snyk_pkg_data
-            assert 'affected'in self._snyk_pkg_data
+            assert 'vulnerabilities' in self._snyk_pkg_data
+            assert 'affected' in self._snyk_pkg_data
             assert 'ecosystem' in self._snyk_pkg_data
             assert 'package' in self._snyk_pkg_data
             assert len(self._snyk_pkg_data['vulnerabilities']) > 0
