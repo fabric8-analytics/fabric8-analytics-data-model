@@ -14,7 +14,6 @@ from src.cve import (
 
 valid_put_input = {
     'cve_id': 'CVE-2018-0001',
-    'cve_sources': 'snyk.io',
     'description': 'Some description.',
     'cvss_v2': 5.0,
     'ecosystem': 'pypi',
@@ -99,8 +98,7 @@ mocker_input = {
                     "cvss_v2": [10.0],
                     "nvd_status": ["Awaiting Analyses"],
                     "description": ["Some description here updated just now."],
-                    "modified_date": ["20180911"],
-                    "cve_sources": ["snyk.io"]
+                    "modified_date": ["20180911"]
                 },
                 "epv": {
                     "pname": ["io.vertx:vertx-core"],
