@@ -143,12 +143,6 @@
             cve_ids = mgmt.makePropertyKey('cve_ids').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
-        cve_sources = mgmt.getPropertyKey('cve_sources');
-        if(cve_sources == null) {
-            cve_sources = mgmt.makePropertyKey('cve_sources').dataType(String.class).cardinality(Cardinality.SET).make();
-        }
-
-
         cvss_scores = mgmt.getPropertyKey('cvss_scores');
         if(cvss_scores == null) {
             cvss_scores =  mgmt.makePropertyKey('cvss_scores').dataType(Float.class).cardinality(Cardinality.SET).make();
@@ -744,7 +738,6 @@
                 'category_runtime',
                 'source_repo',
                 'repo_user',
-                'cve_sources',
                 'snyk_ecosystem'
         ]
 

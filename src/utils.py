@@ -268,50 +268,6 @@ def sync_all_non_cve_version(input):
     return resp
 
 
-def sync_all_cve_source(input):
-    """Update all the cve nodes with given cve source."""
-    logger.info("Sync called for CVEs to update the latest cve sources.")
-    resp = {
-        "message": "Latest cve source rectified for the CVEs",
-        "status": "Success"
-    }
-    ecosystems = input.get("ecosystems", [{0: 0}])
-    cve_sources = input['cve_sources']
-    for eco in ecosystems:
-        # Fetch all the cve ids for the ecosystem
-        logger.info(f'Updating cve source as {cve_sources} for {eco}')
-        query_str = "g.V().has('cecosystem', '{}').values('cve_id')".format(eco)
-        payload = {
-            'gremlin': query_str
-        }
-        gremlin_response = execute_gremlin_dsl(payload)
-        result_data = get_response_data(gremlin_response, [{0: 0}])
-        # For each CVE id, find update the cve_source
-        rectify_cve_source(result_data, cve_sources)
-
-    return resp
-
-
-def rectify_cve_source(input, cve_sources):
-    """Rectify the latest version of the EPVs."""
-    query_str = "g.V().has('cve_id', '{arg0}')" \
-                ".property('cve_sources', '{arg1}').iterate();"
-    args = []
-    resp = {
-        "message": "cve sources updated for the CVEs",
-        "status": "Success"
-    }
-    for cve in input:
-        tmp = {
-            "0": cve,
-            "1": cve_sources
-        }
-        args.append(tmp)
-    result_data = batch_query_executor(query_str, args)
-    logger.info("cve sources updated for the CVEs -> {r}".format(r=result_data))
-    return resp
-
-
 def sync_all_latest_version(file_loc):
     """Rectify the latest version field for all the pkgs in graph."""
     logger.info("Sync operation started for latest version for all the packages")
