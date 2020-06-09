@@ -171,13 +171,17 @@ class SnykCVEPut(object):
 
         :return: list, list of gremlin scripts
         """
-        return [
-            add_affected_snyk_edge_script_template.format(
-                ecosystem=vulnerability.get('ecosystem'),
-                name=vulnerability.get('package'),
-                version=x
-            ) for x in vulnerability.get('affected')
-        ]
+        edge_queries = []
+        edge_binding = self._get_default_bindings(vulnerability)
+        edge_binding['name'] = vulnerability['package']
+        ver_count = 1
+        for aff_ver in vulnerability.get('affected'):
+            ver = "version" + str(ver_count)
+            ver_count += 1
+            edge_queries.append(add_affected_snyk_edge_script_template.format(version=ver))
+            edge_binding[ver] = aff_ver
+
+        return edge_queries, edge_binding
 
     def process(self):
         """Add or replace CVE node in graph."""
@@ -199,9 +203,10 @@ class SnykCVEPut(object):
                 else:
                     try:
                         # Connect CVE node with affected EPV nodes
-                        for query_str in self.get_qstrings_for_edges(vulnerability):
+                        edge_queries, edge_bindings = self.get_qstrings_for_edges(vulnerability)
+                        for query_str in edge_queries:
                             call_gremlin(self.prepare_payload
-                                         (query_str, self._get_default_bindings(vulnerability)))
+                                         (query_str, edge_bindings))
                         logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully "
                                     "created for CVE node: {c}".format(c=vulnerability['id']))
                         logger.info("Updating non cve latest version (snyk)")
@@ -573,13 +578,13 @@ g.V().has('pecosystem','{ecosystem}')\
 # add edge between CVE node and Version node if it does not exist previously
 add_affected_snyk_edge_script_template = """\
 cve_v=g.V().has('snyk_vuln_id',snyk_vuln_id).next();\
-version_v=g.V().has('pecosystem','{ecosystem}')\
-.has('pname','{name}')\
-.has('version','{version}');\
+version_v=g.V().has('pecosystem', ecosystem)\
+.has('pname', name)\
+.has('version', {version});\
 version_v.out('has_snyk_cve').has('snyk_vuln_id', snyk_vuln_id).tryNext().orElseGet{{\
-g.V().has('pecosystem','{ecosystem}')\
-.has('pname','{name}')\
-.has('version','{version}')\
+g.V().has('pecosystem', ecosystem)\
+.has('pname', name)\
+.has('version', {version})\
 .next().addEdge('has_snyk_cve', cve_v)}};\
 """
 
