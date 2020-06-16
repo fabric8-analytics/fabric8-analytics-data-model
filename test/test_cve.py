@@ -141,14 +141,6 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
     assert bindings['snyk_pvt_vul']
 
 
-def test_snyk_cve_put_get_qstrings_for_edges():
-    """Test SnykCVEPut.get_qstrings_for_edges()."""
-    cve = SnykCVEPut(valid_snyk_put_input)
-    vulns = valid_snyk_put_input['vulnerabilities']
-    results = cve.get_qstrings_for_edges(vulns[0])
-    assert len(results) == 3  # 3 edges as the CVE affects 3 versions
-
-
 @patch("src.cve.update_non_cve_on_pkg")
 @patch("src.cve.GraphPopulator.construct_graph_nodes")
 @patch("src.cve.BayesianGraph.execute")
