@@ -291,7 +291,7 @@ def cves_put_delete():
 
     try:
         cve.process()
-    except InternalServerError as e:
+    except ValueError as e:
         return flask.jsonify({'error': str(e)}), 500
 
     return flask.jsonify({}), 200

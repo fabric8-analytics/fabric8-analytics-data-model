@@ -182,11 +182,11 @@ class SnykCVEPut(object):
                     call_gremlin(
                         self.prepare_payload(*self.get_qstring_for_cve_node(vulnerability))
                     )
-                except ValueError:
+                except ValueError as e:
                     logger.error('Snyk CVEIngestionError - Error creating CVE node: {c}'.format(
                         c=vulnerability['id']))
                     raise InternalServerError("Snyk CVEIngestionError - "
-                                              "While Error creating CVE node.")
+                                              "While Error creating CVE node.") from e
                 else:
                     try:
                         # Connect CVE node with affected EPV nodes
@@ -200,14 +200,14 @@ class SnykCVEPut(object):
                                     "created for CVE node: {c}".format(c=vulnerability['id']))
                         logger.info("Updating non cve latest version (snyk)")
                         update_non_cve_version(affected_pkgs)
-                    except ValueError:
+                    except ValueError as e:
                         logger.error("Snyk CVEIngestionError - Error creating CVE edges."
                                      "Rolling back CVE node: {c}".format(c=vulnerability['id']))
                         call_gremlin(self.prepare_payload(
                             snyk_roll_back_cve_template,
                             self._get_default_bindings(vulnerability)))
                         raise InternalServerError("Snyk CVEIngestionError - "
-                                                  "While creating CVE edges.")
+                                                  "While creating CVE edges.") from e
         else:
             logger.error('CVEIngestionError - Error creating EPV nodes for package: {e} {p}'
                          .format(e=self._snyk_pkg_data.get('ecosystem'),
@@ -239,10 +239,10 @@ class SnykCVEDelete(object):
         try:
             # Delete cve and its references
             call_gremlin(json_payload)
-        except ValueError:
+        except ValueError as e:
             logger.error('Snyk CVEDeletionError - Error deleting vulnerability: {c}'.
                          format(c=self._cve_id_dict.get('id')))
-            raise InternalServerError("Snyk CVEDeletionError - Error deleting vulnerability")
+            raise InternalServerError("Snyk CVEDeletionError - While deleting vulnerability") from e
 
     def prepare_payload(self):
         """Prepare payload for Gremlin."""
