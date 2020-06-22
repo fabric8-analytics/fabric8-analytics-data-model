@@ -2,6 +2,7 @@
 
 import pytest
 from mock import patch
+from werkzeug.exceptions import InternalServerError
 from conftest import RequestsMockResponse
 
 from src.cve import (
@@ -188,7 +189,10 @@ def test_snyk_put_process_epv_fail(mock_pv):
     mock_pv.return_value = [], False, {}
 
     cve = SnykCVEPut(valid_snyk_put_input)
-    cve.process()
+    try:
+        cve.process()
+    except InternalServerError as e:
+        assert "CVEIngestionError" in str(e)
 
 
 @patch("src.cve.SnykCVEPut.create_pv_nodes")
@@ -202,7 +206,10 @@ def test_snyk_put_process_cve_fail(mock_gremlin, mock_pv):
                                 RequestsMockResponse({}, 200)]
 
     cve = SnykCVEPut(valid_snyk_put_input)
-    cve.process()
+    try:
+        cve.process()
+    except InternalServerError as e:
+        assert "Snyk CVEIngestionError - While creating CVE edges." in str(e)
 
 
 def test_cve_put_creation():
