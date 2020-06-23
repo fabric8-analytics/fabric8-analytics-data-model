@@ -6,7 +6,9 @@ import json
 from flask import url_for
 from mock import patch
 from test_cve import (
-    valid_put_input, invalid_put_input, valid_delete_input, invalid_delete_input
+    valid_put_input, invalid_put_input, valid_delete_input, invalid_delete_input,
+    invalid_snyk_delete_input, valid_snyk_delete_input, valid_snyk_put_input,
+    invalid_snyk_put_input
 )
 
 logger = logging.getLogger(config.APP_NAME)
@@ -353,6 +355,66 @@ def test_create_blank_nodes_report_status(mocker, client):
     assert response.status_code == 500
 
 
+@patch("src.rest_api.SnykCVEPut.process")
+def test_snyk_cves_put(mocker, client):
+    """Test PUT /api/v1/cves."""
+    mocker.return_value = {}
+    url = url_for('api_v1.snyk_cves_put_delete')
+    response = client.put(
+        url,
+        data=json.dumps(valid_snyk_put_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    # we expect that the HTTP code will be 200/OK
+    assert response.status_code == 200
+    assert response.json == {}
+
+
+@patch("src.rest_api.SnykCVEPut.process")
+def test_snyk_cves_put_invalid_input(mocker, client):
+    """Test PUT /api/v1/cves with invalid input."""
+    mocker.return_value = {}
+    url = url_for('api_v1.snyk_cves_put_delete')
+    response = client.put(
+        url,
+        data=json.dumps(invalid_snyk_put_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    # we expect that the HTTP code will be 400/Bad Request
+    assert response.status_code == 400
+    assert 'error' in response.json
+
+
+@patch("src.rest_api.SnykCVEDelete.process")
+def test_snyk_cves_delete(mocker, client):
+    """Test DELETE /api/v1/cves."""
+    mocker.return_value = {}
+    url = url_for('api_v1.snyk_cves_put_delete')
+    response = client.delete(
+        url,
+        data=json.dumps(valid_snyk_delete_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    # we expect that the HTTP code will be 200/OK
+    assert response.status_code == 200
+    assert response.json == {}
+
+
+@patch("src.rest_api.SnykCVEDelete.process")
+def test_snyk_cves_delete_invalid_input(mocker, client):
+    """Test DELETE /api/v1/cves with invalid input."""
+    mocker.return_value = {}
+    url = url_for('api_v1.snyk_cves_put_delete')
+    response = client.delete(
+        url,
+        data=json.dumps(invalid_snyk_delete_input),
+        headers={'Content-Type': 'application/json'}
+    )
+    # we expect that the HTTP code will be 400/Bad Request
+    assert response.status_code == 400
+    assert 'error' in response.json
+
+
 @patch("src.rest_api.CVEPut.process")
 def test_cves_put(mocker, client):
     """Test PUT /api/v1/cves."""
@@ -557,43 +619,6 @@ def test_sync_latest_non_cve_version(mocker, client):
     data = response.json
     logger.info(data)
     assert data['message'] == 'Latest non cve version rectified for the ecosystem'
-
-    mocker.return_value = {
-        "message": "Failed",
-        "status": "Failure"
-    }
-    response = client.post(url,
-                           data=json.dumps(input_data),
-                           headers={'Content-Type': 'application/json'})
-    logger.info(response)
-    # we expect that the HTTP code will be 500
-    assert response.status_code == 500
-    data = response.json
-    logger.info(data)
-    assert data['message'] == 'Failed'
-
-
-@patch("src.rest_api.sync_all_cve_source")
-def test_sync_cve_source(mocker, client):
-    """Add test for sync_latest_non_cve_version."""
-    mocker.return_value = {
-        "message": "Latest cve source rectified for the CVEs",
-        "status": "Success"
-    }
-    input_data = {
-        "cve_sources": "CRA",
-        "ecosystems": ["npm"]
-    }
-    url = url_for('api_v1.sync_cve_source')
-    response = client.post(url,
-                           data=json.dumps(input_data),
-                           headers={'Content-Type': 'application/json'})
-    logger.info(response)
-    # we expect that the HTTP code will be 200/OK
-    assert response.status_code == 200
-    data = response.json
-    logger.info(data)
-    assert data['message'] == 'Latest cve source rectified for the CVEs'
 
     mocker.return_value = {
         "message": "Failed",

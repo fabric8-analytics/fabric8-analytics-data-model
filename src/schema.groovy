@@ -143,12 +143,6 @@
             cve_ids = mgmt.makePropertyKey('cve_ids').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
-        cve_sources = mgmt.getPropertyKey('cve_sources');
-        if(cve_sources == null) {
-            cve_sources = mgmt.makePropertyKey('cve_sources').dataType(String.class).cardinality(Cardinality.SET).make();
-        }
-
-
         cvss_scores = mgmt.getPropertyKey('cvss_scores');
         if(cvss_scores == null) {
             cvss_scores =  mgmt.makePropertyKey('cvss_scores').dataType(Float.class).cardinality(Cardinality.SET).make();
@@ -156,24 +150,24 @@
 
         // for snyk CVEs
 
-        scve_ids = mgmt.getPropertyKey('scve_ids');
-        if(scve_ids == null) {
-            scve_ids = mgmt.makePropertyKey('scve_ids').dataType(String.class).cardinality(Cardinality.SET).make();
+        snyk_cve_ids = mgmt.getPropertyKey('snyk_cve_ids');
+        if(snyk_cve_ids == null) {
+            snyk_cve_ids = mgmt.makePropertyKey('snyk_cve_ids').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
-        snecosystem = mgmt.getPropertyKey('snecosystem');
-        if(snecosystem == null) {
-            snecosystem = mgmt.makePropertyKey('snecosystem').dataType(String.class).make();
+        snyk_ecosystem = mgmt.getPropertyKey('snyk_ecosystem');
+        if(snyk_ecosystem == null) {
+            snyk_ecosystem = mgmt.makePropertyKey('snyk_ecosystem').dataType(String.class).make();
         }
 
-        sn_id = mgmt.getPropertyKey('sn_id');
-        if(sn_id == null) {
-            sn_id = mgmt.makePropertyKey('sn_id').dataType(String.class).make();
+        snyk_vuln_id = mgmt.getPropertyKey('snyk_vuln_id');
+        if(snyk_vuln_id == null) {
+            snyk_vuln_id = mgmt.makePropertyKey('snyk_vuln_id').dataType(String.class).make();
         }
 
-        scwes = mgmt.getPropertyKey('scwes');
-        if(scwes == null) {
-            scwes = mgmt.makePropertyKey('scwes').dataType(String.class).cardinality(Cardinality.SET).make();
+        snyk_cwes = mgmt.getPropertyKey('snyk_cwes');
+        if(snyk_cwes == null) {
+            snyk_cwes = mgmt.makePropertyKey('snyk_cwes').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
         // for code metrics
@@ -621,8 +615,8 @@
         }
 
         // # for indexes
-        if(null == mgmt.getGraphIndex('SNidIndex')) {
-            mgmt.buildIndex('SNidIndex', Vertex.class).addKey(sn_id).unique().buildCompositeIndex();
+        if(null == mgmt.getGraphIndex('SNVidIndex')) {
+            mgmt.buildIndex('SNVidIndex', Vertex.class).addKey(snyk_vuln_id).unique().buildCompositeIndex();
         }
 
         if(null == mgmt.getGraphIndex('CVEidIndex')) {
@@ -744,8 +738,7 @@
                 'category_runtime',
                 'source_repo',
                 'repo_user',
-                'cve_sources',
-                'snecosystem'
+                'snyk_ecosystem'
         ]
 
         allKeys.each { k ->

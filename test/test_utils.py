@@ -5,8 +5,7 @@ import datetime
 from src.utils import get_current_version, execute_gremlin_dsl, get_timestamp, \
     call_gremlin, rectify_latest_version, get_latest_version_non_cve, \
     update_non_cve_version, get_all_versions, fetch_pkg_details_via_cve, \
-    sync_all_non_cve_version, sync_all_latest_version, sync_all_cve_source,\
-    rectify_cve_source
+    sync_all_non_cve_version, sync_all_latest_version
 import logging
 from src import config
 from mock import patch
@@ -200,7 +199,8 @@ def test_update_non_cve_version(mock1):
     input = {
         "lodash": {
             "latest_version": "1.1.1",
-            "ecosystem": "pypi"
+            "ecosystem": "pypi",
+            "latest_non_cve_version": "1.1.1"
         },
         "request": {
             "latest_version": "1.1.2",
@@ -288,36 +288,6 @@ def test_sync_all_non_cve_version(mock1, mock2, mock3, mock4):
     assert res["message"] == "Latest non cve version rectified for the EPVs"
 
 
-@patch("src.utils.rectify_cve_source")
-@patch("src.utils.execute_gremlin_dsl")
-def test_sync_all_cve_source(mock1, mock2):
-    """Test sync_all_non_cve_version function."""
-    input = {
-        "cve_sources": "CRA",
-        "ecosystems": ["npm"]
-    }
-    mock1.return_value = {
-        "message": "cve sources updated for the CVEs",
-        "status": "Success"
-    }
-    mock2.return_value = None
-
-    res = sync_all_cve_source(input)
-    assert res["message"] == "Latest cve source rectified for the CVEs"
-    assert res["status"] == "Success"
-
-
-@patch("src.utils.execute_gremlin_dsl")
-def test_rectify_cve_source(mock1):
-    """Test sync_all_non_cve_version function."""
-    input = ['CVE-2018-3717']
-    mock1.return_value = None
-
-    res = rectify_cve_source(input, 'CRA')
-    assert res["message"] == "cve sources updated for the CVEs"
-    assert res["status"] == "Success"
-
-
 if __name__ == '__main__':
     test_get_current_version()
     test_execute_gremlin_dsl()
@@ -329,5 +299,3 @@ if __name__ == '__main__':
     test_get_all_versions()
     test_fetch_pkg_details_via_cve()
     test_sync_all_non_cve_version()
-    test_sync_all_cve_source()
-    test_rectify_cve_source()

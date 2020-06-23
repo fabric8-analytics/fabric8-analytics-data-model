@@ -82,7 +82,7 @@ def get_latest_version_non_cve(eco, pkg, ver=""):
     if ver and ver != "-1":
         # Check if the passed latest version has cve or not
         query_str = "g.V().has('pecosystem', eco).has('pname', pkg).has('version', ver)" \
-                    ".not(outE('has_cve')).valueMap()"
+                    ".not(outE('has_snyk_cve')).valueMap()"
         payload = {
             'gremlin': query_str,
             'bindings': {
@@ -111,8 +111,14 @@ def update_non_cve_version(affected_pkgs):
         eco = affected_pkgs[key]['ecosystem']
         pkg = key
         # Get the latest non cve version
-        latest_ver = get_latest_version_non_cve(eco, pkg,
-                                                affected_pkgs[key]['latest_version'])
+        latest_non_cve = affected_pkgs[key].get('latest_non_cve_version', '')
+        if latest_non_cve and latest_non_cve != "-1":
+            logger.info("Latest non cve version found in input data.")
+            latest_ver = latest_non_cve
+        else:
+            logger.info("Latest non cve version to be fetched.")
+            latest_ver = get_latest_version_non_cve(eco, pkg,
+                                                    affected_pkgs[key]['latest_version'])
         logger.info("latest non cve version ->{lver}".format(lver=latest_ver))
         # Update the package node to include the property for non cve version
         res = update_non_cve_on_pkg(eco, pkg, latest_ver)
@@ -151,7 +157,7 @@ def get_all_versions(eco, pkg, cve_check):
     """To get all versions for a package."""
     if cve_check:
         query_str = "g.V().has('ecosystem', eco).has('name',pkg).out('has_version')" \
-                    ".not(outE('has_cve')).not(outE('has_snyk_cve')).values('version')"
+                    ".not(outE('has_snyk_cve')).values('version')"
     else:
         query_str = "g.V().has('ecosystem', eco).has('name',pkg)" \
                     ".out('has_version').values('version')"
@@ -259,50 +265,6 @@ def sync_all_non_cve_version(input):
             non_cve_ver = get_latest_version_non_cve(eco, name, latest)
             # Update the pkg node with the non cve version
             update_non_cve_on_pkg(eco, name, non_cve_ver)
-    return resp
-
-
-def sync_all_cve_source(input):
-    """Update all the cve nodes with given cve source."""
-    logger.info("Sync called for CVEs to update the latest cve sources.")
-    resp = {
-        "message": "Latest cve source rectified for the CVEs",
-        "status": "Success"
-    }
-    ecosystems = input.get("ecosystems", [{0: 0}])
-    cve_sources = input['cve_sources']
-    for eco in ecosystems:
-        # Fetch all the cve ids for the ecosystem
-        logger.info(f'Updating cve source as {cve_sources} for {eco}')
-        query_str = "g.V().has('cecosystem', '{}').values('cve_id')".format(eco)
-        payload = {
-            'gremlin': query_str
-        }
-        gremlin_response = execute_gremlin_dsl(payload)
-        result_data = get_response_data(gremlin_response, [{0: 0}])
-        # For each CVE id, find update the cve_source
-        rectify_cve_source(result_data, cve_sources)
-
-    return resp
-
-
-def rectify_cve_source(input, cve_sources):
-    """Rectify the latest version of the EPVs."""
-    query_str = "g.V().has('cve_id', '{arg0}')" \
-                ".property('cve_sources', '{arg1}').iterate();"
-    args = []
-    resp = {
-        "message": "cve sources updated for the CVEs",
-        "status": "Success"
-    }
-    for cve in input:
-        tmp = {
-            "0": cve,
-            "1": cve_sources
-        }
-        args.append(tmp)
-    result_data = batch_query_executor(query_str, args)
-    logger.info("cve sources updated for the CVEs -> {r}".format(r=result_data))
     return resp
 
 
