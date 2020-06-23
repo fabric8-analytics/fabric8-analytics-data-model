@@ -12,6 +12,7 @@ from src.cve import CVEPut, CVEDelete, CVEGet, CVEDBVersion, SnykCVEPut, SnykCVE
 from raven.contrib.flask import Sentry
 from src import config as config
 from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.exceptions import InternalServerError
 import logging
 from flask import Blueprint, current_app
 from src.utils import rectify_latest_version, sync_all_non_cve_version,\
@@ -316,7 +317,7 @@ def snyk_cves_put_delete():
 
     try:
         cve.process()
-    except ValueError as e:
+    except InternalServerError as e:
         return flask.jsonify({'error': str(e)}), 500
 
     return flask.jsonify({}), 200
