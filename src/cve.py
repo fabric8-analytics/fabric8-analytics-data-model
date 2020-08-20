@@ -64,7 +64,14 @@ class SnykCVEPut(object):
         else:
             logger.info("Latest version is affected {p} {v}".format(p=p, v=latest_version))
 
-        for ver in self._snyk_pkg_data.get('affected'):
+        if e == 'golang':
+            itr_list = self._snyk_pkg_data.get('all_ver')
+            epv_dict['gh_link'] = self._snyk_pkg_data.get('gh_link')
+            epv_dict['license'] = self._snyk_pkg_data.get('license')
+        else:
+            itr_list = self._snyk_pkg_data.get('affected')
+        
+        for ver in itr_list:
             epv_dict['version'] = ver
             query = GraphPopulator.construct_graph_nodes(epv_dict)
             success, json_response = BayesianGraph.execute(query)
@@ -82,7 +89,7 @@ class SnykCVEPut(object):
                 nodes.append((e, p, ver))
 
         # To create the latest version node if not present
-        if latest_version and latest_version != "-1":
+        if latest_version and latest_version != "-1" and e != "golang":
             epv_dict['version'] = latest_version
             logger.info("Creating latest version node {e} {p} {v}".format(e=epv_dict['ecosystem'],
                                                                           p=epv_dict['name'],
@@ -153,6 +160,14 @@ class SnykCVEPut(object):
                 title = re.sub("[\'\"]", "", ref.get('title'))
                 ref_str = title + ":" + ref.get('url')
                 query_str += "cve_v.property('references', '" + ref_str + "');"
+        
+        if vulnerability.get('ecosystem') == 'golang':
+            # These values needs to be set only for golang.
+            query_str += "cve_v.property('package_name', '" + vulnerability.get('package') + "');"
+            if vulnerability.get('vulnerableHashes') \
+                    and len(vulnerability['vulnerableHashes']) != 0:
+                for hash in vulnerability.get('vulnerableHashes'):
+                    query_str += "cve_v.property('vulnerable_hashes', '" + hash + "');"
 
         logger.info(query_str)
         logger.info(bindings)

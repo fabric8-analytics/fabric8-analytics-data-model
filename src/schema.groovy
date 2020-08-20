@@ -38,6 +38,11 @@
 
         // package github details
 
+        gh_link = mgmt.getPropertyKey('gh_link');
+        if(gh_link == null) {
+            gh_link = mgmt.makePropertyKey('gh_link').dataType(String.class).make();
+        }
+
         gh_stargazers = mgmt.getPropertyKey('gh_stargazers');
         if(gh_stargazers == null) {
             gh_stargazers = mgmt.makePropertyKey('gh_stargazers').dataType(Integer.class).make();
@@ -168,6 +173,16 @@
         snyk_cwes = mgmt.getPropertyKey('snyk_cwes');
         if(snyk_cwes == null) {
             snyk_cwes = mgmt.makePropertyKey('snyk_cwes').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        vulnerable_hashes = mgmt.getPropertyKey('vulnerable_hashes');
+        if(vulnerable_hashes == null) {
+            vulnerable_hashes = mgmt.makePropertyKey('vulnerable_hashes').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        package_name = mgmt.getPropertyKey('package_name');
+        if(package_name == null) {
+            package_name = mgmt.makePropertyKey('package_name').dataType(String.class).make();
         }
 
         // for code metrics
@@ -738,7 +753,10 @@
                 'category_runtime',
                 'source_repo',
                 'repo_user',
-                'snyk_ecosystem'
+                'snyk_ecosystem',
+                'package_name',
+                'vulnerable_hashes'
+
         ]
 
         allKeys.each { k ->

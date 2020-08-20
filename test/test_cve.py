@@ -61,6 +61,33 @@ valid_snyk_put_input = {
     ]
 }
 
+valid_snyk_put_input3 = {
+    "affected": ['v1.1', 'v1.2', 'v1.3'],
+    "all_ver": ['v1.1', 'v1.0', 'v1.2', 'v1.3', 'v1.4'],
+    "latest_version": "v1.4",
+    "ecosystem": "golang",
+    "package": "some_golang_pkg",
+    "gh_link": "http://github.com/some_golang_pkg",
+    "license": "MIT",
+    "vulnerabilities": [
+        {
+            'id': 'CVE-2018-0001',
+            'description': 'Some description.',
+            'cvssScore': 5.0,
+            'severity': 'High',
+            'malicious': True,
+            'ecosystem': 'golang',
+            'affected': ['v1.1', 'v1.2', 'v1.3'],
+            'package': 'some_golang_pkg',
+            'initiallyFixedIn': ['1.4'],
+            'cves': ['CVE-990'],
+            'cwes': ['CWS-990'],
+            'pvtVuln': False,
+            'vulnerableHashes': ['111', '222', '333']
+        }
+    ]
+}
+
 valid_snyk_put_input2 = {
     "affected": ['1.1', '1.2', '1.3', '1.4'],
     "all_ver": ['1.1', '1.0', '1.2', '1.3', '1.4'],
@@ -141,6 +168,12 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
     assert 'snyk_pvt_vul' in bindings
     assert bindings['snyk_pvt_vul']
 
+    cve = SnykCVEPut(valid_snyk_put_input3)
+    vulns = valid_snyk_put_input3['vulnerabilities']
+    query_str, bindings_dict = cve.get_qstring_for_cve_node(vulns[0])
+    assert 'package_name' in query_str
+    assert 'vulnerable_hashes' in query_str
+
 
 @patch("src.cve.update_non_cve_on_pkg")
 @patch("src.cve.GraphPopulator.construct_graph_nodes")
@@ -168,6 +201,14 @@ def test_snyk_create_pv_nodes(mock_bg, mock_gp, util):
     assert aff['numpy']['latest_version'] == "1.4"
     assert aff['numpy']['ecosystem'] == "pypi"
     assert 'latest_non_cve_version' not in aff['numpy']
+
+    cve = SnykCVEPut(valid_snyk_put_input3)
+    nodes, successfull_create, aff = cve.create_pv_nodes()
+    assert len(nodes) == 5
+    assert successfull_create is True
+    assert ('golang', 'some_golang_pkg', 'v1.4') in nodes
+    assert 'some_golang_pkg' not in aff
+    assert len(aff) == 0
 
 
 @patch("src.cve.GraphPopulator.construct_graph_nodes")
