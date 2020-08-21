@@ -70,7 +70,7 @@ class SnykCVEPut(object):
             epv_dict['license'] = self._snyk_pkg_data.get('license')
         else:
             itr_list = self._snyk_pkg_data.get('affected')
-        
+
         for ver in itr_list:
             epv_dict['version'] = ver
             query = GraphPopulator.construct_graph_nodes(epv_dict)
@@ -160,7 +160,7 @@ class SnykCVEPut(object):
                 title = re.sub("[\'\"]", "", ref.get('title'))
                 ref_str = title + ":" + ref.get('url')
                 query_str += "cve_v.property('references', '" + ref_str + "');"
-        
+
         if vulnerability.get('ecosystem') == 'golang':
             # These values needs to be set only for golang.
             query_str += "cve_v.property('package_name', '" + vulnerability.get('package') + "');"
