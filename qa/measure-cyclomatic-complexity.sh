@@ -22,7 +22,7 @@ popd
 
 if [[ "$1" == "--fail-on-error" ]]
 then
-    defects="$(radon cc -s -n D -i venv . | wc -l)"
+    defects="$(radon cc -e "test/*" -s -n D -i venv . | wc -l)"
     if [[ $defects -gt 0 ]]
     then
         echo "File(s) with too high cyclomatic complexity detected!"
