@@ -16,7 +16,7 @@ function prepare_venv() {
 
 [ "$NOVENV" == "1" ] || prepare_venv || exit 1
 
-radon mi -s -i venv .
+radon mi -e "test/*" -s -i venv .
 
 popd
 
