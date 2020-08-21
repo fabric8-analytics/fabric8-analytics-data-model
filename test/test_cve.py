@@ -62,9 +62,9 @@ valid_snyk_put_input = {
 }
 
 valid_snyk_put_input3 = {
-    "affected": ['v1.1', 'v1.2', 'v1.3'],
-    "all_ver": ['v1.1', 'v1.0', 'v1.2', 'v1.3', 'v1.4'],
-    "latest_version": "v1.4",
+    "affected": ['1.1', '1.2', '1.3'],
+    "all_ver": ['1.1', '1.0', '1.2', '1.3', '1.4'],
+    "latest_version": "1.4",
     "ecosystem": "golang",
     "package": "some_golang_pkg",
     "gh_link": "http://github.com/some_golang_pkg",
@@ -77,7 +77,7 @@ valid_snyk_put_input3 = {
             'severity': 'High',
             'malicious': True,
             'ecosystem': 'golang',
-            'affected': ['v1.1', 'v1.2', 'v1.3'],
+            'affected': ['1.1', '1.2', '1.3'],
             'package': 'some_golang_pkg',
             'initiallyFixedIn': ['1.4'],
             'cves': ['CVE-990'],
@@ -206,7 +206,7 @@ def test_snyk_create_pv_nodes(mock_bg, mock_gp, util):
     nodes, successfull_create, aff = cve.create_pv_nodes()
     assert len(nodes) == 5
     assert successfull_create is True
-    assert ('golang', 'some_golang_pkg', 'v1.4') in nodes
+    assert ('golang', 'some_golang_pkg', '1.4') in nodes
     assert 'some_golang_pkg' not in aff
     assert len(aff) == 0
 
