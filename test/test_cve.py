@@ -88,6 +88,33 @@ valid_snyk_put_input3 = {
     ]
 }
 
+valid_snyk_put_input4 = {
+    "affected": [],
+    "all_ver": ['1.1', '1.0', '1.2', '1.3', '1.4'],
+    "latest_version": "1.4",
+    "ecosystem": "golang",
+    "package": "some_golang_pkg",
+    "gh_link": "http://github.com/some_golang_pkg",
+    "license": "MIT",
+    "vulnerabilities": [
+        {
+            'id': 'CVE-2018-0001',
+            'description': 'Some description.',
+            'cvssScore': 5.0,
+            'severity': 'High',
+            'malicious': True,
+            'ecosystem': 'golang',
+            'affected': [],
+            'package': 'some_golang_pkg',
+            'initiallyFixedIn': ['1.4'],
+            'cves': ['CVE-990'],
+            'cwes': ['CWS-990'],
+            'pvtVuln': False,
+            'vulnerableHashes': ['111', '222', '333']
+        }
+    ]
+}
+
 valid_snyk_put_input2 = {
     "affected": ['1.1', '1.2', '1.3', '1.4'],
     "all_ver": ['1.1', '1.0', '1.2', '1.3', '1.4'],
@@ -170,6 +197,12 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
 
     cve = SnykCVEPut(valid_snyk_put_input3)
     vulns = valid_snyk_put_input3['vulnerabilities']
+    query_str, bindings_dict = cve.get_qstring_for_cve_node(vulns[0])
+    assert 'package_name' in query_str
+    assert 'vulnerable_hashes' in query_str
+
+    cve = SnykCVEPut(valid_snyk_put_input4)
+    vulns = valid_snyk_put_input4['vulnerabilities']
     query_str, bindings_dict = cve.get_qstring_for_cve_node(vulns[0])
     assert 'package_name' in query_str
     assert 'vulnerable_hashes' in query_str

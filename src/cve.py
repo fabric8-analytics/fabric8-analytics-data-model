@@ -28,7 +28,8 @@ class SnykCVEPut(object):
             assert 'ecosystem' in self._snyk_pkg_data
             assert 'package' in self._snyk_pkg_data
             assert len(self._snyk_pkg_data['vulnerabilities']) > 0
-            assert len(self._snyk_pkg_data['affected']) > 0
+            if self._snyk_pkg_data['ecosystem'] != "golang":
+                assert len(self._snyk_pkg_data['affected']) > 0
             for vuln in self._snyk_pkg_data['vulnerabilities']:
                 assert 'id' in vuln
                 assert 'description' in vuln
@@ -203,26 +204,27 @@ class SnykCVEPut(object):
                     raise InternalServerError("Snyk CVEIngestionError - "
                                               "While Error creating CVE node.") from e
                 else:
-                    try:
-                        # Connect CVE node with affected EPV nodes
-                        edge_query = add_affected_snyk_edge_script_template
-                        edge_bindings = self._get_default_bindings(vulnerability)
-                        for vuln_version in vulnerability.get('affected'):
-                            edge_bindings['vuln_version'] = vuln_version
-                            call_gremlin(self.prepare_payload
-                                         (edge_query, edge_bindings))
-                        logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully "
-                                    "created for CVE node: {c}".format(c=vulnerability['id']))
-                        logger.info("Updating non cve latest version (snyk)")
-                        update_non_cve_version(affected_pkgs)
-                    except ValueError as e:
-                        logger.error("Snyk CVEIngestionError - Error creating CVE edges."
-                                     "Rolling back CVE node: {c}".format(c=vulnerability['id']))
-                        call_gremlin(self.prepare_payload(
-                            snyk_roll_back_cve_template,
-                            self._get_default_bindings(vulnerability)))
-                        raise InternalServerError("Snyk CVEIngestionError - "
-                                                  "While creating CVE edges.") from e
+                    if len(vulnerability.get('affected')) > 0:
+                        try:
+                            # Connect CVE node with affected EPV nodes
+                            edge_query = add_affected_snyk_edge_script_template
+                            edge_bindings = self._get_default_bindings(vulnerability)
+                            for vuln_version in vulnerability.get('affected'):
+                                edge_bindings['vuln_version'] = vuln_version
+                                call_gremlin(self.prepare_payload
+                                             (edge_query, edge_bindings))
+                            logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully "
+                                        "created for CVE node: {c}".format(c=vulnerability['id']))
+                            logger.info("Updating non cve latest version (snyk)")
+                            update_non_cve_version(affected_pkgs)
+                        except ValueError as e:
+                            logger.error("Snyk CVEIngestionError - Error creating CVE edges."
+                                         "Rolling back CVE node: {c}".format(c=vulnerability['id']))
+                            call_gremlin(self.prepare_payload(
+                                snyk_roll_back_cve_template,
+                                self._get_default_bindings(vulnerability)))
+                            raise InternalServerError("Snyk CVEIngestionError - "
+                                                      "While creating CVE edges.") from e
         else:
             logger.error('CVEIngestionError - Error creating EPV nodes for package: {e} {p}'
                          .format(e=self._snyk_pkg_data.get('ecosystem'),
