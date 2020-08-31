@@ -68,7 +68,7 @@ valid_snyk_put_input3 = {
     "ecosystem": "golang",
     "package": "some_golang_pkg",
     "gh_link": "http://github.com/some_golang_pkg",
-    "license": "MIT",
+    "license": ["MIT", "Apache 2.0"],
     "vulnerabilities": [
         {
             'id': 'CVE-2018-0001',

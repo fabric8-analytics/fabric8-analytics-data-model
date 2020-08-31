@@ -23,7 +23,7 @@ class GraphPopulator(object):
         pkg_name = epv.get('name')
         version = epv.get('version')
         source_repo = epv.get('source_repo', '')
-        license = epv.get('license', '')
+        license = epv.get('license', [])
         gh_link = epv.get('gh_link', '')
         latest_version = epv.get('latest_version', '')
         if not latest_version:
@@ -64,10 +64,11 @@ class GraphPopulator(object):
                     source_repo=source_repo
                 )
 
-            if license:
-                ver_str += "ver.property('declared_licenses','{license}');".format(
-                    license=license
-                )
+            if license and len(license) > 0:
+                for lic in license:
+                    ver_str += "ver.property('declared_licenses','{license}');".format(
+                        license=lic
+                    )
 
             # Add package node properties
             if gh_link:
