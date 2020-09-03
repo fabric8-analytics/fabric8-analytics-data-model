@@ -175,9 +175,9 @@
             snyk_cwes = mgmt.makePropertyKey('snyk_cwes').dataType(String.class).cardinality(Cardinality.SET).make();
         }
 
-        vulnerable_hashes = mgmt.getPropertyKey('vulnerable_hashes');
-        if(vulnerable_hashes == null) {
-            vulnerable_hashes = mgmt.makePropertyKey('vulnerable_hashes').dataType(String.class).cardinality(Cardinality.SET).make();
+        vulnerable_commit_hashes = mgmt.getPropertyKey('vulnerable_commit_hashes');
+        if(vulnerable_commit_hashes == null) {
+            vulnerable_commit_hashes = mgmt.makePropertyKey('vulnerable_commit_hashes').dataType(String.class).make();
         }
 
         package_name = mgmt.getPropertyKey('package_name');
@@ -754,9 +754,7 @@
                 'source_repo',
                 'repo_user',
                 'snyk_ecosystem',
-                'package_name',
-                'vulnerable_hashes'
-
+                'package_name'
         ]
 
         allKeys.each { k ->

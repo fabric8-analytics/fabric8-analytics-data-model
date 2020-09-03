@@ -39,7 +39,10 @@ def get_response_data(json_response, data_default):
 def execute_gremlin_dsl(payloads):
     """Execute the gremlin query and return the response."""
     try:
-        resp = get_session_retry().post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payloads))
+        payload = json.dumps(payloads)
+        resp = get_session_retry().post(config.GREMLIN_SERVER_URL_REST,
+                                        headers={'Content-Length': str(len(payload))},
+                                        data=payload)
         if resp.status_code == 200:
             json_response = resp.json()
 
@@ -198,7 +201,8 @@ def call_gremlin(json_payload):
     url = config.GREMLIN_SERVER_URL_REST
     payload_str = json.dumps(json_payload)
     logger.debug('Calling Gremlin at {url} with payload {p}'.format(url=url, p=payload_str))
-    response = get_session_retry().post(url, data=payload_str)
+    response = get_session_retry().post(url, data=payload_str,
+                                        headers={'Content-Length': str(len(payload_str))})
     if response.status_code != 200:
         logger.error('Gremlin call failed ({st}): {resp}'.format(
             st=response.status_code, resp=str(response.content)

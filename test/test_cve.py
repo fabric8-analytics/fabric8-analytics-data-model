@@ -199,13 +199,15 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
     vulns = valid_snyk_put_input3['vulnerabilities']
     query_str, bindings_dict = cve.get_qstring_for_cve_node(vulns[0])
     assert 'package_name' in query_str
-    assert 'vulnerable_hashes' in query_str
+    # assert 'vulnerable_commit_hashes' in query_str
 
     cve = SnykCVEPut(valid_snyk_put_input4)
     vulns = valid_snyk_put_input4['vulnerabilities']
     query_str, bindings_dict = cve.get_qstring_for_cve_node(vulns[0])
     assert 'package_name' in query_str
-    assert 'vulnerable_hashes' in query_str
+    # assert 'vulnerable_commit_hashes' in query_str
+    # assert 'commit_hashes' in bindings_dict
+    # assert bindings_dict['commit_hashes'] == "111, 222, 333"
 
 
 @patch("src.cve.update_non_cve_on_pkg")
