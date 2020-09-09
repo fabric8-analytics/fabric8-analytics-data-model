@@ -23,25 +23,27 @@ class SnykCVEPut(object):
         """Validate input."""
         try:
             assert self._snyk_pkg_data
-            assert 'vulnerabilities' in self._snyk_pkg_data
-            assert 'affected' in self._snyk_pkg_data
-            assert 'ecosystem' in self._snyk_pkg_data
-            assert 'package' in self._snyk_pkg_data
+            assert 'vulnerabilities' in self._snyk_pkg_data, "vulnerabilities missing"
+            assert 'affected' in self._snyk_pkg_data, "affected missing"
+            assert 'ecosystem' in self._snyk_pkg_data, "ecosystem missing"
+            assert 'package' in self._snyk_pkg_data, "package missing"
             assert len(self._snyk_pkg_data['vulnerabilities']) > 0
             if self._snyk_pkg_data['ecosystem'] != "golang":
-                assert len(self._snyk_pkg_data['affected']) > 0
+                assert len(self._snyk_pkg_data['affected']) > 0, "affected count is 0"
             for vuln in self._snyk_pkg_data['vulnerabilities']:
-                assert 'id' in vuln
-                assert 'description' in vuln
+                assert 'id' in vuln, "id missing in vuln"
+                assert 'description' in vuln, "description missing in vuln"
                 # if CVE is new, the score doesn't have to be available
                 if vuln.get('cvssScore'):
-                    assert type(vuln.get('cvssScore')) == float
-                assert 'severity' in vuln
-                assert 'malicious' in vuln
-                assert 'ecosystem' in vuln
-                assert 'affected' in vuln
-                assert 'package' in vuln
-        except AssertionError:
+                    assert type(vuln.get('cvssScore')) == float, "cvssScore is not float"
+                assert 'severity' in vuln, "severity missing in vuln"
+                assert 'malicious' in vuln, "malicious missing in vuln"
+                assert 'ecosystem' in vuln, "ecosystem missing in vuln"
+                assert 'affected' in vuln, "affected missing in vuln"
+                assert 'package' in vuln, "package missing in vuln"
+        except AssertionError as e:
+            logger.error("Input data is not valid. {}".format(e))
+            logger.debug(self._snyk_pkg_data)
             raise ValueError('Invalid input')
         return True
 
