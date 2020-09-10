@@ -23,6 +23,8 @@ class GraphPopulator(object):
         pkg_name = epv.get('name')
         version = epv.get('version')
         source_repo = epv.get('source_repo', '')
+        license = epv.get('license', [])
+        gh_link = epv.get('gh_link', '')
         latest_version = epv.get('latest_version', '')
         if not latest_version:
             latest_version = get_latest_versions_for_ep(ecosystem, pkg_name)
@@ -60,6 +62,18 @@ class GraphPopulator(object):
             if source_repo:
                 ver_str += "ver.property('source_repo','{source_repo}');".format(
                     source_repo=source_repo
+                )
+
+            if license and len(license) > 0:
+                for lic in license:
+                    ver_str += "ver.property('declared_licenses','{license}');".format(
+                        license=lic
+                    )
+
+            # Add package node properties
+            if gh_link:
+                pkg_str += "pkg.property('gh_link','{gh_link}');".format(
+                    gh_link=gh_link
                 )
 
             # Query to create an edge between Package Node to Version Node

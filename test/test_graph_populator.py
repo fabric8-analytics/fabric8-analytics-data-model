@@ -250,7 +250,8 @@ def test_construct_package_query():
         }
     }
     str_package, prp_package = GraphPopulator.construct_package_query(input_json)
-    logger.info(str_package, prp_package)
+    logger.info(str_package)
+    logger.info(prp_package)
 
     assert 'access_points' in str_package
     assert "pypi" in str_package
@@ -268,7 +269,8 @@ def test_construct_package_query():
         }
     }
     str_package, prp_package = GraphPopulator.construct_package_query(input_json)
-    logger.info(str_package, prp_package)
+    logger.info(str_package)
+    logger.info(prp_package)
 
     assert 'access_points' in str_package
     assert "pypi" in str_package
@@ -296,7 +298,8 @@ def test_construct_package_query():
         }
     }
     str_package, prp_package = GraphPopulator.construct_package_query(input_json)
-    logger.info([str_package, prp_package])
+    logger.info(str_package)
+    logger.info(prp_package)
 
     assert 'access_points' in str_package
     assert "pypi" in str_package

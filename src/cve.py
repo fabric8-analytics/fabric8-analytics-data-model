@@ -23,24 +23,27 @@ class SnykCVEPut(object):
         """Validate input."""
         try:
             assert self._snyk_pkg_data
-            assert 'vulnerabilities' in self._snyk_pkg_data
-            assert 'affected' in self._snyk_pkg_data
-            assert 'ecosystem' in self._snyk_pkg_data
-            assert 'package' in self._snyk_pkg_data
+            assert 'vulnerabilities' in self._snyk_pkg_data, "vulnerabilities missing"
+            assert 'affected' in self._snyk_pkg_data, "affected missing"
+            assert 'ecosystem' in self._snyk_pkg_data, "ecosystem missing"
+            assert 'package' in self._snyk_pkg_data, "package missing"
             assert len(self._snyk_pkg_data['vulnerabilities']) > 0
-            assert len(self._snyk_pkg_data['affected']) > 0
+            if self._snyk_pkg_data['ecosystem'] != "golang":
+                assert len(self._snyk_pkg_data['affected']) > 0, "affected count is 0"
             for vuln in self._snyk_pkg_data['vulnerabilities']:
-                assert 'id' in vuln
-                assert 'description' in vuln
+                assert 'id' in vuln, "id missing in vuln"
+                assert 'description' in vuln, "description missing in vuln"
                 # if CVE is new, the score doesn't have to be available
                 if vuln.get('cvssScore'):
-                    assert type(vuln.get('cvssScore')) == float
-                assert 'severity' in vuln
-                assert 'malicious' in vuln
-                assert 'ecosystem' in vuln
-                assert 'affected' in vuln
-                assert 'package' in vuln
-        except AssertionError:
+                    assert type(vuln.get('cvssScore')) == float, "cvssScore is not float"
+                assert 'severity' in vuln, "severity missing in vuln"
+                assert 'malicious' in vuln, "malicious missing in vuln"
+                assert 'ecosystem' in vuln, "ecosystem missing in vuln"
+                assert 'affected' in vuln, "affected missing in vuln"
+                assert 'package' in vuln, "package missing in vuln"
+        except AssertionError as e:
+            logger.error("Input data is not valid. {}".format(e))
+            logger.debug(self._snyk_pkg_data)
             raise ValueError('Invalid input')
         return True
 
@@ -64,7 +67,14 @@ class SnykCVEPut(object):
         else:
             logger.info("Latest version is affected {p} {v}".format(p=p, v=latest_version))
 
-        for ver in self._snyk_pkg_data.get('affected'):
+        if e == 'golang':
+            itr_list = self._snyk_pkg_data.get('all_ver')
+            epv_dict['gh_link'] = self._snyk_pkg_data.get('gh_link')
+            epv_dict['license'] = self._snyk_pkg_data.get('license')
+        else:
+            itr_list = self._snyk_pkg_data.get('affected')
+
+        for ver in itr_list:
             epv_dict['version'] = ver
             query = GraphPopulator.construct_graph_nodes(epv_dict)
             success, json_response = BayesianGraph.execute(query)
@@ -82,7 +92,7 @@ class SnykCVEPut(object):
                 nodes.append((e, p, ver))
 
         # To create the latest version node if not present
-        if latest_version and latest_version != "-1":
+        if latest_version and latest_version != "-1" and e != "golang":
             epv_dict['version'] = latest_version
             logger.info("Creating latest version node {e} {p} {v}".format(e=epv_dict['ecosystem'],
                                                                           p=epv_dict['name'],
@@ -154,6 +164,21 @@ class SnykCVEPut(object):
                 ref_str = title + ":" + ref.get('url')
                 query_str += "cve_v.property('references', '" + ref_str + "');"
 
+        if vulnerability.get('ecosystem') == 'golang':
+            # These values needs to be set only for golang.
+            query_str += "cve_v.property('package_name', '" + vulnerability.get('package') + "');"
+            """
+            if vulnerability.get('vulnerableHashes') \
+                    and len(vulnerability['vulnerableHashes']) != 0:
+                hash_str = ""
+                for hash in vulnerability.get('vulnerableHashes'):
+                    if not hash_str:
+                        hash_str = hash
+                    else:
+                        hash_str = hash_str + ", " + hash
+                query_str += "cve_v.property('vulnerable_commit_hashes', commit_hashes);"
+                bindings['commit_hashes'] = hash_str"""
+
         logger.info(query_str)
         logger.info(bindings)
         return query_str, bindings
@@ -188,26 +213,27 @@ class SnykCVEPut(object):
                     raise InternalServerError("Snyk CVEIngestionError - "
                                               "While Error creating CVE node.") from e
                 else:
-                    try:
-                        # Connect CVE node with affected EPV nodes
-                        edge_query = add_affected_snyk_edge_script_template
-                        edge_bindings = self._get_default_bindings(vulnerability)
-                        for vuln_version in vulnerability.get('affected'):
-                            edge_bindings['vuln_version'] = vuln_version
-                            call_gremlin(self.prepare_payload
-                                         (edge_query, edge_bindings))
-                        logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully "
-                                    "created for CVE node: {c}".format(c=vulnerability['id']))
-                        logger.info("Updating non cve latest version (snyk)")
-                        update_non_cve_version(affected_pkgs)
-                    except ValueError as e:
-                        logger.error("Snyk CVEIngestionError - Error creating CVE edges."
-                                     "Rolling back CVE node: {c}".format(c=vulnerability['id']))
-                        call_gremlin(self.prepare_payload(
-                            snyk_roll_back_cve_template,
-                            self._get_default_bindings(vulnerability)))
-                        raise InternalServerError("Snyk CVEIngestionError - "
-                                                  "While creating CVE edges.") from e
+                    if len(vulnerability.get('affected')) > 0:
+                        try:
+                            # Connect CVE node with affected EPV nodes
+                            edge_query = add_affected_snyk_edge_script_template
+                            edge_bindings = self._get_default_bindings(vulnerability)
+                            for vuln_version in vulnerability.get('affected'):
+                                edge_bindings['vuln_version'] = vuln_version
+                                call_gremlin(self.prepare_payload
+                                             (edge_query, edge_bindings))
+                            logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully "
+                                        "created for CVE node: {c}".format(c=vulnerability['id']))
+                            logger.info("Updating non cve latest version (snyk)")
+                            update_non_cve_version(affected_pkgs)
+                        except ValueError as e:
+                            logger.error("Snyk CVEIngestionError - Error creating CVE edges."
+                                         "Rolling back CVE node: {c}".format(c=vulnerability['id']))
+                            call_gremlin(self.prepare_payload(
+                                snyk_roll_back_cve_template,
+                                self._get_default_bindings(vulnerability)))
+                            raise InternalServerError("Snyk CVEIngestionError - "
+                                                      "While creating CVE edges.") from e
         else:
             logger.error('CVEIngestionError - Error creating EPV nodes for package: {e} {p}'
                          .format(e=self._snyk_pkg_data.get('ecosystem'),
