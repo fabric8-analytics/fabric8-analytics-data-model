@@ -185,6 +185,16 @@
             package_name = mgmt.makePropertyKey('package_name').dataType(String.class).make();
         }
 
+        module_name = mgmt.getPropertyKey('module_name');
+        if(module_name == null) {
+            module_name = mgmt.makePropertyKey('module_name').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
+        vuln_commit_date_rules = mgmt.getPropertyKey('vuln_commit_date_rules');
+        if(vuln_commit_date_rules == null) {
+            vuln_commit_date_rules = mgmt.makePropertyKey('vuln_commit_date_rules').dataType(String.class).make();
+        }
+
         // for code metrics
 
         cm_loc = mgmt.getPropertyKey('cm_loc');
@@ -754,7 +764,8 @@
                 'source_repo',
                 'repo_user',
                 'snyk_ecosystem',
-                'package_name'
+                'package_name',
+                'module_name'
         ]
 
         allKeys.each { k ->

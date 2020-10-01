@@ -167,17 +167,11 @@ class SnykCVEPut(object):
         if vulnerability.get('ecosystem') == 'golang':
             # These values needs to be set only for golang.
             query_str += "cve_v.property('package_name', '" + vulnerability.get('package') + "');"
-            """
-            if vulnerability.get('vulnerableHashes') \
-                    and len(vulnerability['vulnerableHashes']) != 0:
-                hash_str = ""
-                for hash in vulnerability.get('vulnerableHashes'):
-                    if not hash_str:
-                        hash_str = hash
-                    else:
-                        hash_str = hash_str + ", " + hash
-                query_str += "cve_v.property('vulnerable_commit_hashes', commit_hashes);"
-                bindings['commit_hashes'] = hash_str"""
+            query_str += "cve_v.property('vuln_commit_date_rules', '" +\
+                         vulnerability.get('commitRules') + "');"
+            if vulnerability.get('moduleName'):
+                for mod in vulnerability.get('moduleName'):
+                    query_str += "cve_v.property('module_name', '" + mod + "');"
 
         logger.info(query_str)
         logger.info(bindings)
