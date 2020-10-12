@@ -77,6 +77,8 @@ valid_snyk_put_input3 = {
             'severity': 'High',
             'malicious': True,
             'ecosystem': 'golang',
+            "moduleName": ['mod1', 'mod2'],
+            "commitRules": ">#2020-09-15T13:19:13Z&<=#2020-09-16T13:19:13Z",
             'affected': ['1.1', '1.2', '1.3'],
             'package': 'some_golang_pkg',
             'initiallyFixedIn': ['1.4'],
@@ -93,6 +95,7 @@ valid_snyk_put_input4 = {
     "all_ver": ['1.1', '1.0', '1.2', '1.3', '1.4'],
     "latest_version": "1.4",
     "ecosystem": "golang",
+    "moduleName": ['mod1'],
     "package": "some_golang_pkg",
     "gh_link": "http://github.com/some_golang_pkg",
     "license": "MIT",
@@ -104,6 +107,8 @@ valid_snyk_put_input4 = {
             'severity': 'High',
             'malicious': True,
             'ecosystem': 'golang',
+            "moduleName": ['mod1'],
+            "commitRules": ">#2020-09-15T13:19:13Z&<=#2020-09-16T13:19:13Z",
             'affected': [],
             'package': 'some_golang_pkg',
             'initiallyFixedIn': ['1.4'],
@@ -199,15 +204,15 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
     vulns = valid_snyk_put_input3['vulnerabilities']
     query_str, bindings_dict = cve.get_qstring_for_cve_node(vulns[0])
     assert 'package_name' in query_str
-    # assert 'vulnerable_commit_hashes' in query_str
+    assert 'vuln_commit_date_rules' in query_str
+    assert 'module_name' in query_str
 
     cve = SnykCVEPut(valid_snyk_put_input4)
     vulns = valid_snyk_put_input4['vulnerabilities']
     query_str, bindings_dict = cve.get_qstring_for_cve_node(vulns[0])
     assert 'package_name' in query_str
-    # assert 'vulnerable_commit_hashes' in query_str
-    # assert 'commit_hashes' in bindings_dict
-    # assert bindings_dict['commit_hashes'] == "111, 222, 333"
+    assert 'vuln_commit_date_rules' in query_str
+    assert 'module_name' in query_str
 
 
 @patch("src.cve.update_non_cve_on_pkg")
