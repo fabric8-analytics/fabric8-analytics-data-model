@@ -14,7 +14,7 @@ jobs:
           - check-docstyle
           - detect-dead-code
           - detect-common-errors
-          - measure-cyclomatic-complexity
+         # - measure-cyclomatic-complexity
           - measure-maintainability-index    
     steps:
     - uses: actions/checkout@v2
