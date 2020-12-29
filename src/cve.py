@@ -5,9 +5,11 @@ from src.graph_populator import GraphPopulator
 from src.graph_manager import BayesianGraph
 from src.utils import get_timestamp, call_gremlin, update_non_cve_version, update_non_cve_on_pkg
 from werkzeug.exceptions import InternalServerError
+import os
 import re
 
 logger = logging.getLogger(__name__)
+GREMLIN_QUERY_SIZE = int(os.getenv('GREMLIN_QUERY_SIZE', 25))
 
 
 class SnykCVEPut(object):
@@ -194,6 +196,7 @@ class SnykCVEPut(object):
         succesfull_epvs, all_epvs_succesfull, affected_pkgs = self.create_pv_nodes()
         logger.info("PV nodes created for snyk")
 
+
         if all_epvs_succesfull:
             for vulnerability in self._snyk_pkg_data.get('vulnerabilities'):
                 try:
@@ -212,8 +215,26 @@ class SnykCVEPut(object):
                             # Connect CVE node with affected EPV nodes
                             edge_query = add_affected_snyk_edge_script_template
                             edge_bindings = self._get_default_bindings(vulnerability)
+                            edge_bindings['vuln_version'] = []
+                            num_offset = 0
+                            total_offset = 0
                             for vuln_version in vulnerability.get('affected'):
-                                edge_bindings['vuln_version'] = vuln_version
+                                edge_bindings['vuln_version'].append(vuln_version)
+                                num_offset += 1
+                                if num_offset == GREMLIN_QUERY_SIZE:
+                                    total_offset += num_offset
+                                    num_offset = 0
+                                    logger.info("Ingesting in batch for "
+                                                "{i}. Offset {o}".format(
+                                        i=vulnerability['id'], o=total_offset))
+                                    call_gremlin(self.prepare_payload
+                                                 (edge_query, edge_bindings))
+                                    edge_bindings['vuln_version'] = []
+                            if num_offset > 0:
+                                total_offset += num_offset
+                                logger.info("Ingesting in batch for "
+                                            "{i}. Offset {o}".format(
+                                    i=vulnerability['id'], o=total_offset))
                                 call_gremlin(self.prepare_payload
                                              (edge_query, edge_bindings))
                             logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully "
@@ -595,15 +616,10 @@ g.V().has('pecosystem','{ecosystem}')\
 
 # add edge between CVE node and Version node if it does not exist previously
 add_affected_snyk_edge_script_template = """\
-cve_v=g.V().has('snyk_vuln_id',snyk_vuln_id).next();\
-version_v=g.V().has('pecosystem', ecosystem )\
-.has('pname', name )\
-.has('version', vuln_version );\
-version_v.out('has_snyk_cve').has('snyk_vuln_id', snyk_vuln_id).tryNext().orElseGet{\
-g.V().has('pecosystem',ecosystem)\
-.has('pname', name )\
-.has('version', vuln_version)\
-.next().addEdge('has_snyk_cve', cve_v)};\
+g.V().has('snyk_vuln_id', snyk_vuln_id).as('vuln')\
+.V().has('pecosystem', ecosystem).has('pname', name ).has('version', within(vuln_version))\
+.coalesce(outE('has_snyk_cve').inV().has('snyk_vuln_id', snyk_vuln_id), addE('has_snyk_cve')\
+.to('vuln')).dedup();\
 """
 
 # delete CVE node
