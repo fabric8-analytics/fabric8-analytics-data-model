@@ -196,7 +196,6 @@ class SnykCVEPut(object):
         succesfull_epvs, all_epvs_succesfull, affected_pkgs = self.create_pv_nodes()
         logger.info("PV nodes created for snyk")
 
-
         if all_epvs_succesfull:
             for vulnerability in self._snyk_pkg_data.get('vulnerabilities'):
                 try:
@@ -226,7 +225,7 @@ class SnykCVEPut(object):
                                     num_offset = 0
                                     logger.info("Ingesting in batch for "
                                                 "{i}. Offset {o}".format(
-                                        i=vulnerability['id'], o=total_offset))
+                                                    i=vulnerability['id'], o=total_offset))
                                     call_gremlin(self.prepare_payload
                                                  (edge_query, edge_bindings))
                                     edge_bindings['vuln_version'] = []
@@ -234,7 +233,7 @@ class SnykCVEPut(object):
                                 total_offset += num_offset
                                 logger.info("Ingesting in batch for "
                                             "{i}. Offset {o}".format(
-                                    i=vulnerability['id'], o=total_offset))
+                                                i=vulnerability['id'], o=total_offset))
                                 call_gremlin(self.prepare_payload
                                              (edge_query, edge_bindings))
                             logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully "
