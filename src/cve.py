@@ -200,7 +200,6 @@ class SnykCVEPut(object):
         succesfull_epvs, all_epvs_succesfull, affected_pkgs = self.create_pv_nodes()
         logger.info("PV nodes created for snyk")
 
-
         if all_epvs_succesfull:
             for vulnerability in self._snyk_pkg_data.get('vulnerabilities'):
                 try:
