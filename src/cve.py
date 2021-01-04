@@ -189,6 +189,10 @@ class SnykCVEPut(object):
 
         return payload
 
+    def _get_packages_in_batch(self, versions, size):
+        for i in range(0, len(versions), size):
+            yield versions[i:i + size]
+
     def process(self):
         """Add or replace CVE node in graph."""
         # Create EPV nodes first and get a list of failed EPVs
@@ -215,27 +219,18 @@ class SnykCVEPut(object):
                             edge_query = add_affected_snyk_edge_script_template
                             edge_bindings = self._get_default_bindings(vulnerability)
                             edge_bindings['vuln_version'] = []
-                            num_offset = 0
                             total_offset = 0
-                            for vuln_version in vulnerability.get('affected'):
-                                edge_bindings['vuln_version'].append(vuln_version)
-                                num_offset += 1
-                                if num_offset == GREMLIN_QUERY_SIZE:
-                                    total_offset += num_offset
-                                    num_offset = 0
-                                    logger.info("Ingesting in batch for "
-                                                "{i}. Offset {o}".format(
-                                                    i=vulnerability['id'], o=total_offset))
-                                    call_gremlin(self.prepare_payload
-                                                 (edge_query, edge_bindings))
-                                    edge_bindings['vuln_version'] = []
-                            if num_offset > 0:
-                                total_offset += num_offset
+                            vuln_versions = vulnerability.get('affected')
+                            for vuln_version in self._get_packages_in_batch(vuln_versions,
+                                                                            GREMLIN_QUERY_SIZE):
+                                edge_bindings['vuln_version'] = vuln_version
+                                total_offset += len(vuln_version)
                                 logger.info("Ingesting in batch for "
                                             "{i}. Offset {o}".format(
-                                                i=vulnerability['id'], o=total_offset))
+                                    i=vulnerability['id'], o=total_offset))
                                 call_gremlin(self.prepare_payload
                                              (edge_query, edge_bindings))
+                                edge_bindings['vuln_version'] = []
                             logger.info("Snyk CVEIngestionDebug - CVE sub-graph succesfully "
                                         "created for CVE node: {c}".format(c=vulnerability['id']))
                             logger.info("Updating non cve latest version (snyk)")
