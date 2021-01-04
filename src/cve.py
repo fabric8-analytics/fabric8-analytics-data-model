@@ -227,7 +227,7 @@ class SnykCVEPut(object):
                                 total_offset += len(vuln_version)
                                 logger.info("Ingesting in batch for "
                                             "{i}. Offset {o}".format(
-                                                i=vulnerability['id'], o=total_offset))
+                                    i=vulnerability['id'], o=total_offset))
                                 call_gremlin(self.prepare_payload
                                              (edge_query, edge_bindings))
                                 edge_bindings['vuln_version'] = []
