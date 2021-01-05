@@ -11,7 +11,7 @@ psycopg2==2.7.6.1
 sqlalchemy
 minio==4.0.8
 mock
-gevent
+gevent==1.4.0
 pytest-profiling
 pytest-cov
 six

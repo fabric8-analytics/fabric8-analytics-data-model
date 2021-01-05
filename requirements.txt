@@ -54,7 +54,7 @@ flask==1.1.2
     #   raven
 future==0.18.2
     # via radon
-gevent==20.12.1
+gevent==1.4.0
     # via -r requirements.in
 gprof2dot==2019.11.30
     # via pytest-profiling
@@ -170,10 +170,6 @@ werkzeug==0.16.0
     #   pytest-flask
 zipp==3.4.0
     # via importlib-metadata
-zope.event==4.5.0
-    # via gevent
-zope.interface==5.2.0
-    # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
