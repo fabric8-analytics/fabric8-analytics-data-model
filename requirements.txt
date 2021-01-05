@@ -14,7 +14,7 @@ certifi==2018.11.29       # via minio, requests
 chardet==3.0.4            # via requests
 click==7.0                # via flask
 codecov==2.0.15
-colorama==0.3.9           # via radon
+colorama==0.4.4           # via radon
 configparser==3.5.0       # via flake8
 contextlib2==0.5.5        # via raven
 coverage==4.5.2           # via codecov
