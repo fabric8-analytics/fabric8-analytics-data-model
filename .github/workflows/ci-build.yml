@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
    
@@ -32,10 +34,12 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.6'
+    - name: Install virtualenv
+      run: pip install -U pip && pip install virtualenv
     - name: Run Unit Tests
-      run: bash qa/actions-run-tests.sh
+      run: bash qa/runtests.sh
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
-        token: 3c1d9638-afb6-40e6-85eb-3fb193000d4b
-        file: ./coverage.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./shared/coverage.xml   
