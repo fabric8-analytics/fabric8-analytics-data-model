@@ -104,11 +104,11 @@ if python3 sanitycheck.py
 then
     python3 populate_schema.py
     py.test --cov=src/ --cov-report=xml --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
+    printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
     
 else
     echo "Sanity checks failed"
 fi
-printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
 
 deactivate
 
