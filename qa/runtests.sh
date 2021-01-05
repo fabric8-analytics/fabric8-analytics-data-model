@@ -63,12 +63,6 @@ function setup_virtualenv {
 
     pip install -U pip
     pip3.6 install -r requirements.txt
-
-    # Install profiling module
-    pip3.6 install pytest-profiling
-
-    # Install pytest-coverage module
-    pip3.6 install pytest-cov
 }
 
 function destroy_virtualenv {
@@ -109,8 +103,8 @@ echo "Check for sanity of the connections..."
 if python3 sanitycheck.py
 then
     python3 populate_schema.py
-    py.test --cov=src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
-    codecov --token=3c1d9638-afb6-40e6-85eb-3fb193000d4b
+    py.test --cov=src/ --cov-report=xml --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
+    
 else
     echo "Sanity checks failed"
 fi
