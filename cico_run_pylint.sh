@@ -19,7 +19,7 @@ prep
 check_python_version
 ./qa/detect-common-errors.sh
 ./qa/detect-dead-code.sh
-./qa/measure-cyclomatic-complexity.sh
+#./qa/measure-cyclomatic-complexity.sh
 #./measure-cyclomatic-complexity.sh --fail-on-error
 ./qa/measure-maintainability-index.sh --fail-on-error
 ./qa/run-linter.sh
