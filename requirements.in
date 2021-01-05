@@ -7,7 +7,7 @@ uuid
 requests
 boto3
 boto
-psycopg2
+psycopg2==2.7.6.1
 sqlalchemy
 minio==4.0.8
 mock
