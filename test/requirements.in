@@ -1,0 +1,5 @@
+pytest
+pytest-profiling
+pytest-cov
+pytest-mock
+pytest-flask

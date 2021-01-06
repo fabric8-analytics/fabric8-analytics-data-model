@@ -63,6 +63,7 @@ function setup_virtualenv {
 
     pip install -U pip
     pip install -r requirements.txt
+    pip install -r test/requirements.txt
 }
 
 function destroy_virtualenv {
