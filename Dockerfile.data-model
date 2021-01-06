@@ -25,7 +25,6 @@ RUN yum install -y epel-release && \
 # --------------------------------------------------------------------------------------------------------------
 RUN pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@95ebbf2
 
-
 COPY ./ /tmp/f8a_data_model/
 COPY ./src /src
 RUN cd /tmp/f8a_data_model && pip3 install .
