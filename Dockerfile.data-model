@@ -23,7 +23,7 @@ RUN yum install -y epel-release && \
 
 # Note: cron daemon ( crond ) will be invoked from within entry point
 # --------------------------------------------------------------------------------------------------------------
-RUN pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@64e83a7
+RUN pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@3bca34e
 
 COPY ./ /tmp/f8a_data_model/
 COPY ./src /src
