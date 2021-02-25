@@ -324,62 +324,74 @@ class GraphPopulator(object):
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):
             gh_details = input_json.get('analyses').get('github_details').get('details', {})
-            gh_prs_last_year_opened = str(gh_details.get('updated_pull_requests', {})
-                                          .get('year', {}).get('opened', -1))
-            gh_prs_last_month_opened = str(gh_details.get('updated_pull_requests', {})
-                                           .get('month', {}).get('opened', -1))
-            gh_prs_last_year_closed = str(gh_details.get('updated_pull_requests', {})
-                                          .get('year', {}).get('closed', -1))
-            gh_prs_last_month_closed = str(gh_details.get('updated_pull_requests', {})
-                                           .get('month', {}).get('closed', -1))
-            gh_issues_last_year_opened = str(gh_details.get('updated_issues', {})
-                                             .get('year', {}).get('opened', -1))
-            gh_issues_last_month_opened = str(gh_details.get('updated_issues', {})
-                                              .get('month', {}).get('opened', -1))
-            gh_issues_last_year_closed = str(gh_details.get('updated_issues', {})
-                                             .get('year', {}).get('closed', -1))
-            gh_issues_last_month_closed = str(gh_details.get('updated_issues', {})
-                                              .get('month', {}).get('closed', -1))
-            gh_forks = str(gh_details.get('forks_count', -1))
+
+            gh_prs_last_year_opened = gh_details.get('updated_pull_requests', {})\
+                .get('year', {}).get('opened', -1)
+            gh_prs_last_month_opened = gh_details.get('updated_pull_requests', {})\
+                .get('month', {}).get('opened', -1)
+            gh_prs_last_year_closed = gh_details.get('updated_pull_requests', {})\
+                .get('year', {}).get('closed', -1)
+            gh_prs_last_month_closed = gh_details.get('updated_pull_requests', {})\
+                .get('month', {}).get('closed', -1)
+            gh_issues_last_year_opened = gh_details.get('updated_issues', {})\
+                .get('year', {}).get('opened', -1)
+            gh_issues_last_month_opened = gh_details.get('updated_issues', {})\
+                .get('month', {}).get('opened', -1)
+            gh_issues_last_year_closed = gh_details.get('updated_issues', {})\
+                .get('year', {}).get('closed', -1)
+            gh_issues_last_month_closed = gh_details.get('updated_issues', {})\
+                .get('month', {}).get('closed', -1)
+            gh_forks = gh_details.get('forks_count', -1)
             gh_refreshed_on = gh_details.get('updated_on')
-            gh_stargazers = str(gh_details.get('stargazers_count', -1))
-            gh_open_issues_count = str(gh_details.get('open_issues_count', -1))
-            gh_subscribers_count = str(gh_details.get('subscribers_count', -1))
-            gh_contributors_count = str(gh_details.get('contributors_count', -1))
+            gh_stargazers = gh_details.get('stargazers_count', -1)
+            gh_open_issues_count = gh_details.get('open_issues_count', -1)
+            gh_subscribers_count = gh_details.get('subscribers_count', -1)
+            gh_contributors_count = gh_details.get('contributors_count', -1)
             topics = gh_details.get('topics', [])
 
-            # TODO: refactor into the separate module
-            prp_package += "pkg.property('gh_prs_last_year_opened', {gh_prs_last_year_opened});" \
-                           "pkg.property('gh_prs_last_month_opened', {gh_prs_last_month_opened});" \
-                           "pkg.property('gh_prs_last_year_closed', {gh_prs_last_year_closed});" \
-                           "pkg.property('gh_prs_last_month_closed', {gh_prs_last_month_closed});" \
-                           "pkg.property('gh_issues_last_year_opened', " \
-                           "{gh_issues_last_year_opened});" \
-                           "pkg.property('gh_issues_last_month_opened', " \
-                           "{gh_issues_last_month_opened});" \
-                           "pkg.property('gh_issues_last_year_closed', " \
-                           "{gh_issues_last_year_closed});" \
-                           "pkg.property('gh_issues_last_month_closed', " \
-                           "{gh_issues_last_month_closed});" \
-                           "pkg.property('gh_forks', {gh_forks});" \
-                           "pkg.property('gh_refreshed_on', '{gh_refreshed_on}');" \
-                           "pkg.property('gh_stargazers', {gh_stargazers});" \
-                           "pkg.property('gh_open_issues_count', {gh_open_issues_count});" \
-                           "pkg.property('gh_subscribers_count', {gh_subscribers_count});" \
-                           "pkg.property('gh_contributors_count', {gh_contributors_count});".format(
-                            gh_prs_last_year_opened=gh_prs_last_year_opened,
-                            gh_prs_last_month_opened=gh_prs_last_month_opened,
-                            gh_prs_last_year_closed=gh_prs_last_year_closed,
-                            gh_prs_last_month_closed=gh_prs_last_month_closed,
-                            gh_issues_last_year_opened=gh_issues_last_year_opened,
-                            gh_issues_last_month_opened=gh_issues_last_month_opened,
-                            gh_issues_last_year_closed=gh_issues_last_year_closed,
-                            gh_issues_last_month_closed=gh_issues_last_month_closed,
-                            gh_forks=gh_forks, gh_stargazers=gh_stargazers,
-                            gh_refreshed_on=gh_refreshed_on,
-                            gh_open_issues_count=gh_open_issues_count,
-                            gh_subscribers_count=gh_subscribers_count,
-                            gh_contributors_count=gh_contributors_count)
+            # Check if values passed by workers are not -1, if yes then dont set that property
+            if gh_prs_last_year_opened != -1:
+                prp_package += "pkg.property('gh_prs_last_year_opened', {});"\
+                    .format(gh_prs_last_year_opened)
+            if gh_prs_last_month_opened != -1:
+                prp_package += "pkg.property('gh_prs_last_month_opened', {});"\
+                    .format(gh_prs_last_month_opened)
+            if gh_prs_last_year_closed != -1:
+                prp_package += "pkg.property('gh_prs_last_year_closed', {});"\
+                    .format(gh_prs_last_year_closed)
+            if gh_prs_last_month_closed != -1:
+                prp_package += "pkg.property('gh_prs_last_month_closed', {});"\
+                    .format(gh_prs_last_month_closed)
+            if gh_issues_last_year_opened != -1:
+                prp_package += "pkg.property('gh_issues_last_year_opened', {});"\
+                    .format(gh_issues_last_year_opened)
+            if gh_issues_last_month_opened != -1:
+                prp_package += "pkg.property('gh_issues_last_month_opened', {});"\
+                    .format(gh_issues_last_month_opened)
+            if gh_issues_last_year_closed != -1:
+                prp_package += "pkg.property('gh_issues_last_year_closed', {});"\
+                    .format(gh_issues_last_year_closed)
+            if gh_issues_last_month_closed != -1:
+                prp_package += "pkg.property('gh_issues_last_month_closed', {});"\
+                    .format(gh_issues_last_month_closed)
+            if gh_forks != -1:
+                prp_package += "pkg.property('gh_forks', {});".\
+                    format(gh_forks)
+            if gh_stargazers != -1:
+                prp_package += "pkg.property('gh_stargazers', {});"\
+                    .format(gh_stargazers)
+            if gh_open_issues_count != -1:
+                prp_package += "pkg.property('gh_open_issues_count', {});"\
+                    .format(gh_open_issues_count)
+            if gh_subscribers_count != -1:
+                prp_package += "pkg.property('gh_subscribers_count', {});"\
+                    .format(gh_subscribers_count)
+            if gh_contributors_count != -1:
+                prp_package += "pkg.property('gh_contributors_count', {});"\
+                    .format(gh_contributors_count)
+
+            prp_package += "pkg.property('gh_refreshed_on', '{}');"\
+                .format(gh_refreshed_on)
 
             # Add github topics
             if topics:
