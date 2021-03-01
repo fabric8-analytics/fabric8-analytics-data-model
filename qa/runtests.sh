@@ -4,7 +4,7 @@ SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 pushd "${SCRIPT_DIR}/.." > /dev/null
 
-COVERAGE_THRESHOLD=90
+COVERAGE_THRESHOLD=80
 
 export TERM=xterm
 TERM=${TERM:-xterm}
@@ -38,7 +38,7 @@ gc() {
   exit $retval
 }
 
-trap gc EXIT SIGINT
+#trap gc EXIT SIGINT
 
 # Run local instances: dynamodb, gremlin, gremlin-http, worker-ingestion, pgsql
 function start_services {
@@ -104,8 +104,12 @@ if python3 sanitycheck.py
 then
     python3 populate_schema.py
     py.test --cov=src/ --cov-report=xml --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
-    printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
-    
+    if [ $? -ne 0 ]
+    then 
+        printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
+    else
+        EXIT 1 
+    fi
 else
     echo "Sanity checks failed"
 fi
