@@ -32,7 +32,7 @@ colorama==0.4.4
     # via radon
 coverage==5.3.1
     # via codecov
-cryptography==3.3.1
+cryptography==3.3.2
     # via f8a-utils
 git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@c9d3f47#egg=f8a_utils
     # via -r requirements.in
