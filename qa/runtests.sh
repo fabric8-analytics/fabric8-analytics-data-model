@@ -106,9 +106,7 @@ then
     py.test --cov=src/ --cov-report=xml --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
     if [ $? -ne 0 ]
     then 
-        printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
-    else
-        exit 1  
+        printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}" 
     fi
 else
     echo "Sanity checks failed"
