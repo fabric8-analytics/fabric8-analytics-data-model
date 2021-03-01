@@ -108,7 +108,7 @@ then
     then 
         printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
     else
-        EXIT 1 
+        exit 1  
     fi
 else
     echo "Sanity checks failed"
