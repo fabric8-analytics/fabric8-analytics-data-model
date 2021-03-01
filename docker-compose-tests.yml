@@ -35,7 +35,7 @@ services:
       POSTGRESQL_INITIAL_DATABASE: postgres
 
   worker-api: &worker
-    image: uay.io/app-sre/bayesian-cucos-worker
+    image: quay.io/app-sre/bayesian-cucos-worker
     restart: always
     depends_on:
      - worker-db-migrations
