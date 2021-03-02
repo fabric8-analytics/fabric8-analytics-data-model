@@ -1,5 +1,5 @@
-[![Build Status](https://ci.centos.org/buildStatus/icon?job=devtools-fabric8-analytics-data-model-f8a-build-master)](https://ci.centos.org/job/devtools-fabric8-analytics-data-model-f8a-build-master/)
-
+![CI](https://github.com/fabric8-analytics/fabric8-analytics-data-model/workflows/CI/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/fabric8-analytics/fabric8-analytics-data-model/branch/master/graph/badge.svg?token=qi833miGbI)](https://codecov.io/gh/fabric8-analytics/fabric8-analytics-data-model)
 # Fabric8-Analytics Data Models
 
 This repository serves as a base for our data modeling work. You can easily connect to graphing engine (Gremlin + DynamoDB) running remotely in containers and import models to explore the graphs representing Fabric8-Analytics data.

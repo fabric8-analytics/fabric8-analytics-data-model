@@ -10,7 +10,7 @@ env.txt
 tool/
 .idea/
 all-tests.log
-
+.vscode/
 # Unit test / coverage reports
 htmlcov/
 .tox/

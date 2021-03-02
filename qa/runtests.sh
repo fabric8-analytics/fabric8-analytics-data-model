@@ -4,7 +4,7 @@ SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 pushd "${SCRIPT_DIR}/.." > /dev/null
 
-COVERAGE_THRESHOLD=90
+COVERAGE_THRESHOLD=80
 
 export TERM=xterm
 TERM=${TERM:-xterm}
@@ -38,7 +38,7 @@ gc() {
   exit $retval
 }
 
-trap gc EXIT SIGINT
+#trap gc EXIT SIGINT
 
 # Run local instances: dynamodb, gremlin, gremlin-http, worker-ingestion, pgsql
 function start_services {
@@ -62,13 +62,7 @@ function setup_virtualenv {
     printf "%sPython virtual environment initialized%s\n" "${YELLOW}" "${NORMAL}"
 
     pip install -U pip
-    pip3.6 install -r requirements.txt
-
-    # Install profiling module
-    pip3.6 install pytest-profiling
-
-    # Install pytest-coverage module
-    pip3.6 install pytest-cov
+    pip install -r requirements.txt -r test/requirements.txt
 }
 
 function destroy_virtualenv {
@@ -109,12 +103,14 @@ echo "Check for sanity of the connections..."
 if python3 sanitycheck.py
 then
     python3 populate_schema.py
-    py.test --cov=src/ --cov-report term-missing --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
-    codecov --token=3c1d9638-afb6-40e6-85eb-3fb193000d4b
+    py.test --cov=src/ --cov-report=xml --cov-fail-under=$COVERAGE_THRESHOLD -vv -s test/
+    if [ $? -ne 0 ]
+    then 
+        printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}" 
+    fi
 else
     echo "Sanity checks failed"
 fi
-printf "%stests passed%s\n\n" "${GREEN}" "${NORMAL}"
 
 deactivate
 

@@ -1,0 +1,6 @@
+pytest
+pytest-profiling
+pytest-cov
+pytest-mock
+pytest-flask
+minio==4.0.8
