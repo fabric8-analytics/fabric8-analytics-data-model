@@ -14,4 +14,4 @@ six
 raven[flask]
 radon
 werkzeug==0.16.0
-f8a_utils @ git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@c9d3f47#egg=f8a_utils
+f8a_utils @ git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@6cb0a2d#egg=f8a_utils

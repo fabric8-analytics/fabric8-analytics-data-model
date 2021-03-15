@@ -99,6 +99,11 @@ objects:
               secretKeyRef:
                 name: aws
                 key: s3-secret-access-key
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: worker
+                key: github-token
           - name: FLASK_LOGGING_LEVEL
             value: ${FLASK_LOGGING_LEVEL}
           - name: SKIP_SCHEMA
