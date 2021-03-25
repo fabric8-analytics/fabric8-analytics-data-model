@@ -8,11 +8,13 @@ LABEL name="bayesian-data-importer" \
       app-license="GPL-3.0"
 
 RUN microdnf install python3 git && microdnf clean all
-RUN pip3 install --upgrade pip --no-cache-dir
-RUN pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@6cb0a2d
 
 ADD ./ /tmp/f8a_data_model/
 ADD ./src /src
+ADD ./requirements.txt /
+
+RUN pip3 install --upgrade pip --no-cache-dir
+RUN pip3 install -r requirements.txt --no-cache-dir
 RUN cd /tmp/f8a_data_model && pip3 install . --no-cache-dir
 
 ADD scripts/entrypoint.sh /bin/entrypoint.sh
