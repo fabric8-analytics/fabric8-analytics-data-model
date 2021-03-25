@@ -324,64 +324,24 @@ class GraphPopulator(object):
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):
             gh_details = input_json.get('analyses').get('github_details').get('details', {})
-            gh_prs_last_year_opened = str(gh_details.get('updated_pull_requests', {})
-                                          .get('year', {}).get('opened', -1))
-            gh_prs_last_month_opened = str(gh_details.get('updated_pull_requests', {})
-                                           .get('month', {}).get('opened', -1))
-            gh_prs_last_year_closed = str(gh_details.get('updated_pull_requests', {})
-                                          .get('year', {}).get('closed', -1))
-            gh_prs_last_month_closed = str(gh_details.get('updated_pull_requests', {})
-                                           .get('month', {}).get('closed', -1))
-            gh_issues_last_year_opened = str(gh_details.get('updated_issues', {})
-                                             .get('year', {}).get('opened', -1))
-            gh_issues_last_month_opened = str(gh_details.get('updated_issues', {})
-                                              .get('month', {}).get('opened', -1))
-            gh_issues_last_year_closed = str(gh_details.get('updated_issues', {})
-                                             .get('year', {}).get('closed', -1))
-            gh_issues_last_month_closed = str(gh_details.get('updated_issues', {})
-                                              .get('month', {}).get('closed', -1))
-            gh_forks = str(gh_details.get('forks_count', -1))
-            gh_refreshed_on = gh_details.get('updated_on')
-            gh_stargazers = str(gh_details.get('stargazers_count', -1))
-            gh_open_issues_count = str(gh_details.get('open_issues_count', -1))
-            gh_subscribers_count = str(gh_details.get('subscribers_count', -1))
-            gh_contributors_count = str(gh_details.get('contributors_count', -1))
-            topics = gh_details.get('topics', [])
 
-            # TODO: refactor into the separate module
-            prp_package += "pkg.property('gh_prs_last_year_opened', {gh_prs_last_year_opened});" \
-                           "pkg.property('gh_prs_last_month_opened', {gh_prs_last_month_opened});" \
-                           "pkg.property('gh_prs_last_year_closed', {gh_prs_last_year_closed});" \
-                           "pkg.property('gh_prs_last_month_closed', {gh_prs_last_month_closed});" \
-                           "pkg.property('gh_issues_last_year_opened', " \
-                           "{gh_issues_last_year_opened});" \
-                           "pkg.property('gh_issues_last_month_opened', " \
-                           "{gh_issues_last_month_opened});" \
-                           "pkg.property('gh_issues_last_year_closed', " \
-                           "{gh_issues_last_year_closed});" \
-                           "pkg.property('gh_issues_last_month_closed', " \
-                           "{gh_issues_last_month_closed});" \
-                           "pkg.property('gh_forks', {gh_forks});" \
-                           "pkg.property('gh_refreshed_on', '{gh_refreshed_on}');" \
-                           "pkg.property('gh_stargazers', {gh_stargazers});" \
-                           "pkg.property('gh_open_issues_count', {gh_open_issues_count});" \
-                           "pkg.property('gh_subscribers_count', {gh_subscribers_count});" \
-                           "pkg.property('gh_contributors_count', {gh_contributors_count});".format(
-                            gh_prs_last_year_opened=gh_prs_last_year_opened,
-                            gh_prs_last_month_opened=gh_prs_last_month_opened,
-                            gh_prs_last_year_closed=gh_prs_last_year_closed,
-                            gh_prs_last_month_closed=gh_prs_last_month_closed,
-                            gh_issues_last_year_opened=gh_issues_last_year_opened,
-                            gh_issues_last_month_opened=gh_issues_last_month_opened,
-                            gh_issues_last_year_closed=gh_issues_last_year_closed,
-                            gh_issues_last_month_closed=gh_issues_last_month_closed,
-                            gh_forks=gh_forks, gh_stargazers=gh_stargazers,
-                            gh_refreshed_on=gh_refreshed_on,
-                            gh_open_issues_count=gh_open_issues_count,
-                            gh_subscribers_count=gh_subscribers_count,
-                            gh_contributors_count=gh_contributors_count)
+            prp_package += create_query("prs", gh_details["updated_pull_requests"], "month")
+            prp_package += create_query("prs", gh_details["updated_pull_requests"], "year")
+            prp_package += create_query("issues", gh_details["updated_issues"], "month")
+            prp_package += create_query("issues", gh_details["updated_issues"], "year")
+            prp_package += set_property(gh_details, 'forks_count', 'gh_forks')
+            prp_package += set_property(gh_details, 'stargazers_count', 'gh_stargazers')
+            prp_package += set_property(gh_details, 'open_issues_count', 'gh_open_issues_count')
+            prp_package += set_property(gh_details, 'subscribers_count', 'gh_subscribers_count')
+            prp_package += set_property(gh_details, 'subscribers_count', 'gh_subscribers_count')
+            prp_package += set_property(gh_details, 'contributors_count', 'gh_contributors_count')
+
+            gh_refreshed_on = gh_details.get('updated_on')
+            if gh_refreshed_on:
+                prp_package += "pkg.property('gh_refreshed_on', '{}');".format(gh_refreshed_on)
 
             # Add github topics
+            topics = gh_details.get('topics', [])
             if topics:
                 drop_props.append('topics')
                 str_package += " ".join(["pkg.property('topics', '{}');".format(t)
@@ -522,3 +482,21 @@ class GraphPopulator(object):
 
         logger.info("Gremlin Query: %s" % str_gremlin)
         return str_gremlin
+
+
+def set_property(data, type, property_name):
+    """Set properties in query."""
+    query = ''
+    if data[type] != -1:
+        query += "pkg.property('{}', {});".format(property_name, data[type])
+    return query
+
+
+def create_query(property_name, data, duration):
+    """Create gremlin query."""
+    query = ''
+    query += set_property(data[duration], "opened", "gh_" +
+                          property_name + "_last_" + duration + "_opened")
+    query += set_property(data[duration], "closed", "gh_" +
+                          property_name + "_last_" + duration + "_closed")
+    return query
