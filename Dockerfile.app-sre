@@ -13,7 +13,7 @@ RUN pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-util
 
 ADD ./ /tmp/f8a_data_model/
 ADD ./src /src
-RUN cd /tmp/f8a_data_model && pip3 install .
+RUN cd /tmp/f8a_data_model && pip3 install . --no-cache-dir
 
 ADD scripts/entrypoint.sh /bin/entrypoint.sh
 ADD populate_schema.py /populate_schema.py
