@@ -1,0 +1,21 @@
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+
+LABEL name="bayesian-data-importer" \
+      description="Data model and api services." \
+      email-ids="yzainee@redhat.com" \
+      git-url="https://github.com/fabric8-analytics/fabric8-analytics-data-model" \
+      target-file="Dockerfile" \
+      app-license="GPL-3.0"
+
+RUN microdnf install python3 git && microdnf clean all
+RUN pip3 install --upgrade pip --no-cache-dir
+RUN pip3 install git+https://github.com/fabric8-analytics/fabric8-analytics-utils.git@6cb0a2d
+
+ADD ./ /tmp/f8a_data_model/
+ADD ./src /src
+RUN cd /tmp/f8a_data_model && pip3 install .
+
+ADD scripts/entrypoint.sh /bin/entrypoint.sh
+ADD populate_schema.py /populate_schema.py
+
+ENTRYPOINT ["/bin/entrypoint.sh"]
