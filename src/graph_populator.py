@@ -487,8 +487,9 @@ class GraphPopulator(object):
 def set_property(data, type, property_name):
     """Set properties in query."""
     query = ''
-    if data[type] != -1:
-        query += "pkg.property('{}', {});".format(property_name, data[type])
+    value = data[type]
+    if value != -1 and value:
+        query += "pkg.property('{}', {});".format(property_name, value)
     return query
 
 
