@@ -61,8 +61,8 @@ function setup_virtualenv {
     fi
     printf "%sPython virtual environment initialized%s\n" "${YELLOW}" "${NORMAL}"
 
-    pip install -U pip
-    pip install -r requirements.txt -r test/requirements.txt
+    pip3 install -U pip
+    pip3 install -r requirements.txt -r test/requirements.txt
 }
 
 function destroy_virtualenv {
