@@ -323,12 +323,17 @@ class GraphPopulator(object):
 
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):
-            gh_details = input_json.get('analyses').get('github_details').get('details', {})
+            gh_details = input_json.get('analyses', {})\
+                .get('github_details', {}).get('details', {})
 
-            prp_package += create_query("prs", gh_details["updated_pull_requests"], "month")
-            prp_package += create_query("prs", gh_details["updated_pull_requests"], "year")
-            prp_package += create_query("issues", gh_details["updated_issues"], "month")
-            prp_package += create_query("issues", gh_details["updated_issues"], "year")
+            prp_package += create_query("prs",
+                                        gh_details.get("updated_pull_requests", {}), "month")
+            prp_package += create_query("prs",
+                                        gh_details.get("updated_pull_requests", {}), "year")
+
+            prp_package += create_query("issues", gh_details.get("updated_issues", {}), "month")
+            prp_package += create_query("issues", gh_details.get("updated_issues", {}), "year")
+
             prp_package += set_property(gh_details, 'forks_count', 'gh_forks')
             prp_package += set_property(gh_details, 'stargazers_count', 'gh_stargazers')
             prp_package += set_property(gh_details, 'open_issues_count', 'gh_open_issues_count')
@@ -487,7 +492,7 @@ class GraphPopulator(object):
 def set_property(data, type, property_name):
     """Set properties in query."""
     query = ''
-    value = data[type]
+    value = data.get(type, -1)
     if value != -1 and value:
         query += "pkg.property('{}', {});".format(property_name, value)
     return query
@@ -496,8 +501,8 @@ def set_property(data, type, property_name):
 def create_query(property_name, data, duration):
     """Create gremlin query."""
     query = ''
-    query += set_property(data[duration], "opened", "gh_" +
+    query += set_property(data.get(duration, {}), "opened", "gh_" +
                           property_name + "_last_" + duration + "_opened")
-    query += set_property(data[duration], "closed", "gh_" +
+    query += set_property(data.get(duration, {}), "closed", "gh_" +
                           property_name + "_last_" + duration + "_closed")
     return query
