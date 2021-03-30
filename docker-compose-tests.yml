@@ -140,7 +140,7 @@ services:
     container_name: dynamodb
 
   gremlin-http:
-    image: quay.io/openshiftio/bayesian-gremlin
+    image: quay.io/app-sre/bayesian-gremlin
     entrypoint: /bin/entrypoint-local.sh
     environment:
       - REST=1
