@@ -194,7 +194,7 @@ parameters:
   displayName: Docker image
   required: true
   name: DOCKER_IMAGE
-  value: "openshiftio/bayesian-data-model-importer"
+  value: "app-sre/bayesian-data-model-importer"
 
 - description: Image tag
   displayName: Image tag
