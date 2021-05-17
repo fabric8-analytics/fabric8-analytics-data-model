@@ -298,10 +298,10 @@ def sync_all_latest_version(file_loc):
 
 def rectify_latest_version(input):
     """Rectify the latest version of the EPVs."""
-    query_str = "g.V().has('ecosystem', '{arg0}')" \
-                ".has('name', '{arg1}')" \
-                ".property('latest_version', '{arg2}')" \
-                ".property('latest_version_last_updated', '{arg3}');"
+    query_str = "epv=[]; pkgs.each {g.V().has('ecosystem', it.eco)" \
+                ".has('name', it.name)" \
+                ".property('latest_version', it.latest)" \
+                ".property('latest_version_last_updated', it.date).select('1').fill(epv);}; epv;"
     args = []
     resp = {
         "message": "Latest version rectified for the EPVs",
@@ -313,15 +313,15 @@ def rectify_latest_version(input):
             eco = epv['ecosystem']
             pkg = epv['name']
             tmp = {
-                "0": eco,
-                "1": pkg
+                "eco": eco,
+                "name": pkg
             }
             if 'actual_latest_version' in epv:
                 latest = epv['actual_latest_version']
             else:
                 latest = get_latest_versions_for_ep(eco, pkg)
-            tmp['2'] = latest
-            tmp['3'] = cur_date
+            tmp['latest'] = latest
+            tmp['date'] = cur_date
             known_latest = ''
             if 'latest_version' in epv:
                 known_latest = epv['latest_version']
@@ -332,29 +332,18 @@ def rectify_latest_version(input):
     return resp
 
 
-def batch_query_executor(query_string, args):
+def batch_query_executor(query, args):
     """Execute the gremlin query in batches of 20."""
-    tmp_query = ""
-    counter = 0
+    tmp_list = []
     success_count = 0
     failed_count = 0
-    query = ""
     for arg in args:
-        if len(arg) == 4:
-            tmp_query = query_string.format(arg0=arg['0'], arg1=arg['1'],
-                                            arg2=arg['2'], arg3=arg['3'])
-            counter += 1
-        if len(arg) == 2:
-            tmp_query = query_string.format(arg0=arg['0'], arg1=arg['1'])
-            counter += 1
-        if counter == 1:
-            query = ""
-        query += tmp_query
+        tmp_list.append(arg)
 
-        if counter >= GREMLIN_QUERY_SIZE:
-            counter = 0
-            payload = {'gremlin': query}
+        if len(tmp_list) >= GREMLIN_QUERY_SIZE:
+            payload = {'gremlin': query, 'bindings': {'pkgs': tmp_list}}
             gremlin_response = execute_gremlin_dsl(payload)
+            tmp_list = []
             if gremlin_response is None:
                 failed_count += GREMLIN_QUERY_SIZE
                 logger.error("Error while trying to fetch data from graph. "
@@ -362,14 +351,14 @@ def batch_query_executor(query_string, args):
             else:
                 success_count += GREMLIN_QUERY_SIZE
 
-    if counter < GREMLIN_QUERY_SIZE:
-        payload = {'gremlin': query}
+    if 0 < len(tmp_list) < GREMLIN_QUERY_SIZE:
+        payload = {'gremlin': query, 'bindings': {'pkgs': tmp_list}}
         gremlin_response = execute_gremlin_dsl(payload)
         if gremlin_response is None:
-            failed_count += counter
+            failed_count += len(tmp_list)
             logger.error("Error while trying to fetch data from graph. "
                          "Expected response, got None...Query-> {q}".format(q=query))
         else:
-            success_count += counter
+            success_count += len(tmp_list)
 
     return args
