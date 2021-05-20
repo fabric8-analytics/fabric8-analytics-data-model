@@ -53,7 +53,7 @@ valid_snyk_put_input = {
             'ecosystem': 'pypi',
             'affected': ['1.1', '1.2', '1.3'],
             'package': 'numpy',
-            'initiallyFixedIn': ['1.4'],
+            'initiallyFixedIn': ['1.4', '1.6'],
             'cves': ['CVE-99'],
             'cwes': ['CWS-99'],
             'pvtVuln': True
@@ -111,7 +111,7 @@ valid_snyk_put_input4 = {
             "commitRules": ">#2020-09-15T13:19:13Z&<=#2020-09-16T13:19:13Z",
             'affected': [],
             'package': 'some_golang_pkg',
-            'initiallyFixedIn': ['1.4'],
+            'initiallyFixedIn': ['1.4', '1.6'],
             'cves': ['CVE-990'],
             'cwes': ['CWS-990'],
             'pvtVuln': False,
@@ -199,6 +199,14 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
     assert bindings['modified_date']
     assert 'snyk_pvt_vul' in bindings
     assert bindings['snyk_pvt_vul']
+    assert 'cves1' in bindings
+    assert bindings['cves1'] == 'CVE-99'
+    assert 'cwe1' in bindings
+    assert bindings['cwe1'] == 'CWS-99'
+    assert 'fixedIn1' in bindings
+    assert bindings['fixedIn1']
+    assert 'fixedIn2' in bindings
+    assert bindings['fixedIn2']
 
     cve = SnykCVEPut(valid_snyk_put_input3)
     vulns = valid_snyk_put_input3['vulnerabilities']
@@ -213,6 +221,9 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
     assert 'package_name' in query_str
     assert 'vuln_commit_date_rules' in query_str
     assert 'module_name' in query_str
+    assert 'mod1' in query_str
+    assert 'mod1' in bindings_dict
+    assert bindings_dict['mod1']
 
 
 @patch("src.cve.update_non_cve_on_pkg")
