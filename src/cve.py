@@ -149,31 +149,52 @@ class SnykCVEPut(object):
         bindings = self._get_bindings(vulnerability)
 
         if vulnerability.get('initiallyFixedIn'):
+            counter = 1
             for fix in vulnerability.get('initiallyFixedIn'):
-                query_str += "cve_v.property('fixed_in', '" + fix + "');"
+                # query_str += "cve_v.property('fixed_in', '" + fix + "');"
+                query_str += "cve_v.property('fixed_in', fixedIn" + str(counter) + ");"
+                bindings["fixedIn" + str(counter)] = fix
+                counter += 1
 
         if vulnerability.get('cves'):
+            counter = 1
             for cve in vulnerability.get('cves'):
-                query_str += "cve_v.property('snyk_cve_ids', '" + cve + "');"
+                # query_str += "cve_v.property('snyk_cve_ids', '" + cve + "');"
+                query_str += "cve_v.property('snyk_cve_ids', cves" + str(counter) + ");"
+                bindings["cves" + str(counter)] = cve
+                counter += 1
 
         if vulnerability.get('cwes'):
+            counter = 1
             for cwe in vulnerability.get('cwes'):
-                query_str += "cve_v.property('snyk_cwes', '" + cwe + "');"
+                # query_str += "cve_v.property('snyk_cwes', '" + cwe + "');"
+                query_str += "cve_v.property('snyk_cwes', cwe" + str(counter) + ");"
+                bindings["cwe" + str(counter)] = cwe
+                counter += 1
 
         if vulnerability.get('references'):
+            counter = 1
             for ref in vulnerability.get('references'):
                 title = re.sub("[\'\"]", "", ref.get('title'))
                 ref_str = title + ":" + ref.get('url')
-                query_str += "cve_v.property('references', '" + ref_str + "');"
+                # query_str += "cve_v.property('references', '" + ref_str + "');"
+                query_str += "cve_v.property('references', ref" + str(counter) + ");"
+                bindings["ref" + str(counter)] = ref_str
+                counter += 1
 
         if vulnerability.get('ecosystem') == 'golang':
             # These values needs to be set only for golang.
-            query_str += "cve_v.property('package_name', '" + vulnerability.get('package') + "');"
-            query_str += "cve_v.property('vuln_commit_date_rules', '" +\
-                         vulnerability.get('commitRules') + "');"
+            query_str += "cve_v.property('package_name', pkg_name);"
+            bindings['pkg_name'] = vulnerability.get('package')
+            query_str += "cve_v.property('vuln_commit_date_rules', commitRules);"
+            bindings['commitRules'] = vulnerability.get('commitRules')
             if vulnerability.get('moduleName'):
+                counter = 1
                 for mod in vulnerability.get('moduleName'):
-                    query_str += "cve_v.property('module_name', '" + mod + "');"
+                    # query_str += "cve_v.property('module_name', '" + mod + "');"
+                    query_str += "cve_v.property('module_name', mod" + str(counter) + ");"
+                    bindings["mod" + str(counter)] = mod
+                    counter += 1
 
         logger.info(query_str)
         logger.info(bindings)
