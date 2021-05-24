@@ -16,7 +16,10 @@ class BayesianGraph(object):
     def execute(cls, str_gremlin_dsl):
         """Execute the query prepared for the graph database."""
         logger.debug("BayesianGraph::execute() Gremlin DSL:  %s", str_gremlin_dsl)
-        payload = {'gremlin': str_gremlin_dsl}
+        if 'gremlin' not in str_gremlin_dsl:
+            payload = {'gremlin': str_gremlin_dsl}
+        else:
+            payload = str_gremlin_dsl
         response = requests.post(config.GREMLIN_SERVER_URL_REST,
                                  data=json.dumps(payload))
         json_response = response.json()

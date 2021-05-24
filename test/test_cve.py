@@ -231,7 +231,7 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
 @patch("src.cve.BayesianGraph.execute")
 def test_snyk_create_pv_nodes(mock_bg, mock_gp, util):
     """Test SnykCVEPut.create_pv_nodes()."""
-    mock_gp.return_value = "query pkg.property('latest_version', '1.2.3');"
+    mock_gp.return_value = "query pkg.property('latest_version', latest);", {"latest": "1.2.3"}
     mock_bg.return_value = True, {}
     util.return_value = "Success"
 
@@ -266,7 +266,7 @@ def test_snyk_create_pv_nodes(mock_bg, mock_gp, util):
 @patch("src.cve.BayesianGraph.execute")
 def test_snyk_create_pv_nodes_fail(mock_bg, mock_gp):
     """Test SnykCVEPut.create_pv_nodes() fail."""
-    mock_gp.return_value = 'query'
+    mock_gp.return_value = 'query', {}
     mock_bg.return_value = (False, {'error': 'something happened'})
 
     cve = SnykCVEPut(valid_snyk_put_input)
@@ -345,7 +345,7 @@ def test_cve_put_get_qstrings_for_edges():
 @patch("src.cve.BayesianGraph.execute")
 def test_create_pv_nodes(mock_bg, mock_gp):
     """Test CVEPut.create_pv_nodes()."""
-    mock_gp.return_value = "query pkg.property('latest_version', '1.2.3');"
+    mock_gp.return_value = "query pkg.property('latest_version', latest);", {"latest": "1.2.3"}
     mock_bg.return_value = True, {}
 
     cve = CVEPut(valid_put_input)
@@ -362,7 +362,7 @@ def test_create_pv_nodes(mock_bg, mock_gp):
 @patch("src.cve.BayesianGraph.execute")
 def test_create_pv_nodes_fail(mock_bg, mock_gp):
     """Test CVEPut.create_pv_nodes() fail."""
-    mock_gp.return_value = 'query'
+    mock_gp.return_value = 'query', {}
     mock_bg.return_value = (False, {'error': 'something happened'})
 
     cve = CVEPut(valid_put_input)
