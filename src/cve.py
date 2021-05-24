@@ -78,12 +78,11 @@ class SnykCVEPut(object):
 
         for ver in itr_list:
             epv_dict['version'] = ver
-            query = GraphPopulator.construct_graph_nodes(epv_dict)
-            success, json_response = BayesianGraph.execute(query)
+            query, bindings = GraphPopulator.construct_graph_nodes(epv_dict)
+            success, json_response = BayesianGraph.execute(self.prepare_payload(query, bindings))
             # Fetch the value of the latest_version from the query create
-            if not latest_version and "latest_version" in query:
-                data = query.split("\'latest_version\'")[1].split(");")[0]
-                latest_version = data.replace(",", "").strip().replace("'", "")
+            if not latest_version and "latest" in bindings:
+                latest_version = bindings['latest']
 
             if not success:
                 logger.error('CVEIngestionError - Error creating nodes for {e}/{p}/{v}: {r}'.format(
@@ -99,8 +98,8 @@ class SnykCVEPut(object):
             logger.info("Creating latest version node {e} {p} {v}".format(e=epv_dict['ecosystem'],
                                                                           p=epv_dict['name'],
                                                                           v=epv_dict['version']))
-            query = GraphPopulator.construct_graph_nodes(epv_dict)
-            BayesianGraph.execute(query)
+            query, bindings = GraphPopulator.construct_graph_nodes(epv_dict)
+            BayesianGraph.execute(self.prepare_payload(query, bindings))
 
         res = ""
         if latest_non_cve_version:
@@ -129,7 +128,8 @@ class SnykCVEPut(object):
             'fixable': vulnerability.get('fixable') or "",
             'malicious': vulnerability.get('malicious'),
             'patch_exists': vulnerability.get('patchExists') or "",
-            'snyk_pvt_vul': vulnerability.get('pvtVuln') or False
+            'snyk_pvt_vul': vulnerability.get('pvtVuln') or False,
+            'vertex_scve': 'SCVE'
         }
 
     def _get_default_bindings(self, vulnerability):
@@ -390,13 +390,12 @@ class CVEPut(object):
         for pv_dict in self._cve_dict.get('affected'):
             epv_dict = pv_dict.copy()
             epv_dict['ecosystem'] = self._cve_dict.get('ecosystem')
-            query = GraphPopulator.construct_graph_nodes(epv_dict)
-            latest_version = "-1"
+            query, bindings = GraphPopulator.construct_graph_nodes(epv_dict)
             # Fetch the value of the latest_version from the query created
-            if "latest_version" in query:
-                data = query.split("\'latest_version\'")[1].split(");")[0]
-                latest_version = data.replace(",", "").strip().replace("'", "")
-            success, json_response = BayesianGraph.execute(query)
+            latest_version = -1
+            if "latest" in bindings:
+                latest_version = bindings['latest']
+            success, json_response = BayesianGraph.execute(self.prepare_payload(query, bindings))
             e = epv_dict.get('ecosystem')
             p = epv_dict.get('name')
             v = epv_dict.get('version')
@@ -593,8 +592,8 @@ cve_v.property('modified_date', modified_date);\
 cve_snyk_node_replace_script_template = """\
 g.V().has('snyk_vuln_id',snyk_vuln_id).inE('has_snyk_cve').drop().iterate();\
 cve_v=g.V().has('snyk_vuln_id',snyk_vuln_id).has('snyk_ecosystem', ecosystem).tryNext().orElseGet{\
-graph.addVertex(label, 'SCVE',\
-'vertex_label', 'SCVE',\
+graph.addVertex(label, vertex_scve,\
+'vertex_label', vertex_scve,\
 'snyk_vuln_id', snyk_vuln_id)};\
 cve_v.property('snyk_ecosystem', ecosystem);\
 cve_v.property('cvss_scores', cvss_score);\

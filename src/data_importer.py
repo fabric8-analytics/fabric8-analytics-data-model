@@ -286,11 +286,11 @@ def create_graph_nodes(list_epv):
     failure_epvs = []
 
     for item in list_epv:
-        str_gremlin = GraphPopulator.construct_graph_nodes(item)
+        str_gremlin, bindings = GraphPopulator.construct_graph_nodes(item)
         epv = item.get('ecosystem') + ":" + item.get('name') + ":" + item.get('version')
 
         if str_gremlin:
-            payload = {'gremlin': str_gremlin}
+            payload = {'gremlin': str_gremlin, "bindings": bindings}
             print(json.dumps(payload))
             try:
                 result = requests.post(config.GREMLIN_SERVER_URL_REST, data=json.dumps(payload),

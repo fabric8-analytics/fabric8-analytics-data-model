@@ -28,65 +28,70 @@ class GraphPopulator(object):
         latest_version = epv.get('latest_version', '')
         if not latest_version:
             latest_version = get_latest_versions_for_ep(ecosystem, pkg_name)
+        bindings = {
+            "ecosystem": ecosystem,
+            "name": pkg_name,
+            "version": version,
+            "repo": source_repo,
+            "gh_link": gh_link,
+            "latest": latest_version,
+            "ep_count": ecosystem + "_pkg_count",
+            "epv_count": ecosystem + "_ver_count",
+            "last_updated": str(time.time()),
+            "vertex_p": "Package",
+            "vertex_c": "Count",
+            "vertex_v": "Version"
+        }
         if ecosystem and pkg_name and version:
             # Query to Create Package Node
             # TODO: refactor into the separate module
-            pkg_str = "pkg = g.V().has('ecosystem','{ecosystem}').has('name', '{pkg_name}')." \
-                      "tryNext().orElseGet{{g.V()." \
-                      "has('vertex_label','Count').choose(has('{ecosystem}_pkg_count')," \
-                      "sack(assign).by('{ecosystem}_pkg_count').sack(sum).by(constant(" \
-                      "1)).property('{ecosystem}_pkg_count',sack())," \
-                      "property('{ecosystem}_pkg_count',1)).iterate();" \
-                      "graph.addVertex('ecosystem', '{ecosystem}', " \
-                      "'name', '{pkg_name}', 'vertex_label', 'Package');}};" \
-                      "pkg.property('latest_version', '{latest_version}');" \
-                      "pkg.property('last_updated', {last_updated});".format(
-                        ecosystem=ecosystem, latest_version=latest_version, pkg_name=pkg_name,
-                        last_updated=str(time.time())
-                       )
+            pkg_str = "pkg = g.V().has('ecosystem',ecosystem).has('name', name)." \
+                      "tryNext().orElseGet{g.V()." \
+                      "has('vertex_label',vertex_c).choose(has(ep_count)," \
+                      "sack(assign).by(ep_count).sack(sum).by(constant(" \
+                      "1)).property(ep_count,sack())," \
+                      "property(ep_count,1)).iterate();" \
+                      "graph.addVertex('ecosystem', ecosystem, " \
+                      "'name', name, 'vertex_label', vertex_p);};" \
+                      "pkg.property('latest_version', latest);" \
+                      "pkg.property('last_updated', last_updated);"
 
             # Query to Create Version Node
             # TODO: refactor into the separate module
-            ver_str = "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', " \
-                      "'{pkg_name}').has('version', '{version}').tryNext().orElseGet{{" \
-                      "g.V().has('vertex_label','Count').choose(has('{ecosystem}_ver_count')," \
-                      "sack(assign).by('{ecosystem}_ver_count').sack(sum).by(constant(" \
-                      "1)).property('{ecosystem}_ver_count',sack())," \
-                      "property('{ecosystem}_ver_count',1)).iterate();" \
-                      "graph.addVertex('pecosystem','{ecosystem}', 'pname','{pkg_name}', " \
-                      "'version', '{version}', 'vertex_label', 'Version');}};" \
-                      "ver.property('last_updated',{last_updated});".format(
-                        ecosystem=ecosystem, pkg_name=pkg_name, version=version,
-                        last_updated=str(time.time()))
+            ver_str = "ver = g.V().has('pecosystem', ecosystem).has('pname', " \
+                      "name).has('version', version).tryNext().orElseGet{" \
+                      "g.V().has('vertex_label', vertex_c).choose(has(epv_count)," \
+                      "sack(assign).by(epv_count).sack(sum).by(constant(" \
+                      "1)).property(epv_count,sack())," \
+                      "property(epv_count,1)).iterate();" \
+                      "graph.addVertex('pecosystem',ecosystem, 'pname',name, " \
+                      "'version', version, 'vertex_label', vertex_v);};" \
+                      "ver.property('last_updated',last_updated);"
             # Add version node properties
             if source_repo:
-                ver_str += "ver.property('source_repo','{source_repo}');".format(
-                    source_repo=source_repo
-                )
+                ver_str += "ver.property('source_repo', repo);"
 
             if license and len(license) > 0:
+                counter = 1
                 for lic in license:
-                    ver_str += "ver.property('declared_licenses','{license}');".format(
-                        license=lic
-                    )
+                    ver_str += "ver.property('declared_licenses', lic" + str(counter) + ");"
+                    bindings["lic" + str(counter)] = lic
+                    counter += 1
 
             # Add package node properties
             if gh_link:
-                pkg_str += "pkg.property('gh_link','{gh_link}');".format(
-                    gh_link=gh_link
-                )
+                pkg_str += "pkg.property('gh_link', gh_link);"
 
             # Query to create an edge between Package Node to Version Node
             # TODO: refactor into the separate module
-            edge_str = "edge_c = g.V().has('pecosystem','{ecosystem}').has('pname'," \
-                       "'{pkg_name}').has('version','{version}').in(" \
+            edge_str = "edge_c = g.V().has('pecosystem', ecosystem).has('pname'," \
+                       "name).has('version', version).in(" \
                        "'has_version').tryNext()" \
-                       ".orElseGet{{pkg.addEdge('has_version', ver)}};".format(
-                        ecosystem=ecosystem, pkg_name=pkg_name, version=version)
+                       ".orElseGet{pkg.addEdge('has_version', ver)};"
 
-            return pkg_str + ver_str + edge_str
+            return pkg_str + ver_str + edge_str, bindings
         else:
-            return None
+            return None, None
 
     @classmethod
     def sanitize_text_for_query(cls, text):
