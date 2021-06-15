@@ -3,7 +3,6 @@
 import logging
 import re
 import time
-from dateutil.parser import parse as parse_datetime
 from six import string_types
 from src import config
 from src.utils import get_current_version, get_latest_version_non_cve
@@ -254,7 +253,6 @@ class GraphPopulator(object):
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time()))
         cur_latest_ver, cur_libio_latest_ver = get_current_version(ecosystem, pkg_name)
         cur_date = (datetime.utcnow()).strftime('%Y%m%d')
-        last_updated_flag = 'false'
         latest_version = cls.sanitize_text_for_query(input_json.get('latest_version'))
 
         if latest_version:
@@ -264,7 +262,6 @@ class GraphPopulator(object):
             prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
             if latest_version != cur_latest_ver:
                 prp_package += "pkg.property('latest_version_last_updated', '{}');".format(cur_date)
-                last_updated_flag = 'true'
 
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):
