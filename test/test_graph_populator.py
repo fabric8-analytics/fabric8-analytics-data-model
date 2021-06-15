@@ -215,7 +215,8 @@ def test_construct_version_query_4():
                         "dependencies": [],
                         "ecosystem": "gofedlib",
                         "name": "github.com/gorilla/mux",
-                        "version": "deb579d6e030503f430978ee229008b9bc912d40"
+                        "version": "deb579d6e030503f430978ee229008b9bc912d40",
+                        "declared_license": "BSD-Modified"
                     }
                 ]
             }
@@ -224,7 +225,6 @@ def test_construct_version_query_4():
     q = GraphPopulator.construct_version_query(input_json)
 
     assert "'declared_licenses'" in q
-    assert "'licenses'" in q
     assert "BSD-Modified" in q
 
 

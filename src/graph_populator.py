@@ -3,7 +3,6 @@
 import logging
 import re
 import time
-from dateutil.parser import parse as parse_datetime
 from six import string_types
 from src import config
 from src.utils import get_current_version, get_latest_version_non_cve
@@ -148,11 +147,6 @@ class GraphPopulator(object):
         licenses = []
         drop_props = []
         str_version = prp_version = drop_prop = ""
-        # Check if license and cve analyses succeeded. Then we refresh the property
-        if 'success' == input_json.get('analyses', {}).get('source_licenses', {}).get('status'):
-            drop_props.append('licenses')
-        if 'success' == input_json.get('analyses', {}).get('security_issues', {}).get('status'):
-            drop_props.append('cve_ids')
 
         # TODO: refactor into the separate module
         str_version += "ver = g.V().has('pecosystem', '{ecosystem}').has('pname', '{pkg_name}')." \
@@ -177,53 +171,6 @@ class GraphPopulator(object):
             prp_version += "ver.property('source_repo','{source_repo}');".format(
                 source_repo=source_repo
             )
-        # Get Code Metrics Details
-        if 'code_metrics' in input_json.get('analyses', {}):
-            count = 0
-            tot_complexity = 0.0
-            languages = input_json.get('analyses').get('code_metrics').get('details', {}) \
-                .get('languages', [])
-            for lang in languages:
-                if lang.get('metrics', {}).get('functions', {}).get(
-                        'average_cyclomatic_complexity'):
-                    count += 1
-                    tot_complexity += lang['metrics']['functions']['average_cyclomatic_complexity']
-            cm_avg_cyclomatic_complexity = str(tot_complexity / count) if count > 0 else '-1'
-            cm_loc = str(input_json.get('analyses').get('code_metrics').get('summary', {})
-                         .get('total_lines', -1))
-
-            cm_num_files = str(input_json.get('analyses').get('code_metrics').get('summary', {})
-                               .get('total_files', -1))
-            prp_version += "ver.property('cm_num_files',{cm_num_files});" \
-                           "ver.property('cm_avg_cyclomatic_complexity', " \
-                           "{cm_avg_cyclomatic_complexity});" \
-                           "ver.property('cm_loc',{cm_loc});".format(
-                            cm_num_files=cm_num_files, cm_loc=cm_loc,
-                            cm_avg_cyclomatic_complexity=cm_avg_cyclomatic_complexity)
-
-        # Get downstream details
-
-        if len(input_json.get('analyses', {}).get('redhat_downstream', {})
-                .get('summary', {}).get('all_rhsm_product_names', [])) > 0:
-            shipped_as_downstream = 'true'
-            prp_version += "ver.property('shipped_as_downstream',{shipped_as_downstream});".format(
-                shipped_as_downstream=shipped_as_downstream
-            )
-
-        # Add license details
-        if 'source_licenses' in input_json.get('analyses', {}):
-            licenses = input_json.get('analyses').get('source_licenses').get('summary', {}) \
-                .get('sure_licenses', [])
-            licenses = [cls.sanitize_text_for_query(lic) for lic in licenses]
-            prp_version += " ".join(["ver.property('licenses', '{}');"
-                                    .format(lic) for lic in licenses])
-
-        # Add CVE property if it exists
-        if 'security_issues' in input_json.get('analyses', {}):
-            cves = []
-            for cve in input_json.get('analyses', {}).get('security_issues', {}).get('details', []):
-                cves.append(cve.get('id') + ":" + str(cve.get('cvss', {}).get('score')))
-            prp_version += " ".join(["ver.property('cve_ids', '{}');".format(c) for c in cves])
 
         # Get Metadata Details
         if 'metadata' in input_json.get('analyses', {}):
@@ -270,14 +217,6 @@ class GraphPopulator(object):
 
                 prp_version += " ".join(["ver.property('declared_licenses', '{}');".format
                                          (dl) for dl in declared_licenses])
-                # Create License Node and edge from EPV
-                for lic in declared_licenses:
-                    prp_version += "lic = g.V().has('lname', '{lic}').tryNext().orElseGet{{" \
-                                   "graph.addVertex('vertex_label', 'License', 'lname', '{lic}', " \
-                                   "'last_updated',{last_updated})}}; g.V(ver).out(" \
-                                   "'has_declared_license').has('lname', '{lic}').tryNext()." \
-                                   "orElseGet{{ver.addEdge('has_declared_license', lic)}};".format(
-                                    lic=lic, last_updated=str(time.time()))
 
         if len(drop_props) > 0:
             drop_prop += "g.V().has('pecosystem','{ecosystem}').has('pname','{pkg_name}')." \
@@ -314,7 +253,6 @@ class GraphPopulator(object):
                         ecosystem=ecosystem, pkg_name=pkg_name, last_updated=str(time.time()))
         cur_latest_ver, cur_libio_latest_ver = get_current_version(ecosystem, pkg_name)
         cur_date = (datetime.utcnow()).strftime('%Y%m%d')
-        last_updated_flag = 'false'
         latest_version = cls.sanitize_text_for_query(input_json.get('latest_version'))
 
         if latest_version:
@@ -324,7 +262,6 @@ class GraphPopulator(object):
             prp_package += "pkg.property('latest_version', '{}');".format(latest_version)
             if latest_version != cur_latest_ver:
                 prp_package += "pkg.property('latest_version_last_updated', '{}');".format(cur_date)
-                last_updated_flag = 'true'
 
         # Get Github Details
         if 'github_details' in input_json.get('analyses', {}):
@@ -362,82 +299,6 @@ class GraphPopulator(object):
             drop_props.append('tokens')
             str_package += " ".join(["pkg.property('tokens', '{}');".format(t)
                                      for t in pkg_name_tokens if t])
-
-        # Get Libraries.io data
-        if 'libraries_io' in input_json.get('analyses', {}):
-            v2 = input_json['analyses']['libraries_io'].get('schema', {}).get('version', '0-0-0') \
-                 >= '2-0-0'
-            details = input_json['analyses']['libraries_io'].get('details', {})
-            libio_dependents_projects = details.get('dependents', {}).get('count', -1)
-            libio_dependents_repos = details.get('dependent_repositories', {}).get('count', -1)
-            releases = details.get('releases', {})
-            libio_total_releases = int(releases.get('count', -1))
-            libio_latest_version = libio_latest_published_at = ''
-            if libio_total_releases > 0:
-                if v2:
-                    libio_latest = releases.get('recent', [{}])[-1]  # last is latest
-                    libio_latest_published_at = libio_latest.get('published_at', '')
-                    libio_latest_version = libio_latest.get('number', '')
-                else:
-                    libio_latest_published_at = releases.get('latest', {}).get('published_at', '')
-                    libio_latest_version = releases.get('latest', {}).get('version', '')
-
-                if libio_latest_version != cur_libio_latest_ver and last_updated_flag != 'true':
-                    prp_package += "pkg.property('latest_version_last_updated', '{}');" \
-                        .format(cur_date)
-
-            if libio_latest_published_at:
-                t = libio_latest_published_at
-                p = parse_datetime(t).timetuple() if t else ''
-                published_at = str(time.mktime(p)) if p else ''
-                prp_package += "pkg.property('libio_latest_release', '{}');".format(published_at)
-
-            if details.get('dependent_repositories', {}).get('top'):
-                drop_props.append('libio_usedby')
-                for key, val in details.get('dependent_repositories', {}).get('top', {}).items():
-                    prp_package += "pkg.property('libio_usedby', '{key}:{val}');".format(
-                        key=key, val=val)
-
-            prp_package += "pkg.property('libio_dependents_projects', " \
-                           "'{libio_dependents_projects}');" \
-                           "pkg.property('libio_dependents_repos', '{libio_dependents_repos}');" \
-                           "pkg.property('libio_total_releases', '{libio_total_releases}');" \
-                           "pkg.property('libio_latest_version', '{libio_latest_version}');".format(
-                            libio_dependents_projects=libio_dependents_projects,
-                            libio_dependents_repos=libio_dependents_repos,
-                            libio_total_releases=libio_total_releases,
-                            libio_latest_version=libio_latest_version)
-
-            # Update EPV Github Release Date based on libraries_io data
-            if v2:
-                # 'recent' is list of {'number':n, 'published_at':p} including the latest
-                for release in releases.get('recent', []):
-                    rel_published = release.get('published_at', '')
-                    parsed_dt = parse_datetime(rel_published).timetuple() if rel_published else ''
-                    timestamp = time.mktime(parsed_dt) if parsed_dt else ''
-
-                    prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
-                                   "'{pkg_name}').has('version','{version}')." \
-                                   "property('gh_release_date',{gh_rel});".format(
-                                    ecosystem=ecosystem, pkg_name=pkg_name,
-                                    version=release.get('number', ''),
-                                    gh_rel=str(timestamp))
-            else:
-                if libio_latest_published_at:
-                    gh_release = time.mktime(parse_datetime(libio_latest_published_at).timetuple())
-                    prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
-                                   "'{pkg_name}')." \
-                                   "has('version','{libio_latest_version}')." \
-                                   "property('gh_release_date', {gh_rel});".format(
-                                    pkg_name=pkg_name, ecosystem=ecosystem,
-                                    libio_latest_version=libio_latest_version,
-                                    gh_rel=str(gh_release))
-                for version, release in releases.get('latest', {}).get('recent', {}).items():
-                    prp_package += "g.V().has('pecosystem','{ecosystem}').has('pname'," \
-                                   "'{pkg_name}').has('version','{version}')." \
-                                   "property('gh_release_date',{gh_rel});".format(
-                                    ecosystem=ecosystem, pkg_name=pkg_name, version=version,
-                                    gh_rel=str(time.mktime(parse_datetime(release).timetuple())))
 
         # Refresh the properties whereever applicable
         if len(drop_props) > 0:
