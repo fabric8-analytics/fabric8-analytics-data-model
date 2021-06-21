@@ -185,6 +185,11 @@
             package_name = mgmt.makePropertyKey('package_name').dataType(String.class).make();
         }
 
+        affected_versions = mgmt.getPropertyKey('affected_versions');
+        if(affected_versions == null) {
+            affected_versions = mgmt.makePropertyKey('affected_versions').dataType(String.class).cardinality(Cardinality.SET).make();
+        }
+
         module_name = mgmt.getPropertyKey('module_name');
         if(module_name == null) {
             module_name = mgmt.makePropertyKey('module_name').dataType(String.class).cardinality(Cardinality.SET).make();

@@ -208,6 +208,10 @@ def test_snyk_cve_put_get_qstring_for_cve_node():
     assert 'fixedIn2' in bindings
     assert bindings['fixedIn2']
 
+    assert 'affected1' in bindings
+    assert 'pkg_name' in bindings
+    assert bindings['pkg_name'] == "numpy"
+
     cve = SnykCVEPut(valid_snyk_put_input3)
     vulns = valid_snyk_put_input3['vulnerabilities']
     query_str, bindings_dict = cve.get_qstring_for_cve_node(vulns[0])

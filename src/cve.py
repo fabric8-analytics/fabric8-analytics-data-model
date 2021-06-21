@@ -148,6 +148,14 @@ class SnykCVEPut(object):
 
         bindings = self._get_bindings(vulnerability)
 
+        if vulnerability.get('affected'):
+            counter = 1
+            for fix in vulnerability.get('affected'):
+                # query_str += "cve_v.property('fixed_in', '" + fix + "');"
+                query_str += "cve_v.property('affected_versions', affected" + str(counter) + ");"
+                bindings["affected" + str(counter)] = fix
+                counter += 1
+
         if vulnerability.get('initiallyFixedIn'):
             counter = 1
             for fix in vulnerability.get('initiallyFixedIn'):
@@ -182,10 +190,12 @@ class SnykCVEPut(object):
                 bindings["ref" + str(counter)] = ref_str
                 counter += 1
 
-        if vulnerability.get('ecosystem') == 'golang':
-            # These values needs to be set only for golang.
+        if vulnerability.get('package'):
             query_str += "cve_v.property('package_name', pkg_name);"
             bindings['pkg_name'] = vulnerability.get('package')
+
+        if vulnerability.get('ecosystem') == 'golang':
+            # These values needs to be set only for golang.
             query_str += "cve_v.property('vuln_commit_date_rules', commitRules);"
             bindings['commitRules'] = vulnerability.get('commitRules')
             if vulnerability.get('moduleName'):
