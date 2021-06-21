@@ -16,11 +16,11 @@ function prepare_venv() {
 
 [ "$NOVENV" == "1" ] || prepare_venv || exit 1
 
-radon cc -e "test/*" -s -a -i venv .
+radon cc -e "env-test/*,test/*" -s -a -i venv .
 
 popd
 
-defects="$(radon cc -e "test/*" -s -n D -i venv . | wc -l)"
+defects="$(radon cc -e "env-test/*,test/*" -s -n D -i venv . | wc -l)"
 if [[ $defects -gt 0 ]]
 then
     echo "File(s) with too high cyclomatic complexity detected!"
