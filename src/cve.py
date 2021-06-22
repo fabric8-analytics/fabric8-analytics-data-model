@@ -159,20 +159,20 @@ class SnykCVEPut(object):
         bindings = self._get_bindings(vulnerability)
 
         # This will iterate and add all the affected versions in the bindings.
-        self._add_list_data_to_bindings('affected', 'affected_versions', 'affected',
-                                        vulnerability, query_str, bindings)
+        query_str, bindings = self._add_list_data_to_bindings(
+            'affected', 'affected_versions', 'affected', vulnerability, query_str, bindings)
 
         # This will iterate and add all the fixed_in in the bindings.
-        self._add_list_data_to_bindings('initiallyFixedIn', 'fixed_in', 'fixedIn',
-                                        vulnerability, query_str, bindings)
+        query_str, bindings = self._add_list_data_to_bindings(
+            'initiallyFixedIn', 'fixed_in', 'fixedIn', vulnerability, query_str, bindings)
 
         # This will iterate and add all the snyk_cve_ids in the bindings.
-        self._add_list_data_to_bindings('cves', 'snyk_cve_ids', 'cves',
-                                        vulnerability, query_str, bindings)
+        query_str, bindings = self._add_list_data_to_bindings(
+            'cves', 'snyk_cve_ids', 'cves', vulnerability, query_str, bindings)
 
         # This will iterate and add all the snyk_cwes in the bindings.
-        self._add_list_data_to_bindings('cwes', 'snyk_cwes', 'cwe',
-                                        vulnerability, query_str, bindings)
+        query_str, bindings = self._add_list_data_to_bindings(
+            'cwes', 'snyk_cwes', 'cwe', vulnerability, query_str, bindings)
 
         if vulnerability.get('references'):
             counter = 1
