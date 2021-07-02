@@ -157,10 +157,16 @@ class SnykCVEPut(object):
         query_str = cve_snyk_node_replace_script_template
 
         bindings = self._get_bindings(vulnerability)
-
-        # This will iterate and add all the affected versions in the bindings.
-        query_str, bindings = self._add_list_data_to_bindings(
-            'affected', 'affected_versions', 'affected', vulnerability, query_str, bindings)
+        affected = vulnerability.get('affected')
+        if affected:
+            aff_str = ""
+            for aff in affected:
+                if aff_str:
+                    aff_str += "," + aff
+                else:
+                    aff_str += aff
+            query_str += "cve_v.property('vulnerable_versions', vuln_ver);"
+            bindings['vuln_ver'] = aff_str
 
         # This will iterate and add all the fixed_in in the bindings.
         query_str, bindings = self._add_list_data_to_bindings(

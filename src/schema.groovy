@@ -185,9 +185,9 @@
             package_name = mgmt.makePropertyKey('package_name').dataType(String.class).make();
         }
 
-        affected_versions = mgmt.getPropertyKey('affected_versions');
-        if(affected_versions == null) {
-            affected_versions = mgmt.makePropertyKey('affected_versions').dataType(String.class).cardinality(Cardinality.SET).make();
+        vulnerable_versions = mgmt.getPropertyKey('vulnerable_versions');
+        if(vulnerable_versions== null) {
+            vulnerable_versions = mgmt.makePropertyKey('vulnerable_versions').dataType(String.class).make();
         }
 
         module_name = mgmt.getPropertyKey('module_name');
