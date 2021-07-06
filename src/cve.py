@@ -139,6 +139,16 @@ class SnykCVEPut(object):
             'name': vulnerability.get('package')
         }
 
+    def _add_list_data_to_bindings(self, field, prop, binder, vulnerability, query_str, bindings):
+        """Add list data to bindings."""
+        if vulnerability.get(field):
+            counter = 1
+            for fix in vulnerability.get(field):
+                query_str += "cve_v.property('" + prop + "', " + binder + str(counter) + ");"
+                bindings[binder + "" + str(counter)] = fix
+                counter += 1
+        return query_str, bindings
+
     def get_qstring_for_cve_node(self, vulnerability):
         """Construct Gremlin script that will create a CVE node.
 
@@ -147,30 +157,28 @@ class SnykCVEPut(object):
         query_str = cve_snyk_node_replace_script_template
 
         bindings = self._get_bindings(vulnerability)
+        affected = vulnerability.get('affected')
+        if affected:
+            aff_str = ""
+            for aff in affected:
+                if aff_str:
+                    aff_str += "," + aff
+                else:
+                    aff_str += aff
+            query_str += "cve_v.property('vulnerable_versions', vuln_ver);"
+            bindings['vuln_ver'] = aff_str
 
-        if vulnerability.get('initiallyFixedIn'):
-            counter = 1
-            for fix in vulnerability.get('initiallyFixedIn'):
-                # query_str += "cve_v.property('fixed_in', '" + fix + "');"
-                query_str += "cve_v.property('fixed_in', fixedIn" + str(counter) + ");"
-                bindings["fixedIn" + str(counter)] = fix
-                counter += 1
+        # This will iterate and add all the fixed_in in the bindings.
+        query_str, bindings = self._add_list_data_to_bindings(
+            'initiallyFixedIn', 'fixed_in', 'fixedIn', vulnerability, query_str, bindings)
 
-        if vulnerability.get('cves'):
-            counter = 1
-            for cve in vulnerability.get('cves'):
-                # query_str += "cve_v.property('snyk_cve_ids', '" + cve + "');"
-                query_str += "cve_v.property('snyk_cve_ids', cves" + str(counter) + ");"
-                bindings["cves" + str(counter)] = cve
-                counter += 1
+        # This will iterate and add all the snyk_cve_ids in the bindings.
+        query_str, bindings = self._add_list_data_to_bindings(
+            'cves', 'snyk_cve_ids', 'cves', vulnerability, query_str, bindings)
 
-        if vulnerability.get('cwes'):
-            counter = 1
-            for cwe in vulnerability.get('cwes'):
-                # query_str += "cve_v.property('snyk_cwes', '" + cwe + "');"
-                query_str += "cve_v.property('snyk_cwes', cwe" + str(counter) + ");"
-                bindings["cwe" + str(counter)] = cwe
-                counter += 1
+        # This will iterate and add all the snyk_cwes in the bindings.
+        query_str, bindings = self._add_list_data_to_bindings(
+            'cwes', 'snyk_cwes', 'cwe', vulnerability, query_str, bindings)
 
         if vulnerability.get('references'):
             counter = 1
@@ -182,10 +190,12 @@ class SnykCVEPut(object):
                 bindings["ref" + str(counter)] = ref_str
                 counter += 1
 
-        if vulnerability.get('ecosystem') == 'golang':
-            # These values needs to be set only for golang.
+        if vulnerability.get('package'):
             query_str += "cve_v.property('package_name', pkg_name);"
             bindings['pkg_name'] = vulnerability.get('package')
+
+        if vulnerability.get('ecosystem') == 'golang':
+            # These values needs to be set only for golang.
             query_str += "cve_v.property('vuln_commit_date_rules', commitRules);"
             bindings['commitRules'] = vulnerability.get('commitRules')
             if vulnerability.get('moduleName'):
