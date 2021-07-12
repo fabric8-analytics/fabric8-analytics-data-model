@@ -502,6 +502,7 @@ def test_snyk_cve_delete_prepare_payload():
     json_payload = cve.prepare_payload()
 
     assert 'gremlin' in json_payload
+    assert 'vulnerable_versions' in json_payload['gremlin']
 
     assert 'bindings' in json_payload
     bindings = json_payload['bindings']
