@@ -657,6 +657,7 @@ g.V().has('cve_id',cve_id)\
 snyk_cve_node_delete_script_template = """\
 g.V().has('snyk_vuln_id',snyk_vuln_id)\
 .property('modified_date',timestamp)\
+.property('vulnerable_versions','')\
 .inE('has_snyk_cve').drop().iterate();\
 """
 
