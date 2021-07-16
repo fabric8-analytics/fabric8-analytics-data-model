@@ -601,6 +601,9 @@ cve_v.property('modified_date', modified_date);\
 # add or replace CVE node
 cve_snyk_node_replace_script_template = """\
 g.V().has('snyk_vuln_id',snyk_vuln_id).inE('has_snyk_cve').drop().iterate();\
+g.V().has('snyk_vuln_id',snyk_vuln_id).properties('fixed_in').drop().iterate(); \
+g.V().has('snyk_vuln_id',snyk_vuln_id).properties('snyk_cve_ids').drop().iterate(); \
+g.V().has('snyk_vuln_id',snyk_vuln_id).properties('snyk_cwes').drop().iterate(); \
 cve_v=g.V().has('snyk_vuln_id',snyk_vuln_id).has('snyk_ecosystem', ecosystem).tryNext().orElseGet{\
 graph.addVertex(label, vertex_scve,\
 'vertex_label', vertex_scve,\
