@@ -57,7 +57,7 @@ idna==2.10
     # via requests
 itsdangerous==1.1.0
     # via flask
-jinja2==2.11.2
+jinja2==2.11.3
     # via flask
 jmespath==0.10.0
     # via
@@ -83,11 +83,14 @@ radon==4.3.2
     # via -r requirements.in
 raven[flask]==6.10.0
     # via -r requirements.in
+requests-futures==1.0.0
+    # via f8a-utils
 requests==2.25.1
     # via
     #   -r requirements.in
     #   codecov
     #   f8a-utils
+    #   requests-futures
 s3transfer==0.3.3
     # via boto3
 semver==2.13.0
@@ -117,5 +120,6 @@ werkzeug==0.16.0
     # via
     #   -r requirements.in
     #   flask
+
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
