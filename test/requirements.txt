@@ -16,10 +16,6 @@ flask==1.1.2
     # via pytest-flask
 gprof2dot==2019.11.30
     # via pytest-profiling
-importlib-metadata==3.3.0
-    # via
-    #   pluggy
-    #   pytest
 iniconfig==1.1.1
     # via pytest
 itsdangerous==1.1.0
@@ -63,13 +59,9 @@ six==1.15.0
     #   python-dateutil
 toml==0.10.2
     # via pytest
-typing-extensions==3.7.4.3
-    # via importlib-metadata
-urllib3==1.26.2
+urllib3==1.26.5
     # via minio
 werkzeug==0.16.0
     # via
     #   flask
     #   pytest-flask
-zipp==3.4.0
-    # via importlib-metadata
