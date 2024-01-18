@@ -122,6 +122,27 @@ def test_insertion_not_exists():
         logger.error("Traceback for latest failure in import call: %s" % tb)
 
 
+def test_insertion_invalid():
+    """Test if the stored e/p/v data can be retrieved back."""
+    list_epv = [
+        {
+            "version": "0.0.0",
+            "name": "INVALID",
+            "ecosystem": "INVALID"
+        }
+    ]
+
+    # if True:  # with pytest.raises(RuntimeError):
+    try:
+        report = import_epv_from_s3_http(list_epv, select_doc=['not_exists_data'])
+        logger.info(report)
+        assert report['status'] == "Success"
+        assert report["count_imported_EPVs"] == 0
+    except RuntimeError:
+        tb = traceback.format_exc()
+        logger.error("Traceback for latest failure in import call: %s" % tb)
+
+
 if __name__ == '__main__':
     test_insertion()
     test_insertion_not_exists()
